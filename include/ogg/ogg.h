@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.11 2001/05/24 01:04:36 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.12 2001/11/24 07:49:31 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -154,6 +154,8 @@ extern int      ogg_stream_clear(ogg_stream_state *os);
 extern int      ogg_stream_reset(ogg_stream_state *os);
 extern int      ogg_stream_destroy(ogg_stream_state *os);
 extern int      ogg_stream_eos(ogg_stream_state *os);
+
+extern void     ogg_page_checksum_set(ogg_page *og);
 
 extern int      ogg_page_version(ogg_page *og);
 extern int      ogg_page_continued(ogg_page *og);

@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.18 2001/11/24 06:19:46 xiphmont Exp $
+ last mod: $Id: framing.c,v 1.19 2001/11/24 07:49:32 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -244,19 +244,27 @@ static void _os_lacing_expand(ogg_stream_state *os,int needed){
 /* Direct table CRC; note that this will be faster in the future if we
    perform the checksum silmultaneously with other copies */
 
-static void _os_checksum(ogg_page *og){
-  ogg_uint32_t crc_reg=0;
-  int i;
+void ogg_page_checksum_set(ogg_page *og){
+  if(og){
+    ogg_uint32_t crc_reg=0;
+    int i;
 
-  for(i=0;i<og->header_len;i++)
-    crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->header[i]];
-  for(i=0;i<og->body_len;i++)
-    crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->body[i]];
-  
-  og->header[22]=crc_reg&0xff;
-  og->header[23]=(crc_reg>>8)&0xff;
-  og->header[24]=(crc_reg>>16)&0xff;
-  og->header[25]=(crc_reg>>24)&0xff;
+    /* safety; needed for API behavior, but not framing code */
+    og->header[22]=0;
+    og->header[23]=0;
+    og->header[24]=0;
+    og->header[25]=0;
+    
+    for(i=0;i<og->header_len;i++)
+      crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->header[i]];
+    for(i=0;i<og->body_len;i++)
+      crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->body[i]];
+    
+    og->header[22]=crc_reg&0xff;
+    og->header[23]=(crc_reg>>8)&0xff;
+    og->header[24]=(crc_reg>>16)&0xff;
+    og->header[25]=(crc_reg>>24)&0xff;
+  }
 }
 
 /* submit data to the internal buffer of the framing engine */
@@ -424,7 +432,7 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   
   /* calculate the checksum */
   
-  _os_checksum(og);
+  ogg_page_checksum_set(og);
 
   /* done */
   return(1);
@@ -573,7 +581,7 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
     log.header_len=oy->headerbytes;
     log.body=page+oy->headerbytes;
     log.body_len=oy->bodybytes;
-    _os_checksum(&log);
+    ogg_page_checksum_set(&log);
     
     /* Compare */
     if(memcmp(chksum,page+22,4)){

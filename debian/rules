@@ -55,12 +55,11 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-
 	dh_movefiles
 
 	dh_installdocs debian/tmp/usr/share/doc/libogg-1.0rc2/*
 	dh_installexamples
-	dh_installmanpages
+	dh_installman
 	dh_installchangelogs
 	dh_link
 	dh_strip

@@ -30,6 +30,8 @@ Directory:
 
 ./win32		Win32 projects and build automation
 
+./mac		MacOS 9 projects and build automation
+
 WHAT IS OGG?:
 
 Ogg project codecs use the Ogg bitstream format to arrange the raw,
@@ -81,4 +83,22 @@ You can also run one of the batch files from the commandline.
 
 E.g.: build_ogg_dynamic
 
-$Id: README,v 1.7 2000/11/08 08:41:14 jack Exp $
+BUILDING ON MACOS 9:
+
+Ogg on MacOS 9 is built using CodeWarrior 5.3.  To build it, first
+open ogg/mac/libogg.mcp, switch to the "Targets" pane, select
+everything, and make the project.  In ogg/mac/Output you will now have
+both debug and final versions of Ogg shared libraries to link your
+projects against.
+
+To build a project using Ogg, add access paths to your CodeWarrior
+project for the ogg/include and ogg/mac/Output folders.  Be sure that
+"interpret DOS and Unix paths" is turned on in your project; it can be
+found in the "access paths" pane in your project settings.  Now simply
+add the shared libraries you need to your project (OggLib at least)
+and #include "ogg/ogg.h" wherever you need to acces Ogg functionality.
+
+(Build instructions for Ogg codecs such as vorbis are similar and may
+be found in those source modules' README files)
+
+$Id: README,v 1.8 2000/11/22 06:20:07 xiphmont Exp $

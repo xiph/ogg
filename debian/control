@@ -1,5 +1,5 @@
 Source: libogg
-Section: devel
+Section: libs
 Priority: optional
 Maintainer: Christopher L Cheney <ccheney@debian.org>
 Build-Depends: debhelper
@@ -7,13 +7,15 @@ Standards-Version: 3.1.1
 
 Package: libogg-dev
 Architecture: any
+Section: devel
 Depends: libogg0 (= ${Source-Version}), libc6-dev
 Description: Ogg Bitstream Library Development
- The libogg-devel package contains the header files and documentation
+ The libogg-dev package contains the header files and documentation
  needed to develop applications with libogg.
 
 Package: libogg0
 Architecture: any
+Section: libs
 Depends: ${shlibs:Depends}
 Description: Ogg Bitstream Library
  Libogg is a library for manipulating ogg bitstreams.  It handles

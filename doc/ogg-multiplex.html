@@ -177,14 +177,25 @@ least the following complications:<p>
 for this reason, the point at which a video frame changes to the next
 frame is usually a strictly defined offset within the frme 'period'.
 That is, video at 50fps could just as easily define frame transitions
-<.015, .035, .055...> as at <.00, .02, .04...>
+<.015, .035, .055...> as at <.00, .02, .04...>.
 
 <li>frame rates often include drop-frames, leap-frames or other
-rational-but-non-integer timings
+rational-but-non-integer timings.
 
 <li>Decode must begin at a 'keyframe' or 'I frame'.  Keyframes usually
 occur relatively seldom.
 </ul>
+
+The first two points can be handled straightforwardly via the fact
+that the codec has complete control mapping granule position to
+absolute time; non-integer frame rates and offsets can be set in the
+codec's initial header, and the rest is just arithmetic.<p>
+
+The third point appears trickier at first glance, but it too can be
+handled through the granule position mapping mechanism.  Here we
+arrange the granule position in such a way that granule positions of
+keyframes are easy to find.  Divide the granule position <p>
+
 
 
 
@@ -253,27 +264,6 @@ continuous (such as Vorbis) or discontinuous (such as Writ).
 
 <h3>discontinuous granule position</h3>
 
-it is able to definitively  from the Ogg layer
-
-
-
-
-Topics:
-
-Granpos mapping set by decoder
-  header decode (codec plugin) required to decode granpos
-    rationale: 
-  must map back to absolute time
-
-Examples of granpos mappings
-  a) Vorbis (fixed rate)
-  b) Theora (bit-field for keyframe)
-  c) absolute time
-
-Continuous Stream Type
-Discontinuous stream type
-
-MNG: variable framerate, possibly discontinuous; two code mappings?
 
 flushes around keyframes?  RFC suggestion: repaginating or building a
   stream this way is nice but not required
@@ -314,7 +304,6 @@ This excerpt discusses:
 &lt;mau&gt;      ok, so what would be the strategy? seek to an arbitrary time,
            and wait for a keyframe?
 &lt;mau&gt;      yeah, currently there is the hack in granulepos, right?
-&lt;mau&gt;      maybe just a macro?
 &lt;danx0r&gt;   I've heard about it -- some sort of bitfield division
 &lt;danx0r&gt;   lower bits are frames after a key
 &lt;xiphmont&gt; you can seek to a given location.  the hack in granpos
@@ -340,7 +329,7 @@ This excerpt discusses:
 &lt;mau&gt;      it is also a good strategy, guess it depends on the player
 &lt;xiphmont&gt; rillian: the stream is set up to have a maximum keyframe spacing.  
 	   Granpos is updated by a fixed amount at each keyframe.  The 
-	   granpos is not [necessarily] monotonically increasing
+	   granpos is not [necessarily] linearly increasing
 &lt;Mike&gt;     true. 
 &lt;rillian&gt;  it's monotonic, but not (necessarily) linear
 &lt;mau&gt;      xiphmont: so ideally the player would look at the granulepos and 
@@ -436,13 +425,9 @@ This excerpt discusses:
 &lt;rillian&gt;  the concern as I understand was that there wasn't a page/packet 
 	   that was specifically labelled 'this is a keyframe' at the ogg layer
 &lt;xiphmont&gt; rillian: same way vorbis does.  Each frame does have a granpos,
-	    they're just not monotonic.
+	    they're just not linear.
 &lt;rillian&gt;  s/wasn't/might not be/
 &lt;xiphmont&gt; ah, yes there is.
-&lt;derf&gt;     Wait, they're not monotonic?
-&lt;xiphmont&gt; no, just guaranteed to increase.
-&lt;derf&gt;     Oh... whew.
-&lt;derf&gt;     Different definitions of monotonic.
 &lt;mau&gt;      sorry for being slow, but when you say "Frame" is this a packet, 
 	   a page?
 &lt;derf&gt;     I thought the encoding was 
@@ -455,7 +440,6 @@ This excerpt discusses:
 &lt;mau&gt;      k, but if you put many packets in a page, then you do not have one 
 	   for each, right? It is just a matter of counting up, and not 
 	   allowing keyframes in the middle of a page?
-&lt;xiphmont&gt; 'monotonically increasing' == 'increasing by one'
 &lt;derf&gt;     mau: No.
 &lt;derf&gt;     You can still put keyframes anywhere.
 &lt;xiphmont&gt; actually, my Ogg algos counts forward from previous page generally.

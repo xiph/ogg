@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: pack variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.14.2.15 2003/07/20 07:32:27 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.14.2.16 2003/07/21 20:32:33 xiphmont Exp $
 
  ********************************************************************/
 
@@ -640,7 +640,14 @@ long oggpackB_bytes(oggpack_buffer *b){
 long oggpackB_bits(oggpack_buffer *b){
   return oggpack_bits(b);
 }
-  
+
+int oggpack_eop(oggpack_buffer *b){
+  return(b->headend<0?-1:0);
+}  
+
+int oggpackB_eop(oggpack_buffer *b){
+  return oggpack_eop(b);
+}  
 
 /* Self test of the bitwise routines; everything else is based on
    them, so they damned well better be solid. */

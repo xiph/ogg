@@ -1,4 +1,5 @@
-# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
+# Generated automatically from Makefile.in by configure.
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -15,7 +16,6 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-
 prefix = /usr/local
 exec_prefix = ${prefix}
 
@@ -39,15 +39,15 @@ pkgincludedir = $(includedir)/libogg
 
 top_builddir = ../..
 
-ACLOCAL = aclocal-1.4
+ACLOCAL = aclocal
 AUTOCONF = autoconf
-AUTOMAKE = automake-1.4
+AUTOMAKE = automake
 AUTOHEADER = autoheader
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL} $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = ${INSTALL} -m 644
-INSTALL_SCRIPT = ${INSTALL}
+INSTALL_SCRIPT = ${INSTALL_PROGRAM}
 transform = s,x,x,
 
 NORMAL_INSTALL = :
@@ -56,8 +56,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-host_alias = 
-host_triplet = i686-pc-linux-gnu
+host_alias = powerpc-unknown-linux-gnu
+host_triplet = powerpc-unknown-linux-gnu
 AS = @AS@
 CC = gcc
 CFLAGS = -O20 -ffast-math -fsigned-char -g -O2 -DUSE_POSIX_THREADS
@@ -72,7 +72,7 @@ LIB_AGE = 0
 LIB_CURRENT = 6
 LIB_REVISION = 0
 LN_S = ln -s
-MAKEINFO = /home/xiphmont/MotherfishCVS/ogg/missing makeinfo
+MAKEINFO = makeinfo
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
 OPT = 

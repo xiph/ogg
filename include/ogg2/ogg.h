@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.1.2.5 2003/07/20 07:32:27 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.1.2.6 2003/07/21 20:32:32 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -74,6 +74,7 @@ extern int   oggpack_read(oggpack_buffer *b,int bits,unsigned long *ret);
 extern long  oggpack_read1(oggpack_buffer *b);
 extern long  oggpack_bytes(oggpack_buffer *b);
 extern long  oggpack_bits(oggpack_buffer *b);
+extern int   oggpack_eop(oggpack_buffer *b);
 
 extern void  oggpackB_writeinit(oggpack_buffer *b,ogg_buffer_state *bs);
 extern ogg_reference *oggpackB_writebuffer(oggpack_buffer *b);
@@ -89,6 +90,7 @@ extern int   oggpackB_read(oggpack_buffer *b,int bits,unsigned long *ret);
 extern long  oggpackB_read1(oggpack_buffer *b);
 extern long  oggpackB_bytes(oggpack_buffer *b);
 extern long  oggpackB_bits(oggpack_buffer *b);
+extern int   oggpackB_eop(oggpack_buffer *b);
 
 /* Ogg BITSTREAM PRIMITIVES: encoding **************************/
 extern long     ogg_sync_bufferout(ogg_sync_state *oy, unsigned char **buffer);

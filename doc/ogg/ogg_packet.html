@@ -1,0 +1,78 @@
+<html>
+
+<head>
+<title>libogg - datatype - ogg_packet</title>
+<link rel=stylesheet href="style.css" type="text/css">
+</head>
+
+<body bgcolor=white text=black link="#5555ff" alink="#5555ff" vlink="#5555ff">
+<table border=0 width=100%>
+<tr>
+<td><p class=tiny>libogg documentation</p></td>
+<td align=right><p class=tiny>libogg version 1.25 - 20000615</p></td>
+</tr>
+</table>
+
+<h1>ogg_packet</h1>
+
+<p><i>declared in "ogg/ogg.h"</i></p>
+
+<p>
+The ogg_packet struct encapsulates the data for a single raw packet of data.
+<p>
+
+<table border=0 width=100% color=black cellspacing=0 cellpadding=7>
+<tr bgcolor=#cccccc>
+	<td>
+<pre><b>
+typedef struct {
+  unsigned char *packet;
+  long  bytes;
+  long  b_o_s;
+  long  e_o_s;
+
+  ogg_int64_t  frameno;
+  ogg_int64_t  packetno;       /* sequence number for decode; the framing
+                             knows where there's a hole in the data,
+                             but we need coupling so that the codec
+                             (which is in a seperate abstraction
+                             layer) also knows about the gap */
+
+} ogg_packet;
+</b></pre>
+	</td>
+</tr>
+</table>
+
+<h3>Relevant Struct Members</h3>
+<dl>
+<dt><i>packet</i></dt>
+<dd>Pointer to data in form of a packet.</dd>
+<dt><i>bytes</i></dt>
+<dd>Indicates size in bytes of the data within this page.  Pages can be of arbitrary size.</dd>
+<dt><i>b_o_s</i></dt>
+<dd>Flag indicating whether this page is at the beginning of a bitstream.  <tt>1</tt> indicates beginning page, <tt>0</tt> indicates any other position in the stream.</dd>
+<dt><i>e_o_s</i></dt>
+<dd>Flag indicating whether this page is at the end of a bitstream.  <tt>1</tt> indicates ending page, <tt>0</tt> indicates any other position in the stream.</dd>
+<dt><i>frameno</i></dt>
+<dd>Sequential number indicating precise position within stream.</dd>
+<dt><i>packetno</i></dt>
+<dd>Sequential number of this packet.  Used within the decoder for internal ordering.<dd>
+</dl>
+
+
+<br><br>
+<hr noshade>
+<table border=0 width=100%>
+<tr valign=top>
+<td><p class=tiny>copyright &copy; 2000 xiph.org</p></td>
+<td align=right><p class=tiny><a href="http://www.xiph.org/ogg/vorbis/index.html">Ogg Vorbis</a><br><a href="mailto:team@xiph.org">team@xiph.org</a></p></td>
+</tr><tr>
+<td><p class=tiny>libogg documentation</p></td>
+<td align=right><p class=tiny>libogg version 1.25 - 20000615</p></td>
+</tr>
+</table>
+
+</body>
+
+</html>

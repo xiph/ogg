@@ -12,7 +12,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.3 2000/11/13 23:54:58 xiphmont Exp $
+ last mod: $Id: os_types.h,v 1.4 2001/01/22 00:56:30 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -40,7 +40,7 @@ typedef __int16 ogg_int16_t;
 #include <_G_config.h>
 typedef _G_int64_t ogg_int64_t;
 typedef _G_int32_t ogg_int32_t;
-typedef unsigned _G_int32_t ogg_uint32_t;
+typedef _G_uint32_t ogg_uint32_t;
 typedef _G_int16_t ogg_int16_t;
 
 #  endif

@@ -12,11 +12,11 @@ dnl
 AC_ARG_WITH(ogg-prefix,[  --with-ogg-prefix=PFX   Prefix where libogg is installed (optional)], ogg_prefix="$withval", ogg_prefix="")
 AC_ARG_ENABLE(oggtest, [  --disable-oggtest       Do not try to compile and run a test Ogg program],, enable_oggtest=yes)
 
-  if test "x$ogg_prefix" != "xNONE" ; then
+  if test "x$ogg_prefix" != "x"; then
     ogg_args="$ogg_args --prefix=$ogg_prefix"
     OGG_CFLAGS="-I$ogg_prefix/include"
     OGG_LIBS="-L$ogg_prefix/lib"
-  elif test "$prefix" != ""; then
+  elif test "x$prefix" != "xNONE"; then
     ogg_args="$ogg_args --prefix=$prefix"
     OGG_CFLAGS="-I$prefix/include"
     OGG_LIBS="-L$prefix/lib"

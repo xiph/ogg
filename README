@@ -1,13 +1,12 @@
 ********************************************************************
 *                                                                  *
-* THIS FILE IS PART OF THE Ogg BITSTREAM LAYER SOURCE CODE.        *
-* USE, DISTRIBUTION AND REPRODUCTION OF THIS SOURCE IS GOVERNED BY *
-* THE GNU LESSER/LIBRARY PUBLIC LICENSE 2, WHICH IS INCLUDED WITH  *
-* THIS SOURCE. PLEASE READ THESE TERMS DISTRIBUTING.               *
+* THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.   *
+* USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *
+* GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
+* IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
 *                                                                  *
-* THE Ogg SOURCE CODE IS (C) COPYRIGHT 1994-2000                   *
-* by Monty <monty@xiph.org> and The XIPHOPHORUS Company            *
-* http://www.xiph.org/                                             *
+* THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2001             *
+* by the XIPHOPHORUS Company http://www.xiph.org/                  *
 *                                                                  *
 ********************************************************************
 
@@ -19,7 +18,7 @@ codec) contain the codec libraries for use with Ogg bitstreams.
 
 Directory:
 
-./src  		The source for libogg, an LGPLed inplementation of 
+./src  		The source for libogg, a BSD-license inplementation of 
 		the public domain Ogg bitstream format
 
 ./include       Library API headers and codebooks
@@ -101,4 +100,4 @@ and #include "ogg/ogg.h" wherever you need to acces Ogg functionality.
 (Build instructions for Ogg codecs such as vorbis are similar and may
 be found in those source modules' README files)
 
-$Id: README,v 1.8 2000/11/22 06:20:07 xiphmont Exp $
+$Id: README,v 1.9 2001/03/22 00:29:37 xiphmont Exp $

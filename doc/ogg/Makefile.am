@@ -16,9 +16,9 @@ doc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
 	ogg_sync_destroy.html ogg_sync_init.html ogg_sync_pageout.html\
 	ogg_sync_pageseek.html ogg_sync_reset.html ogg_sync_state.html\
 	ogg_sync_wrote.html oggpack_adv.html oggpack_adv1.html\
-	oggpack_adv_huff.html oggpack_bits.html oggpack_buffer.html\
+	oggpack_bits.html oggpack_buffer.html\
 	oggpack_bytes.html oggpack_get_buffer.html oggpack_look.html\
-	oggpack_look1.html oggpack_look_huff.html oggpack_read.html\
+	oggpack_look1.html oggpack_read.html\
 	oggpack_read1.html oggpack_readinit.html oggpack_reset.html\
 	oggpack_write.html oggpack_writeclear.html oggpack_writeinit.html\
 	overview.html reference.html style.css vorbis_comment.html\

@@ -44,9 +44,9 @@ The Ogg homepage is located at 'http://www.xiph.org/ogg/'.
 Up to date technical documents, contact information, source code and
 pre-built utilities may be found there.
 
-BUILD:
+BUILDING FROM CVS:
 
-A standard build should consist of nothing more than:
+A standard cvs build should consist of nothing more than:
 
 ./autogen.sh
 make 
@@ -59,11 +59,18 @@ This will install the Ogg libraries (static and shared) into
 /usr/local/lib, includes into /usr/local/include and API manpages
 (once we write some) into /usr/local/man.
 
+BUILDING FROM TARBALL DISTRIBUTIONS:
+
+./configure
+make
+
+and optionally (as root):
+make install
+
 BUILDING RPMS:
 
 RPMs may be built by:
 
-./autogen.sh
 make dist
 rpm -ta libogg-<version>.tar.gz
 
@@ -74,4 +81,4 @@ You can also run one of the batch files from the commandline.
 
 E.g.: build_ogg_dynamic
 
-$Id: README,v 1.6 2000/11/08 08:18:39 jack Exp $
+$Id: README,v 1.7 2000/11/08 08:41:14 jack Exp $

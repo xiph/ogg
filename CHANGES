@@ -1,3 +1,7 @@
+Version 1.1.2 (unreleased)
+
+ * fix a bug with multipage packet assembly after seek
+
 Version 1.1.1 (2004 September 12)
 
  * various bugfixes

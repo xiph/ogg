@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.9 2001/12/20 00:58:45 segher Exp $
+  last mod: $Id: bitwise.c,v 1.10 2001/12/21 14:41:15 segher Exp $
 
  ********************************************************************/
 
@@ -172,7 +172,7 @@ long oggpack_read(oggpack_buffer *b,int bits){
 
   if(b->endbyte+4>=b->storage){
     /* not the main path */
-    ret=-1;
+    ret=-1UL;
     if(b->endbyte+(bits-1)/8>=b->storage)goto overflow;
   }
   
@@ -204,7 +204,7 @@ long oggpack_read1(oggpack_buffer *b){
   
   if(b->endbyte>=b->storage){
     /* not the main path */
-    ret=-1;
+    ret=-1UL;
     goto overflow;
   }
 

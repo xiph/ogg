@@ -1,7 +1,5 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = ogg
 
 docdir = $(datadir)/doc/$(PACKAGE)-$(VERSION)

@@ -1,2 +1,10 @@
+2004-07-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+
+	* error out on autotools failures so warnings are caught early on
+	* clean up AC_OUTPUT
+	* AUTOMAKE_OPTIONS = foreign only needs to be done toplevel
+	  (this can be verified by checking Makefile's generated in other
+	   directories and seeing that the var isn't used)
+
 - Sat Sep 02 2000 Jack Moffitt <jack@icecast.org>
 	+ separated from vorbis

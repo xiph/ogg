@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-AUTOMAKE_OPTIONS = foreign 1.6
-
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 
 lib_LTLIBRARIES = libogg.la

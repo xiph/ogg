@@ -1,5 +1,5 @@
 %define name	libogg
-%define version	1.0.0
+%define version	1.0beta3
 %define release 1
 
 Summary:	Ogg Bitstream Library
@@ -20,6 +20,7 @@ both making ogg bitstreams and getting packets from ogg bitstreams.
 %package devel
 Summary: Ogg Bitstream Library Development
 Group: Development/Libraries
+Requires: libogg = %{version}
 
 %description devel
 The libogg-devel package contains the header files and documentation

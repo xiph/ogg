@@ -13,11 +13,13 @@
 
 WHAT'S HERE:
 
-This source distribution includes libogg and nothing else.  Other modules (eg, the modules vorbis, vorbis-tools and vorbis-plugins for the Vorbis codec) contain the codec libraries for use with Ogg bitstreams.
+This source distribution includes libogg and nothing else.  Other modules 
+(eg, the modules vorbis, vorbis-tools and vorbis-plugins for the Vorbis 
+codec) contain the codec libraries for use with Ogg bitstreams.
 
 Directory:
 
-./lib  		The source for libogg, an LGPLed inplementation of 
+./src  		The source for libogg, an LGPLed inplementation of 
 		the public domain Ogg bitstream format
 
 ./include       Library API headers and codebooks
@@ -25,6 +27,8 @@ Directory:
 ./debian        Rules/spec files for building Debian .deb packages
 
 ./doc           Ogg specification documents
+
+./win32		Win32 projects and build automation
 
 WHAT IS OGG?:
 
@@ -55,6 +59,19 @@ This will install the Ogg libraries (static and shared) into
 /usr/local/lib, includes into /usr/local/include and API manpages
 (once we write some) into /usr/local/man.
 
-Monty <monty@xiph.org>
+BUILDING RPMS:
 
-$Id: README,v 1.5 2000/10/10 08:55:07 xiphmont Exp $
+RPMs may be built by:
+
+./autogen.sh
+make dist
+rpm -ta libogg-<version>.tar.gz
+
+BUILDING ON WIN32:
+
+Use the project file in the win32 directory.  It should compile out of the box.
+You can also run one of the batch files from the commandline.
+
+E.g.: build_ogg_dynamic
+
+$Id: README,v 1.6 2000/11/08 08:18:39 jack Exp $

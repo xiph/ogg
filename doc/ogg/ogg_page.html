@@ -9,7 +9,7 @@
 <table border=0 width=100%>
 <tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg version 1.25 - 20000615</p></td>
+<td align=right><p class=tiny>libogg - 200011015</p></td>
 </tr>
 </table>
 
@@ -20,7 +20,12 @@
 <p>
 The ogg_page struct encapsulates the data for an Ogg page.
 <p>
-Ogg pages are of arbitrary length, with an approximate maximum size of 6kB.  They are made up of packet segments of 255 bytes each. There can be as many as 255 packet segments per page.
+Ogg pages are the fundamental unit of framing and interleave in an ogg bitstream.
+They are made up of packet segments of 255 bytes each. There can be as many as
+255 packet segments per page, for a maximum page size of a little under 64 kB.
+This is not a practical limitation as the segments can be joined across
+page boundaries allowing packets of arbitrary size. In practice pages are
+usually around 4 kB.
 <p>
 <p>For a complete description of ogg pages and headers, please refer to the <a href="../framing.html">framing document</a>.
 
@@ -30,9 +35,9 @@ Ogg pages are of arbitrary length, with an approximate maximum size of 6kB.  The
 <pre><b>
 typedef struct {
   unsigned char *header;
-  long header_len;
+  long           header_len;
   unsigned char *body;
-  long body_len;
+  long           body_len;
 } ogg_page;
 </b></pre>
 	</td>
@@ -43,12 +48,12 @@ typedef struct {
 <dl>
 <dt><i>header</i></dt>
 <dd>Pointer to the page header for this page.  The exact contents of this header are defined in the framing spec document.</dd>
-<dt><i>header_len</a></dt>
-<dd>Length in bytes of the page header.</a>
-<dt><i>body</a></dt>
+<dt><i>header_len</i></dt>
+<dd>Length of the page header in bytes.</a>
+<dt><i>body</i></dt>
 <dd>Pointer to the data for this page.</dd>
-<dt><i>body_len</a></dt>
-<dd>Length in bytes of the body.</dd>
+<dt><i>body_len</i></dt>
+<dd>Length of the body data in bytes.</dd>
 </dl>
 
 
@@ -56,11 +61,11 @@ typedef struct {
 <hr noshade>
 <table border=0 width=100%>
 <tr valign=top>
-<td><p class=tiny>copyright &copy; 2000 xiph.org</p></td>
+<td><p class=tiny>copyright &copy; 2001 xiph.org foundation</p></td>
 <td align=right><p class=tiny><a href="http://www.xiph.org/ogg/vorbis/index.html">Ogg Vorbis</a><br><a href="mailto:team@xiph.org">team@xiph.org</a></p></td>
 </tr><tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg version 1.25 - 20000615</p></td>
+<td align=right><p class=tiny>libogg version - 20011015</p></td>
 </tr>
 </table>
 

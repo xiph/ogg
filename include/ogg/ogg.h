@@ -136,7 +136,7 @@ extern int      ogg_stream_init(ogg_stream_state *os,int serialno);
 extern int      ogg_stream_clear(ogg_stream_state *os);
 extern int      ogg_stream_reset(ogg_stream_state *os);
 extern int      ogg_stream_destroy(ogg_stream_state *os);
-extern int      ogg_stream_eof(ogg_stream_state *os);
+extern int      ogg_stream_eos(ogg_stream_state *os);
 
 extern int      ogg_page_version(ogg_page *og);
 extern int      ogg_page_continued(ogg_page *og);

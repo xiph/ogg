@@ -1,3 +1,10 @@
+libogg (1.0beta4-1) unstable; urgency=low
+
+  *  Fixed package description (closes: #78387)
+  *  Fixed library dev package name.
+
+ -- root <root@cheney.cx>  Wed, 24 Jan 2001 22:04:41 -0600
+
 libogg (1.0beta3-1) unstable; urgency=low
 
   * Initial Release.

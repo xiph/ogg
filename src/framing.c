@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.11 2001/02/26 03:49:59 xiphmont Exp $
+ last mod: $Id: framing.c,v 1.12 2001/05/24 01:04:36 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -766,7 +766,7 @@ int ogg_stream_reset(ogg_stream_state *os){
   return(0);
 }
 
-int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
+static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
   /* The last part of decode. We have the stream broken into packet
      segments.  Now we need to group them into packets (or return the
@@ -777,41 +777,53 @@ int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
   if(os->lacing_packet<=ptr)return(0);
 
   if(os->lacing_vals[ptr]&0x400){
-    /* We lost sync here; let the app know */
-    os->lacing_returned++;
-
     /* we need to tell the codec there's a gap; it might need to
        handle previous packet dependencies. */
-    os->packetno++;
+    if(adv){
+      os->lacing_returned++;
+      os->packetno++;
+    }
     return(-1);
   }
 
   /* Gather the whole packet. We'll have no holes or a partial packet */
   {
     int size=os->lacing_vals[ptr]&0xff;
-    int bytes=0;
-
-    op->packet=os->body_data+os->body_returned;
-    op->e_o_s=os->lacing_vals[ptr]&0x200; /* last packet of the stream? */
-    op->b_o_s=os->lacing_vals[ptr]&0x100; /* first packet of the stream? */
-    bytes+=size;
+    int bytes=size;
+    int eos=os->lacing_vals[ptr]&0x200; /* last packet of the stream? */
+    int bos=os->lacing_vals[ptr]&0x100; /* first packet of the stream? */
 
     while(size==255){
       int val=os->lacing_vals[++ptr];
       size=val&0xff;
-      if(val&0x200)op->e_o_s=0x200;
+      if(val&0x200)eos=0x200;
       bytes+=size;
     }
 
-    op->packetno=os->packetno;
-    op->granulepos=os->granule_vals[ptr];
-    op->bytes=bytes;
+    if(op){
+      op->e_o_s=eos;
+      op->b_o_s=bos;
+      op->packet=os->body_data+os->body_returned;
+      op->packetno=os->packetno;
+      op->granulepos=os->granule_vals[ptr];
+      op->bytes=bytes;
+    }
 
-    os->body_returned+=bytes;
-    os->lacing_returned=ptr+1;
+    if(adv){
+      os->body_returned+=bytes;
+      os->lacing_returned=ptr+1;
+      os->packetno++;
+    }
   }
-  os->packetno++;
   return(1);
+}
+
+int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
+  return _packetout(os,op,1);
+}
+
+int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
+  return _packetout(os,op,0);
 }
 
 void ogg_packet_clear(ogg_packet *op) {
@@ -1174,7 +1186,7 @@ void test_pack(const int *pl, const int **headers){
 
 	{
 	  ogg_page og_de;
-	  ogg_packet op_de;
+	  ogg_packet op_de,op_de2;
 	  char *buf=ogg_sync_buffer(&oy,og.header_len+og.body_len);
 	  memcpy(buf,og.header,og.header_len);
 	  memcpy(buf+og.header_len,og.body,og.body_len);
@@ -1191,8 +1203,17 @@ void test_pack(const int *pl, const int **headers){
 	    ogg_stream_pagein(&os_de,&og_de);
 
 	    /* packets out? */
-	    while(ogg_stream_packetout(&os_de,&op_de)>0){
+	    while(ogg_stream_packetpeek(&os_de,&op_de2)>0){
+	      ogg_stream_packetpeek(&os_de,NULL);
+	      ogg_stream_packetout(&os_de,&op_de); /* just catching them all */
 	      
+	      /* verify peek and out match */
+	      if(memcmp(&op_de,&op_de2,sizeof(ogg_packet))){
+		fprintf(stderr,"packetout != packetpeek! pos=%ld\n",
+			depacket);
+		exit(1);
+	      }
+
 	      /* verify the packet! */
 	      /* check data */
 	      if(memcmp(data+depacket,op_de.packet,op_de.bytes)){

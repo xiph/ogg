@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.10 2001/02/26 03:49:58 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.11 2001/05/24 01:04:36 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -145,6 +145,7 @@ extern long     ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og);
 extern int      ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og);
 extern int      ogg_stream_pagein(ogg_stream_state *os, ogg_page *og);
 extern int      ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op);
+extern int      ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op);
 
 /* Ogg BITSTREAM PRIMITIVES: general ***************************/
 

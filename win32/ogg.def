@@ -1,5 +1,5 @@
 ; ogg.def
-LIBRARY ogg
+LIBRARY
 EXPORTS
 oggpack_writeinit
 oggpack_reset

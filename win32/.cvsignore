@@ -1,4 +1,9 @@
+Static_Debug
+Static_Release
+Dynamic_Debug
+Dynamic_Release
 Makefile.in
 Makefile
 *.ncb
 *.plg
+*.opt

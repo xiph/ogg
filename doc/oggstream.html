@@ -8,7 +8,7 @@ src="vorbisword2.png" border=0></a></nobr><p>
 Ogg logical and physical bitstream overview
 </font></h1>
 
-<em>Last update to this document: July 18, 1999</em><br> 
+<em>Last update to this document: July 14, 2002</em><br> 
 
 <h2>Ogg bitstreams</h2>
 
@@ -18,12 +18,12 @@ high-level structure or boundary information; strung together, they
 appear to be streams of random bytes with no landmarks.<p>
 
 Raw packets may be used directly by transport mechanisms that provide
-their own framing and packet-seperation mechanisms (such as UDP
+their own framing and packet-separation mechanisms (such as UDP
 datagrams).  For stream based storage (such as files) and transport
 (such as TCP streams or pipes), Vorbis and other future Ogg codecs use
 the Ogg bitstream format to provide framing/sync, sync recapture
 after error, landmarks during seeking, and enough information to
-properly seperate data back into packets at the original packet
+properly separate data back into packets at the original packet
 boundaries without relying on decoding to find packet boundaries.<p>
 
 <h2>Logical and physical bitstreams</h2>
@@ -36,15 +36,18 @@ possible that a packet may be split and encoded across one or more
 pages); that is, the page decode mechanism is designed to recognize,
 verify and handle single pages at a time from the overall bitstream.<p>
 
-Multiple logical bitstreams can be combined (with restricctions) into
-a single <em>physical bitstream</em>.  A physical bitstream consists
-of multiple logical bitstreams multiplexed at the page level. Whole
-pages are taken in order from multiple logical bitstreams and combined
-into a single physical stream of pages. The decoder reconstructs the
-original logical bitstreams from the physical bitstream by taking the
-pages in order fromt he physical bitstream and redirecting them into
-the appropriate logical decoding entitiy. The simplest physical
-bitstream is a single, unmultiplexed logical bitstream.  <p>
+Multiple logical bitstreams can be combined (with restrictions) into a
+single <em>physical bitstream</em>.  A physical bitstream consists of
+multiple logical bitstreams multiplexed at the page level and may
+include a 'meta-header' at the beginning of the multiplexed logical
+stream that serves as identification magic. Whole pages are taken in
+order from multiple logical bitstreams and combined into a single
+physical stream of pages. The decoder reconstructs the original
+logical bitstreams from the physical bitstream by taking the pages in
+order from the physical bitstream and redirecting them into the
+appropriate logical decoding entity. The simplest physical bitstream
+is a single, unmultiplexed logical bitstream with no meta-header; this
+is referred to as a 'degenerate stream'.  <p>
 
 <a href=framing.html>Ogg Logical Bitstream Framing</a> discusses
 the page format of an Ogg bitstream, the packet coding process
@@ -58,9 +61,9 @@ Logical bitstreams may not be mapped/multiplexed into physical
 bitstreams without restriction.  Here we discuss design restrictions
 on Ogg physical bitstreams in general, mostly to introduce
 design rationale. Each 'media' format defines its own (generally more
-restrictive) mapping.  An '<a href="vorbis-stream.html">Ogg Vorbis
+restrictive) mapping.  An '<a href="vorbis-ogg.html">Ogg Vorbis
 Audio Bitstream</a>', for example, has a <a
-href="vorbis-stream.html">specific physical bitstream structure</a>.
+href="vorbis-ogg.html">specific physical bitstream structure</a>.
 An 'Ogg A/V' bitstream (not currently specified) will also mandate a
 specific, restricted physical bitstream format.<p>
 
@@ -106,7 +109,7 @@ the scope of the physical bitstream.<p>
 
 Logical bitstreams may also be multiplexed 'in parallel'
 (<em>grouped</em>).  An example of grouping would be to allow
-streaming of seperate audio and video streams, using differnt codecs
+streaming of separate audio and video streams, using different codecs
 and different logical bitstreams, in the same physical bitstream.
 Whole pages from multiple logical bitstreams are mixed together.<p>
 
@@ -153,7 +156,7 @@ bitstreams in the previous group have terminated.<p>
 to a regular order; the only requirement is that page <tt>n</tt> of a
 logical bitstream follow page <tt>n-1</tt> in the physical bitstream.
 There are no restrictions on intervening pages belonging to other
-logical bitstreams.  (Tying page appearence to bitrate demands is one
+logical bitstreams.  (Tying page appearance to bitrate demands is one
 logical strategy, ie, the page appears at the chronological point
 where decode requires more information).
 

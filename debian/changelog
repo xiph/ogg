@@ -4,6 +4,13 @@ libogg (1.0beta4-1) unstable; urgency=low
 
  -- Christopher L Cheney <ccheney@debian.org>  Wed, 24 Jan 2001 22:04:41 -0600
 
+libogg (1.0beta3-3) unstable; urgency=low
+
+  * Fixed Sections.
+  * Updated to Standards-Version to 3.5.1.0
+
+ -- Christopher L Cheney <ccheney@debian.org>  Sat, 17 Feb 2001 18:00:47 -0600
+
 libogg (1.0beta3-2) unstable; urgency=low
 
   * Fixed package description (closes: #78387)

@@ -17,6 +17,9 @@ AC_SUBST(LIB_AGE)
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
+dnl config.h
+AM_CONFIG_HEADER(config.h)
+
 dnl Set some options based on environment
 
 cflags_save="$CFLAGS"

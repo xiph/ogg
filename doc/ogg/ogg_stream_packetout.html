@@ -17,8 +17,8 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function assembles a raw data packet for output to the codec decoding engine. The data is already in the stream and broken into packet segments.
-<p>In a typical decoding situation, this should be used after calling <a href="ogg_stream_pagein.html"> to submit a page of data to the bitstream.
+<p>This function assembles a raw data packet for output to the codec decoding engine. The data is already in the stream and broken into packet segments.</p>
+<p>In a typical decoding situation, this should be used after calling <a href="ogg_stream_pagein.html">ogg_stream_pagein()</a> to submit a page of data to the bitstream.</p>
 
 <br><br>
 <table border=0 color=black cellspacing=0 cellpadding=7>
@@ -34,22 +34,25 @@ int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op);
 <h3>Parameters</h3>
 <dl>
 <dt><i>os</i></dt>
-<dd>Pointer to a previously declared <a href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this function is called, an <a href="ogg_page.html">ogg_page</a> should be submitted to the stream using <a href="ogg_stream_pagein.html">ogg_stream_pagein.<dd>
+<dd>Pointer to a previously declared <a
+href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this function is called, an <a href="ogg_page.html">ogg_page</a> should be submitted to the stream using <a href="ogg_stream_pagein.html">ogg_stream_pagein()</a>.</dd>
 <dt><i>op</i></dt>
-<dd>Pointer to the packet that will be submitted to the decoding layer after this function is called.
+<dd>Pointer to the packet that will be submitted to the decoding layer after this function is called.</dd>
 </dl>
 
 
 <h3>Return Values</h3>
 <blockquote>
-<li>-1 if we are out of sync and there is a gap in the data.  Usually this will not be a fatal error.
-<li>
-1 in all other cases.</li>
+<ul>
+<li>-1 if we are out of sync and there is a gap in the data. Usually this will not be a fatal error.</li>
+<li>1 in all other cases.</li>
+</ul>
 </blockquote>
-<p>
 
 <br><br>
+
 <hr noshade>
+
 <table border=0 width=100%>
 <tr valign=top>
 <td><p class=tiny>copyright &copy; 2000 xiph.org</p></td>
@@ -59,7 +62,6 @@ int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op);
 <td align=right><p class=tiny>libogg version 1.25 - 20000615</p></td>
 </tr>
 </table>
-
 
 </body>
 

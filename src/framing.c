@@ -13,7 +13,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.7 2000/11/05 23:50:21 xiphmont Exp $
+ last mod: $Id: framing.c,v 1.8 2000/11/13 23:54:59 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -156,9 +156,9 @@ int ogg_stream_init(ogg_stream_state *os,int serialno){
 /* _clear does not free os, only the non-flat storage within */
 int ogg_stream_clear(ogg_stream_state *os){
   if(os){
-    if(os->body_data)free(os->body_data);
-    if(os->lacing_vals)free(os->lacing_vals);
-    if(os->granule_vals)free(os->granule_vals);
+    if(os->body_data)_ogg_free(os->body_data);
+    if(os->lacing_vals)_ogg_free(os->lacing_vals);
+    if(os->granule_vals)_ogg_free(os->granule_vals);
 
     memset(os,0,sizeof(ogg_stream_state));    
   }
@@ -168,7 +168,7 @@ int ogg_stream_clear(ogg_stream_state *os){
 int ogg_stream_destroy(ogg_stream_state *os){
   if(os){
     ogg_stream_clear(os);
-    free(os);
+    _ogg_free(os);
   }
   return(0);
 } 
@@ -432,7 +432,7 @@ int ogg_sync_init(ogg_sync_state *oy){
 /* clear non-flat storage within */
 int ogg_sync_clear(ogg_sync_state *oy){
   if(oy){
-    if(oy->data)free(oy->data);
+    if(oy->data)_ogg_free(oy->data);
     ogg_sync_init(oy);
   }
   return(0);
@@ -441,7 +441,7 @@ int ogg_sync_clear(ogg_sync_state *oy){
 int ogg_sync_destroy(ogg_sync_state *oy){
   if(oy){
     ogg_sync_clear(oy);
-    free(oy);
+    _ogg_free(oy);
   }
   return(0);
 }
@@ -1226,7 +1226,7 @@ void test_pack(const int *pl, const int **headers){
       }
     }
   }
-  free(data);
+  _ogg_free(data);
   if(headers[pageno]!=NULL){
     fprintf(stderr,"did not write last page!\n");
     exit(1);
@@ -1391,7 +1391,7 @@ int main(void){
       ogg_stream_packetin(&os_en,&op);
     }
 
-    free(data);
+    _ogg_free(data);
 
     /* retrieve finished pages */
     for(i=0;i<5;i++){

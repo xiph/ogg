@@ -12,7 +12,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.3 2000/11/05 23:50:21 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.4 2000/11/13 23:54:59 xiphmont Exp $
 
  ********************************************************************/
 
@@ -48,7 +48,7 @@ void oggpack_reset(oggpack_buffer *b){
 }
 
 void oggpack_writeclear(oggpack_buffer *b){
-  free(b->buffer);
+  _ogg_free(b->buffer);
   memset(b,0,sizeof(oggpack_buffer));
 }
 

@@ -1,5 +1,5 @@
 @echo off
-echo ---+++--- Building Ogg (Dynamic) ---+++---
+echo ---+++--- Building Ogg (Static) ---+++---
 
 if .%SRCROOT%==. set SRCROOT=c:\src
 
@@ -11,7 +11,7 @@ call "c:\program files\microsoft visual studio\vc98\bin\vcvars32.bat"
 echo Setting include paths for Ogg
 set INCLUDE=%INCLUDE%;%SRCROOT%\ogg\include
 echo Compiling...
-msdev ogg_dynamic.dsp /useenv /make "ogg_dynamic - Win32 Release" /rebuild
+msdev ogg_static.dsp /useenv /make "ogg_static - Win32 Debug" /rebuild
 
 set PATH=%OLDPATH%
 set INCLUDE=%OLDINCLUDE%

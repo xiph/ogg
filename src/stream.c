@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.9 2003/03/27 21:38:16 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.10 2003/03/28 04:51:33 xiphmont Exp $
 
  ********************************************************************/
 
@@ -104,9 +104,11 @@ static void _packet_flush(ogg_stream_state *os,int nextcomplete){
     if(os->header_tail){
       ogg_reference *ret=oggbyte_return_and_reset(&os->header_build);
       os->header_head=ogg_buffer_cat(os->header_head,ret);
+      if(nextcomplete)oggbyte_init(&os->header_build,0,os->bufferpool);
     }else{
       os->header_tail=oggbyte_return_and_reset(&os->header_build);
       os->header_head=ogg_buffer_walk(os->header_tail);
+      if(nextcomplete)oggbyte_init(&os->header_build,0,os->bufferpool);
     }
     os->lacing_fill=0;
     os->body_fill=0;

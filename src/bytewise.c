@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: byte-aligned access; array-like abstraction over buffers
-  last mod: $Id: bytewise.c,v 1.1.2.5 2003/03/26 23:49:26 xiphmont Exp $
+  last mod: $Id: bytewise.c,v 1.1.2.6 2003/03/28 04:51:33 xiphmont Exp $
 
  ********************************************************************/
 
@@ -96,7 +96,7 @@ int oggbyte_init(oggbyte_buffer *b,ogg_reference *or,ogg_buffer_state *bs){
 ogg_reference *oggbyte_return_and_reset(oggbyte_buffer *b){
   if(!b->external){
     ogg_reference *ret=b->baseref;
-    oggbyte_init(b,0,b->owner);
+    memset(b,0,sizeof(*b));
     return(ret);
   }
   return(NULL);

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.13 2003/05/23 09:41:40 msmith Exp $
+ last mod: $Id: os_types.h,v 1.14 2003/09/02 05:09:14 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -76,6 +76,14 @@
    /* OS/2 GCC */
    typedef short ogg_int16_t;
    typedef unsigned short ogg_uint16_t;
+   typedef int ogg_int32_t;
+   typedef unsigned int ogg_uint32_t;
+   typedef long long ogg_int64_t;
+
+#elif defined (DJGPP)
+
+   /* DJGPP */
+   typedef short ogg_int16_t;
    typedef int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;

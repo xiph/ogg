@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.13 2001/05/24 05:17:14 xiphmont Exp $
+ last mod: $Id: framing.c,v 1.14 2001/05/24 21:22:52 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -783,6 +783,10 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
     os->packetno++;
     return(-1);
   }
+
+  if(!op && !adv)return(1); /* just using peek as an inexpensive way
+                               to ask if there's a whole packet
+                               waiting */
 
   /* Gather the whole packet. We'll have no holes or a partial packet */
   {

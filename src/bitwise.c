@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.6 2001/02/26 03:49:59 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.7 2001/03/28 11:45:33 segher Exp $
 
  ********************************************************************/
 
@@ -385,7 +385,7 @@ int main(void){
   cliptest(testbuffer2,test2size,17,five,fivesize);
   fprintf(stderr,"ok.");
 
-  fprintf(stderr,"\nSingle bit unclicpped packing: ");
+  fprintf(stderr,"\nSingle bit unclipped packing: ");
   cliptest(testbuffer3,test3size,1,six,sixsize);
   fprintf(stderr,"ok.");
 

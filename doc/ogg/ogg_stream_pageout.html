@@ -43,9 +43,8 @@ int ogg_stream_pageout(<a href="ogg_stream_state.html">ogg_stream_state</a> *os,
 
 <h3>Return Values</h3>
 <blockquote>
-<li>0 means that there is not enough data yet to form a page.</li>
-<li>
-0 means that the page was successfully submitted to the bitstream.</li>
+<li>Zero means that insufficient data has accumulated to fill a page.</li>
+<li>Non-zero means that a page has been completed and flushed.</li>
 </blockquote>
 <p>
 

@@ -1,10 +1,23 @@
-2004-07-05  Thomas Vander Stichele  <thomas at apestaart dot org>
+Version 1.1.1 (2004 September 12)
 
-	* error out on autotools failures so warnings are caught early on
-	* clean up AC_OUTPUT
-	* AUTOMAKE_OPTIONS = foreign only needs to be done toplevel
-	  (this can be verified by checking Makefile's generated in other
-	   directories and seeing that the var isn't used)
+ * various bugfixes
+ * important bugfix for 64-bit platforms
+ * various portability fixes
+ * autotools cleanup from Thomas Vander Stichele
+ * Symbian OS build support from Colin Ward at CSIRO
+ * new multiplexed Ogg stream documentation
 
-- Sat Sep 02 2000 Jack Moffitt <jack@icecast.org>
-	+ separated from vorbis
+Version 1.1 (2003 November 17)
+
+ * big-endian bitpacker routines for Theora
+ * various portability fixes
+ * improved API documenation
+ * RFC 3533 documentation of the format by Silvia Pfeiffer at CSIRO
+ * RFC 3534 documentation of the application/ogg mime-type by Linus Walleij
+ 
+Version 1.0 (2002 July 19)
+
+ * First stable release
+ * little-endian bitpacker routines for Vorbis
+ * basic Ogg bitstream sync and coding support
+

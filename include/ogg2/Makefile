@@ -69,7 +69,7 @@ LIBS =  -lm -lpthread
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIBTOOL_DEPS = ./ltmain.sh
 LIB_AGE = 0
-LIB_CURRENT = 5
+LIB_CURRENT = 6
 LIB_REVISION = 0
 LN_S = ln -s
 MAKEINFO = makeinfo
@@ -85,7 +85,7 @@ SIZE64 = int64_t
 STRIP = strip
 USIZE16 = u_int16_t
 USIZE32 = u_int32_t
-VERSION = 2.0
+VERSION = 3.0
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -106,7 +106,7 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign include/ogg/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign include/ogg2/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -161,14 +161,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = include/ogg
+subdir = include/ogg2
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign include/ogg/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign include/ogg2/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

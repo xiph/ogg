@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.1.2.1 2003/03/06 23:12:28 xiphmont Exp $
+ last mod: $Id: os_types.h,v 1.1.2.2 2003/03/27 09:19:43 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -83,7 +83,7 @@
 #else
 
 #  include <sys/types.h>
-#  include <ogg/config_types.h>
+#  include <ogg2/config_types.h>
 
 #endif
 

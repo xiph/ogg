@@ -2,4 +2,4 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = ogg
+SUBDIRS = ogg2

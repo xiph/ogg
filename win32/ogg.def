@@ -35,6 +35,7 @@ ogg_stream_clear
 ogg_stream_reset
 ogg_stream_destroy
 ogg_stream_eos
+ogg_stream_packetpeek
 ogg_page_version
 ogg_page_continued
 ogg_page_bos

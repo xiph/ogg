@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.16 2002/07/11 09:09:07 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.17 2002/07/12 13:06:21 giles Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -118,10 +118,8 @@ extern void  oggpack_writeclear(oggpack_buffer *b);
 extern void  oggpack_readinit(oggpack_buffer *b,unsigned char *buf,int bytes);
 extern void  oggpack_write(oggpack_buffer *b,unsigned long value,int bits);
 extern long  oggpack_look(oggpack_buffer *b,int bits);
-extern long  oggpack_look_huff(oggpack_buffer *b,int bits);
 extern long  oggpack_look1(oggpack_buffer *b);
 extern void  oggpack_adv(oggpack_buffer *b,int bits);
-extern int   oggpack_adv_huff(oggpack_buffer *b,int bits);
 extern void  oggpack_adv1(oggpack_buffer *b);
 extern long  oggpack_read(oggpack_buffer *b,int bits);
 extern long  oggpack_read1(oggpack_buffer *b);
@@ -158,8 +156,6 @@ extern int      ogg_stream_reset(ogg_stream_state *os);
 extern int      ogg_stream_reset_serialno(ogg_stream_state *os,int serialno);
 extern int      ogg_stream_destroy(ogg_stream_state *os);
 extern int      ogg_stream_eos(ogg_stream_state *os);
-
-extern void     ogg_page_checksum_set(ogg_page *og);
 
 extern int      ogg_page_version(ogg_page *og);
 extern int      ogg_page_continued(ogg_page *og);

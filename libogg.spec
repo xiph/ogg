@@ -1,5 +1,5 @@
 Name:		libogg
-Version:	1.0
+Version:	1.1
 Release:	1
 Summary:	Ogg Bitstream Library
 
@@ -76,10 +76,15 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %{_includedir}/ogg/os_types.h
 %{_includedir}/ogg/config_types.h
 %{_libdir}/libogg.a
+%{_libdir}/libogg.la
 %{_libdir}/libogg.so
+%{_libdir}/pkgconfig/ogg.pc
 %{_datadir}/aclocal/ogg.m4
 
 %changelog
+* Tue Oct 07 2003 Warren Dukes <shank@xiph.org>
+- update for 1.1 release
+
 * Sun Jul 14 2002 Thomas Vander Stichele <thomas@apestaart.org>
 - update for 1.0 release
 - conform Group to Red Hat's idea of it

@@ -23,3 +23,5 @@ mkinstalldirs
 *.so
 .libs
 .deps
+*.tar.gz
+ogg-config

@@ -7,11 +7,11 @@
  *                                                                  *
  * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2001             *
  * by the XIPHOPHORUS Company http://www.xiph.org/                  *
-
+ *                                                                  *
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.8 2001/10/02 00:15:03 segher Exp $
+  last mod: $Id: bitwise.c,v 1.9 2001/12/20 00:58:45 segher Exp $
 
  ********************************************************************/
 

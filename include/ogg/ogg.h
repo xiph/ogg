@@ -7,11 +7,11 @@
  *                                                                  *
  * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2001             *
  * by the XIPHOPHORUS Company http://www.xiph.org/                  *
-
+ *                                                                  *
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.12 2001/11/24 07:49:31 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.13 2001/12/20 00:58:44 segher Exp $
 
  ********************************************************************/
 #ifndef _OGG_H

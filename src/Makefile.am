@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = -I../include
+INCLUDES = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libogg.la
 

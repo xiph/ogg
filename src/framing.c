@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.23 2002/09/29 07:10:37 giles Exp $
+ last mod: $Id$
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -117,7 +117,7 @@ static ogg_uint32_t _ogg_crc_entry(unsigned long index){
 }
 #endif
 
-static ogg_uint32_t crc_lookup[256]={
+static const ogg_uint32_t crc_lookup[256]={
   0x00000000,0x04c11db7,0x09823b6e,0x0d4326d9,
   0x130476dc,0x17c56b6b,0x1a864db2,0x1e475005,
   0x2608edb8,0x22c9f00f,0x2f8ad6d6,0x2b4bcb61,
@@ -260,10 +260,10 @@ void ogg_page_checksum_set(ogg_page *og){
     for(i=0;i<og->body_len;i++)
       crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->body[i]];
     
-    og->header[22]=crc_reg&0xff;
-    og->header[23]=(crc_reg>>8)&0xff;
-    og->header[24]=(crc_reg>>16)&0xff;
-    og->header[25]=(crc_reg>>24)&0xff;
+    og->header[22]=(unsigned char)(crc_reg&0xff);
+    og->header[23]=(unsigned char)((crc_reg>>8)&0xff);
+    og->header[24]=(unsigned char)((crc_reg>>16)&0xff);
+    og->header[25]=(unsigned char)((crc_reg>>24)&0xff);
   }
 }
 
@@ -378,7 +378,7 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
 
   /* 64 bits of PCM position */
   for(i=6;i<14;i++){
-    os->header[i]=(granule_pos&0xff);
+    os->header[i]=(unsigned char)(granule_pos&0xff);
     granule_pos>>=8;
   }
 
@@ -386,7 +386,7 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   {
     long serialno=os->serialno;
     for(i=14;i<18;i++){
-      os->header[i]=(serialno&0xff);
+      os->header[i]=(unsigned char)(serialno&0xff);
       serialno>>=8;
     }
   }
@@ -401,7 +401,7 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   {
     long pageno=os->pageno++;
     for(i=18;i<22;i++){
-      os->header[i]=(pageno&0xff);
+      os->header[i]=(unsigned char)(pageno&0xff);
       pageno>>=8;
     }
   }
@@ -413,9 +413,9 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   os->header[25]=0;
   
   /* segment table */
-  os->header[26]=vals&0xff;
+  os->header[26]=(unsigned char)(vals&0xff);
   for(i=0;i<vals;i++)
-    bytes+=os->header[i+27]=(os->lacing_vals[i]&0xff);
+    bytes+=os->header[i+27]=(unsigned char)(os->lacing_vals[i]&0xff);
   
   /* set pointers in the ogg_page struct */
   og->header=os->header;
@@ -645,7 +645,7 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
      buffer.  If it doesn't verify, we look for the next potential
      frame */
 
-  while(1){
+  for(;;){
     long ret=ogg_sync_pageseek(oy,og);
     if(ret>0){
       /* have a page */

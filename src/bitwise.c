@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.19 2004/03/16 18:31:49 xiphmont Exp $
+  last mod: $Id$
 
  ********************************************************************/
 
@@ -24,7 +24,7 @@
 
 #define BUFFER_INCREMENT 256
 
-static unsigned long mask[]=
+static const unsigned long mask[]=
 {0x00000000,0x00000001,0x00000003,0x00000007,0x0000000f,
  0x0000001f,0x0000003f,0x0000007f,0x000000ff,0x000001ff,
  0x000003ff,0x000007ff,0x00000fff,0x00001fff,0x00003fff,
@@ -33,7 +33,7 @@ static unsigned long mask[]=
  0x01ffffff,0x03ffffff,0x07ffffff,0x0fffffff,0x1fffffff,
  0x3fffffff,0x7fffffff,0xffffffff };
 
-static unsigned int mask8B[]=
+static const unsigned int mask8B[]=
 {0x00,0x80,0xc0,0xe0,0xf0,0xf8,0xfc,0xfe,0xff};
 
 void oggpack_writeinit(oggpack_buffer *b){
@@ -79,14 +79,14 @@ void oggpack_write(oggpack_buffer *b,unsigned long value,int bits){
   b->ptr[0]|=value<<b->endbit;  
   
   if(bits>=8){
-    b->ptr[1]=value>>(8-b->endbit);  
+    b->ptr[1]=(unsigned char)(value>>(8-b->endbit));
     if(bits>=16){
-      b->ptr[2]=value>>(16-b->endbit);  
+      b->ptr[2]=(unsigned char)(value>>(16-b->endbit));
       if(bits>=24){
-	b->ptr[3]=value>>(24-b->endbit);  
+	b->ptr[3]=(unsigned char)(value>>(24-b->endbit));
 	if(bits>=32){
 	  if(b->endbit)
-	    b->ptr[4]=value>>(32-b->endbit);
+	    b->ptr[4]=(unsigned char)(value>>(32-b->endbit));
 	  else
 	    b->ptr[4]=0;
 	}
@@ -113,14 +113,14 @@ void oggpackB_write(oggpack_buffer *b,unsigned long value,int bits){
   b->ptr[0]|=value>>(24+b->endbit);  
   
   if(bits>=8){
-    b->ptr[1]=value>>(16+b->endbit);  
+    b->ptr[1]=(unsigned char)(value>>(16+b->endbit));
     if(bits>=16){
-      b->ptr[2]=value>>(8+b->endbit);  
+      b->ptr[2]=(unsigned char)(value>>(8+b->endbit));
       if(bits>=24){
-	b->ptr[3]=value>>(b->endbit);  
+	b->ptr[3]=(unsigned char)(value>>(b->endbit));
 	if(bits>=32){
 	  if(b->endbit)
-	    b->ptr[4]=value<<(8-b->endbit);
+	    b->ptr[4]=(unsigned char)(value<<(8-b->endbit));
 	  else
 	    b->ptr[4]=0;
 	}
@@ -310,14 +310,14 @@ void oggpackB_adv1(oggpack_buffer *b){
 
 /* bits <= 32 */
 long oggpack_read(oggpack_buffer *b,int bits){
-  unsigned long ret;
+  long ret;
   unsigned long m=mask[bits];
 
   bits+=b->endbit;
 
   if(b->endbyte+4>=b->storage){
     /* not the main path */
-    ret=-1UL;
+    ret=-1L;
     if(b->endbyte*8+bits>b->storage*8)goto overflow;
   }
   
@@ -346,14 +346,14 @@ long oggpack_read(oggpack_buffer *b,int bits){
 
 /* bits <= 32 */
 long oggpackB_read(oggpack_buffer *b,int bits){
-  unsigned long ret;
+  long ret;
   long m=32-bits;
   
   bits+=b->endbit;
 
   if(b->endbyte+4>=b->storage){
     /* not the main path */
-    ret=-1UL;
+    ret=-1L;
     if(b->endbyte*8+bits>b->storage*8)goto overflow;
   }
   
@@ -380,11 +380,11 @@ long oggpackB_read(oggpack_buffer *b,int bits){
 }
 
 long oggpack_read1(oggpack_buffer *b){
-  unsigned long ret;
+  long ret;
   
   if(b->endbyte>=b->storage){
     /* not the main path */
-    ret=-1UL;
+    ret=-1L;
     goto overflow;
   }
 
@@ -402,11 +402,11 @@ long oggpack_read1(oggpack_buffer *b){
 }
 
 long oggpackB_read1(oggpack_buffer *b){
-  unsigned long ret;
+  long ret;
   
   if(b->endbyte>=b->storage){
     /* not the main path */
-    ret=-1UL;
+    ret=-1L;
     goto overflow;
   }
 

@@ -1,5 +1,5 @@
 %define name	libogg
-%define version	1.0rc2
+%define version	1.0rc3
 %define release 1
 
 Summary:	Ogg Bitstream Library
@@ -75,6 +75,9 @@ make DESTDIR=$RPM_BUILD_ROOT install
 /sbin/ldconfig
 
 %changelog
+* Tue Dec 18 2001 Jack Moffitt <jack@xiph.org>
+- Update for RC3 release
+
 * Sun Oct 07 2001 Jack Moffitt <jack@xiph.org>
 - add support for configurable prefixes
 

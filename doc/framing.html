@@ -241,6 +241,9 @@ buffered packet segments.<p>
  tells how long the PCM data coded by the bitstream is.  A truncated
  stream will still return the proper number of samples that can be
  decoded fully.
+<p>
+ A special value of '-1' (in two's complement) indicates that no packets
+ finish on this page.
 
 <pre><tt>
  byte value

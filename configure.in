@@ -227,4 +227,4 @@ AC_SUBST(PROFILE)
 AC_SUBST(CC)
 AC_SUBST(RANLIB)
 
-AC_OUTPUT(Makefile src/Makefile doc/Makefile include/Makefile include/ogg/Makefile include/ogg/os_types.h)
+AC_OUTPUT(Makefile src/Makefile doc/Makefile include/Makefile include/ogg/Makefile include/ogg/config_types.h)

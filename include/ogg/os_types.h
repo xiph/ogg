@@ -1,5 +1,3 @@
-#ifndef _OS_TYPES_H
-#define _OS_TYPES_H
 /********************************************************************
  *                                                                  *
  * THIS FILE IS PART OF THE Ogg Vorbis SOFTWARE CODEC SOURCE CODE.  *
@@ -14,12 +12,14 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h.in,v 1.1 2000/09/03 05:54:27 jack Exp $
+ last mod: $Id: os_types.h,v 1.1 2000/10/06 07:32:30 jack Exp $
 
  ********************************************************************/
+#ifndef _OS_TYPES_H
+#define _OS_TYPES_H
 
 #ifdef _WIN32 
-#ifndef __GNUC__
+#  ifndef __GNUC__
 
 /* MSVC/Borland */
 typedef __int64 ogg_int64_t;
@@ -27,7 +27,7 @@ typedef __int32 ogg_int32_t;
 typedef unsigned __int32 ogg_uint32_t;
 typedef __int16 ogg_int16_t;
 
-#else
+#  else
 
 /* Cygwin */
 #include <_G_config.h>
@@ -35,21 +35,34 @@ typedef _G_int64_t ogg_int64_t;
 typedef _G_int32_t ogg_int32_t;
 typedef unsigned _G_int32_t ogg_uint32_t;
 typedef _G_int16_t ogg_int16_t;
-#endif
+
+#  endif
 #else
 
-#ifdef __BEOS__
-/* Be */
-#include <inttypes.h>
-#endif
+
+#  ifdef macintosh
 
 #include <sys/types.h>
 
-/* filled in by configure */
-typedef @SIZE16@ ogg_int16_t;
-typedef @SIZE32@ ogg_int32_t;
-typedef @USIZE32@ ogg_uint32_t;
-typedef @SIZE64@ ogg_int64_t;
+typedef SInt16 ogg_int16_t;
+typedef SInt32 ogg_int32_t;
+typedef UInt32 ogg_uint32_t;
+typedef SInt64 ogg_int64_t;
+
+#  else
+
+#    ifdef __BEOS__
+
+/* Be */
+#include <inttypes.h>
+
+#    endif
+
+#include <sys/types.h>
+#include <ogg/config_types.h>
+
+#  endif /* macintosh */
 
 #endif  /* _WIN32 */
+
 #endif  /* _OS_TYPES_H */

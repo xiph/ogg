@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.11 2003/03/28 22:37:16 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.12 2003/03/29 00:07:32 xiphmont Exp $
 
  ********************************************************************/
 
@@ -172,11 +172,12 @@ int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
   long body_bytes=0;
   int i;
 
+  /* if the incoming page is still valid (and thus unconsumed),
+     release it to prevent a leak */
+  ogg_page_release(og);
+
   /* is there a page waiting to come back? */
-  if(!os->header_tail){
-    if(og)memset(og,0,sizeof(*og));
-    return 0;
-  }
+  if(!os->header_tail) return 0;
 
   /* get header and body sizes */
   oggbyte_init(&ob,os->header_tail,0);
@@ -426,6 +427,11 @@ int ogg_stream_reset_serialno(ogg_stream_state *os,int serialno){
 
 static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
+  /* if the incoming packet is a valid reference, release it such that
+     we don't leak the memory */
+  ogg_packet_release(op);
+
+  /* buffer packets for return */
   _span_queued_page(os);
 
   if(os->holeflag){
@@ -436,7 +442,6 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
       os->holeflag=1;
     if(temp==2){
       os->packetno++;
-      if(op)memset(op,0,sizeof(*op));
       return OGG_HOLE;
     }
   }
@@ -448,15 +453,11 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
       os->spanflag=1;
     if(temp==2){
       os->packetno++;
-      if(op)memset(op,0,sizeof(*op));
       return OGG_SPAN;
     }
   }
 
-  if(!(os->body_fill&FINFLAG)){
-    if(op)memset(op,0,sizeof(*op));
-    return 0;
-  }
+  if(!(os->body_fill&FINFLAG)) return 0;
   if(!op && !adv)return 1; /* just using peek as an inexpensive way
                                to ask if there's a whole packet
                                waiting */
@@ -513,15 +514,19 @@ int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
 }
 
 int ogg_packet_release(ogg_packet *op) {
-  ogg_buffer_release(op->packet);
-  memset(op, 0, sizeof(*op));
+  if(op){
+    ogg_buffer_release(op->packet);
+    memset(op, 0, sizeof(*op));
+  }
   return OGG_SUCCESS;
 }
 
 int ogg_page_release(ogg_page *og) {
-  ogg_buffer_release(og->header);
-  ogg_buffer_release(og->body);
-  memset(og, 0, sizeof(*og));
+  if(og){
+    ogg_buffer_release(og->header);
+    ogg_buffer_release(og->body);
+    memset(og, 0, sizeof(*og));
+  }
   return OGG_SUCCESS;
 }
 
@@ -881,7 +886,7 @@ void test_pack(const int *pl, const int **headers){
 
   for(i=0;i<packets;i++){
     /* construct a test packet */
-    ogg_packet op;
+    ogg_packet op={0,0,0,0,0,0};
     int len=pl[i];
     
     op.packet=ogg_buffer_alloc(bs,len);
@@ -900,7 +905,7 @@ void test_pack(const int *pl, const int **headers){
 
     /* retrieve any finished pages */
     {
-      ogg_page og;
+      ogg_page og={0,0,0,0};
       
       while(ogg_stream_pageout(os_en,&og)){
 	/* We have a page.  Check it carefully */
@@ -920,8 +925,8 @@ void test_pack(const int *pl, const int **headers){
 	/* have a complete page; submit it to sync/decode */
 
 	{
-	  ogg_page og_de;
-	  ogg_packet op_de,op_de2;
+	  ogg_page og_de={0,0,0,0};
+	  ogg_packet op_de={0,0,0,0,0,0},op_de2={0,0,0,0,0,0};
 	  int blen=ogg_buffer_length(og.header)+ogg_buffer_length(og.body);
 	  char *buf=ogg_sync_bufferin(oy,blen);
 	  bufcpy(buf,og.header);
@@ -1159,6 +1164,7 @@ int main(void){
     int pl[]={0,100,4079,2956,2057,76,34,912,0,234,1000,1000,1000,300,-1};
     int inptr=0,i,j;
     ogg_page og[5];
+    memset(og,0,sizeof(og));
     
     ogg_stream_reset(os_en);
 
@@ -1197,8 +1203,8 @@ int main(void){
     
     /* Test lost pages on pagein/packetout: no rollback */
     {
-      ogg_page temp;
-      ogg_packet test;
+      ogg_page temp={0,0,0,0};
+      ogg_packet test={0,0,0,0,0,0};
 
       fprintf(stderr,"Testing loss of pages... ");
 
@@ -1249,8 +1255,8 @@ int main(void){
 
     /* Test lost pages on pagein/packetout: rollback with continuation */
     {
-      ogg_page temp;
-      ogg_packet test;
+      ogg_page temp={0,0,0,0};
+      ogg_packet test={0,0,0,0,0,0};
 
       fprintf(stderr,"Testing loss of pages (rollback required)... ");
 
@@ -1303,7 +1309,7 @@ int main(void){
     
     /* the rest only test sync */
     {
-      ogg_page og_de;
+      ogg_page og_de={0,0,0,0};
       /* Test fractional page inputs: incomplete capture */
       fprintf(stderr,"Testing sync on partial inputs... ");
       ogg_sync_reset(oy);
@@ -1346,7 +1352,7 @@ int main(void){
 
     /* Test fractional page inputs: page + incomplete capture */
     {
-      ogg_page og_de;
+      ogg_page og_de={0,0,0,0};
       fprintf(stderr,"Testing sync on 1+partial inputs... ");
       ogg_sync_reset(oy); 
 
@@ -1377,7 +1383,7 @@ int main(void){
     
     /* Test recapture: garbage + page */
     {
-      ogg_page og_de;
+      ogg_page og_de={0,0,0,0};
       fprintf(stderr,"Testing search for capture... ");
       ogg_sync_reset(oy); 
       
@@ -1414,7 +1420,7 @@ int main(void){
 
     /* Test recapture: page + garbage + page */
     {
-      ogg_page og_de;
+      ogg_page og_de={0,0,0,0};
       fprintf(stderr,"Testing recapture... ");
       ogg_sync_reset(oy); 
 

@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.11 2002/01/19 04:06:53 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.12 2002/05/08 03:34:10 xiphmont Exp $
 
  ********************************************************************/
 
@@ -38,6 +38,50 @@ void oggpack_writeinit(oggpack_buffer *b){
   b->ptr=b->buffer=_ogg_malloc(BUFFER_INCREMENT);
   b->buffer[0]='\0';
   b->storage=BUFFER_INCREMENT;
+}
+
+void oggpack_writetrunc(oggpack_buffer *b,long bits){
+  long bytes=bits>>3;
+  bits-=bytes*8;
+  b->ptr=b->buffer+bytes;
+  b->endbit=bits;
+  b->endbyte=bytes;
+  *b->ptr|=mask[bits];
+}
+
+void oggpack_writealign(oggpack_buffer *b){
+  int bits=8-b->endbit;
+  if(bits<8)
+    oggpack_write(b,0,bits);
+}
+
+void oggpack_writecopy(oggpack_buffer *b,void *source,long bits){
+  unsigned char *ptr=(unsigned char *)source;
+
+  long bytes=bits/8;
+  bits-=bytes*8;
+
+  if(b->endbit){
+    int i;
+    /* unaligned copy.  Do it the hard way. */
+    for(i=0;i<bytes;i++)
+      oggpack_write(b,(long)(ptr[i]),8);    
+  }else{
+    /* aligned block copy */
+    if(b->endbyte+bytes+1>=b->storage){
+      b->storage=b->endbyte+bytes+BUFFER_INCREMENT;
+      b->buffer=_ogg_realloc(b->buffer,b->storage);
+      b->ptr=b->buffer+b->endbyte;
+    }
+
+    memmove(b->ptr,source,bytes);
+    b->ptr+=bytes;
+    b->buffer+=bytes;
+    *b->ptr=0;
+
+  }
+  if(bits)
+    oggpack_write(b,(long)(ptr[bytes]),bits);    
 }
 
 void oggpack_reset(oggpack_buffer *b){

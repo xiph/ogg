@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.14 2002/03/07 03:36:52 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.15 2002/05/08 03:34:09 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -110,6 +110,9 @@ typedef struct {
 /* Ogg BITSTREAM PRIMITIVES: bitstream ************************/
 
 extern void  oggpack_writeinit(oggpack_buffer *b);
+extern void  oggpack_writetrunc(oggpack_buffer *b,long bits);
+extern void  oggpack_writealign(oggpack_buffer *b);
+extern void  oggpack_writecopy(oggpack_buffer *b,void *source,long bits);
 extern void  oggpack_reset(oggpack_buffer *b);
 extern void  oggpack_writeclear(oggpack_buffer *b);
 extern void  oggpack_readinit(oggpack_buffer *b,unsigned char *buf,int bytes);
@@ -175,3 +178,9 @@ extern void     ogg_packet_clear(ogg_packet *op);
 #endif
 
 #endif  /* _OGG_H */
+
+
+
+
+
+

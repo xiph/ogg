@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: centralized fragment buffer management
-  last mod: $Id: buffer.c,v 1.1.2.10 2003/03/26 23:49:26 xiphmont Exp $
+  last mod: $Id: buffer.c,v 1.1.2.11 2003/03/27 07:12:45 xiphmont Exp $
 
  ********************************************************************/
 
@@ -176,9 +176,11 @@ ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length){
   /* duplicate the reference chain; increment refcounts */
   while(or && length){
     ogg_reference *temp=_fetch_ref(or->buffer->ptr.owner);
-    if(head)head->next=temp;
+    if(head)
+      head->next=temp;
+    else
+      ret=temp;
     head=temp;
-    if(!ret)ret=head;
 
 #ifdef OGGBUFFER_DEBUG
     if(or->used==0){
@@ -191,11 +193,12 @@ ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length){
     
     head->begin=or->begin+begin;
     head->length=length;
-    if(head->begin+head->length>or->begin+or->length)
-      head->length=or->begin+or->length-head->begin;
-
+    if(head->length>or->length-begin)
+      head->length=or->length-begin;
+    
     begin=0;
     length-=head->length;
+    or=or->next;
   }
 
   ogg_buffer_mark(ret);
@@ -222,16 +225,19 @@ static void _ogg_buffer_mark_one(ogg_reference *or){
   ogg_mutex_unlock(&bs->mutex);
 }
 
-/* split a reference into two references; on return the passed in
-   pointer points to the first segment (pos of zero disallowed).
-   pointer to the beginning of the secrond reference is returned.  If
-   pos is at or past the end of the passed in segment, returns NULL */
-ogg_reference *ogg_buffer_split(ogg_reference *or,long pos){
+/* split a reference into two references; 'return' is a reference to
+   the buffer preceeding pos and 'head'/'tail' are the buffer past the
+   split.  If pos is at or past the end of the passed in segment,
+   'head/tail' are NULL */
+ogg_reference *ogg_buffer_split(ogg_reference **tail,
+				ogg_reference **head,long pos){
 
   /* walk past any preceeding fragments to one of:
      a) the exact boundary that seps two fragments
      b) the fragment that needs split somewhere in the middle */
-  
+  ogg_reference *ret=*tail;
+  ogg_reference *or=*tail;
+
   while(or && pos>or->length){
 #ifdef OGGBUFFER_DEBUG
     if(or->used==0){
@@ -243,45 +249,50 @@ ogg_reference *ogg_buffer_split(ogg_reference *or,long pos){
     or=or->next;
   }
 
-  if(!or)return NULL;
+  if(!or || pos==0){
 
-  if(pos>=or->length){
-    /* exact split, or off the end */
-    if(or->next){
-
-      /* a split */
-      ogg_reference *ret=or->next;
-      or->next=0;
-      return ret;
-
-    }else{
-
-      /* off or at the end */
-      return NULL;
-
-    }
+    return 0;
+    
   }else{
-
-    /* split within a fragment */
-    long lengthA=pos;
-    long beginB=or->begin+pos;
-    long lengthB=or->length-pos;
-
-    /* make a new reference to head the second piece */
-    ogg_reference *ret=_fetch_ref(or->buffer->ptr.owner);
-
-    ret->buffer=or->buffer;
-    ret->begin=beginB;
-    ret->length=lengthB;
-    ret->next=or->next;
-    _ogg_buffer_mark_one(ret);
-
-    /* update the first piece */
-    or->next=0;
-    or->length=lengthA;
-
-    return ret;
+    
+    if(pos>=or->length){
+      /* exact split, or off the end? */
+      if(or->next){
+	
+	/* a split */
+	*tail=or->next;
+	or->next=0;
+	
+      }else{
+	
+	/* off or at the end */
+	*tail=*head=0;
+	
+      }
+    }else{
+      
+      /* split within a fragment */
+      long lengthA=pos;
+      long beginB=or->begin+pos;
+      long lengthB=or->length-pos;
+      
+      /* make a new reference to tail the second piece */
+      *tail=_fetch_ref(or->buffer->ptr.owner);
+      
+      (*tail)->buffer=or->buffer;
+      (*tail)->begin=beginB;
+      (*tail)->length=lengthB;
+      (*tail)->next=or->next;
+      _ogg_buffer_mark_one(*tail);
+      if(head && or==*head)*head=*tail;    
+      
+      /* update the first piece */
+      or->next=0;
+      or->length=lengthA;
+      
+    }
   }
+  return ret;
 }
 
 /* add a new fragment link to the end of a chain; return ptr to the new link */

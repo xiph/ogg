@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: internal/hidden data representation structures
- last mod: $Id: ogginternal.h,v 1.1.2.11 2003/03/26 23:49:26 xiphmont Exp $
+ last mod: $Id: ogginternal.h,v 1.1.2.12 2003/03/27 07:12:45 xiphmont Exp $
 
  ********************************************************************/
 
@@ -147,7 +147,8 @@ extern void           ogg_buffer_posttruncate(ogg_reference *or,long pos);
 extern ogg_reference *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head);
 extern ogg_reference *ogg_buffer_walk(ogg_reference *or);
 extern long           ogg_buffer_length(ogg_reference *or);
-extern ogg_reference *ogg_buffer_split(ogg_reference *or,long pos);
+extern ogg_reference *ogg_buffer_split(ogg_reference **tail,
+				       ogg_reference **head,long pos);
 
 extern  int           oggbyte_init(oggbyte_buffer *b,ogg_reference *or,
 				   ogg_buffer_state *bs);

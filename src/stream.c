@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.6 2003/03/26 23:49:26 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.7 2003/03/27 07:12:45 xiphmont Exp $
 
  ********************************************************************/
 
@@ -177,19 +177,17 @@ int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
 
   /* split page references out of the fifos */
   if(og){
-    og->header=os->header_tail;
-    og->body=os->body_tail;
-    os->header_tail=ogg_buffer_split(os->header_tail,header_bytes);
-    os->body_tail=ogg_buffer_split(os->body_tail,body_bytes);
+    og->header=ogg_buffer_split(&os->header_tail,&os->header_head,header_bytes);
+    og->body=ogg_buffer_split(&os->body_tail,&os->body_head,body_bytes);
 
     /* checksum */
     ogg_page_checksum_set(og);
   }else{
     os->header_tail=ogg_buffer_pretruncate(os->header_tail,header_bytes);
     os->body_tail=ogg_buffer_pretruncate(os->body_tail,body_bytes);
+    if(!os->header_tail)os->header_head=0;
+    if(!os->body_tail)os->body_head=0;
   }
-  if(!os->header_tail)os->header_head=0;
-  if(!os->body_tail)os->body_head=0;
   
   return 1;
 }
@@ -452,12 +450,11 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
     /* split the body contents off */
     if(op){
-      op->packet=os->body_tail;
-      os->body_tail=ogg_buffer_split(os->body_tail,os->body_fill&FINMASK);
+      op->packet=ogg_buffer_split(&os->body_tail,&os->body_head,os->body_fill&FINMASK);
     }else{
       os->body_tail=ogg_buffer_pretruncate(os->body_tail,os->body_fill&FINMASK);
+      if(os->body_tail==0)os->body_head=0;
     }
-    if(os->body_tail==0)os->body_head=0;
 
     /* update lacing pointers */
     os->body_fill=os->body_fill_next;
@@ -546,6 +543,24 @@ void checkpacket(ogg_packet *op,int len, int no, int pos){
 void check_page(unsigned char *data,const int *header,ogg_page *og){
   long j;
   oggbyte_buffer ob;
+
+  /* test buffer lengths */
+  long header_len=header[26]+27;
+  long body_len=0;
+
+  for(j=27;j<header_len;j++)
+    body_len+=header[j];
+
+  if(header_len!=ogg_buffer_length(og->header)){
+    fprintf(stderr,"page header length mismatch: %ld correct, buffer is %ld\n",
+	    header_len,ogg_buffer_length(og->header));
+    exit(1);
+  }
+  if(body_len!=ogg_buffer_length(og->body)){
+    fprintf(stderr,"page body length mismatch: %ld correct, buffer is %ld\n",
+	    body_len,ogg_buffer_length(og->body));
+    exit(1);
+  }
 
   /* Test data */
   oggbyte_init(&ob,og->body,0);
@@ -895,8 +910,8 @@ void test_pack(const int *pl, const int **headers){
 	    ogg_stream_pagein(os_de,&og_de);
 
 	    /* packets out? */
-	    while(ogg_stream_packetpeek(os_de,&op_de2)>0){
-	      ogg_stream_packetpeek(os_de,NULL);
+	    while(ogg_stream_packetpeek(os_de,NULL)>0){
+	      ogg_stream_packetpeek(os_de,&op_de2);
 	      ogg_stream_packetout(os_de,&op_de); /* just catching them all */
 	      
 	      /* verify the packets! */
@@ -950,6 +965,9 @@ void test_pack(const int *pl, const int **headers){
 		fprintf(stderr,"packet/peek granpos mismatch!\n");
 		exit(1);
 	      }
+
+	      ogg_packet_release(&op_de);
+	      ogg_packet_release(&op_de2);
 	    }
 	  }
 	}

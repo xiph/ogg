@@ -12,7 +12,7 @@
 
  function: decode stream sync and memory management foundation code;
            takes in raw data, spits out packets
- last mod: $Id: sync.c,v 1.1.2.7 2003/03/26 23:49:26 xiphmont Exp $
+ last mod: $Id: sync.c,v 1.1.2.8 2003/03/27 07:12:45 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -335,21 +335,19 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
   /* We have a page.  Set up page return. */
   if(og){
     /* set up page output */
-    og->header=oy->fifo_tail;
-    oy->fifo_tail=ogg_buffer_split(oy->fifo_tail,oy->headerbytes);
-    og->body=oy->fifo_tail;
-    oy->fifo_tail=ogg_buffer_split(oy->fifo_tail,oy->bodybytes);
+    og->header=ogg_buffer_split(&oy->fifo_tail,&oy->fifo_head,oy->headerbytes);
+    og->body=ogg_buffer_split(&oy->fifo_tail,&oy->fifo_head,oy->bodybytes);
   }else{
     /* simply advance */
     oy->fifo_tail=
       ogg_buffer_pretruncate(oy->fifo_tail,oy->headerbytes+oy->bodybytes);
+    if(!oy->fifo_tail)oy->fifo_head=0;
   }
   
   ret=oy->headerbytes+oy->bodybytes;
   oy->unsynced=0;
   oy->headerbytes=0;
   oy->bodybytes=0;
-  if(!oy->fifo_tail)oy->fifo_head=0;
   oy->fifo_fill-=ret;
 
   return ret;

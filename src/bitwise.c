@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: pack variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.14.2.13 2003/03/23 23:40:58 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.14.2.14 2003/03/27 07:12:45 xiphmont Exp $
 
  ********************************************************************/
 
@@ -1112,7 +1112,7 @@ int main(void){
   fprintf(stderr,"\nTesting read past end (LSb): ");
   {
     ogg_buffer lob={"\0\0\0\0\0\0\0\0",8,0,{0}};
-    ogg_reference lor={&lob,0,8,0};
+    ogg_reference lor={&lob,0,8,0,1};
 
     oggpack_readinit(&r,&lor);
     for(i=0;i<64;i++){
@@ -1129,7 +1129,7 @@ int main(void){
   }
   {
     ogg_buffer lob={"\0\0\0\0\0\0\0\0",8,0,{0}};
-    ogg_reference lor={&lob,0,8,0};
+    ogg_reference lor={&lob,0,8,0,1};
     unsigned long test;
 
     oggpack_readinit(&r,&lor);
@@ -1207,7 +1207,7 @@ int main(void){
   fprintf(stderr,"\nTesting read past end (MSb): ");
   {
     ogg_buffer lob={"\0\0\0\0\0\0\0\0",8,0,{0}};
-    ogg_reference lor={&lob,0,8,0};
+    ogg_reference lor={&lob,0,8,0,1};
     unsigned long test;
 
     oggpackB_readinit(&r,&lor);
@@ -1225,7 +1225,7 @@ int main(void){
   }
   {
     ogg_buffer lob={"\0\0\0\0\0\0\0\0",8,0,{0}};
-    ogg_reference lor={&lob,0,8,0};
+    ogg_reference lor={&lob,0,8,0,1};
     unsigned long test;
     oggpackB_readinit(&r,&lor);
 
@@ -1528,8 +1528,7 @@ int main(void){
 	  bitcount+=len[j];
 	/* also exercise the split code */
 	{
-	  ogg_reference *temp=or;
-	  or=ogg_buffer_split(or,bitcount/8);
+	  ogg_reference *temp=ogg_buffer_split(&or,0,bitcount/8);
 	  ogg_buffer_release(temp);
 	}
 

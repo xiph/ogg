@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: centralized fragment buffer management
-  last mod: $Id: buffer.c,v 1.1.2.9 2003/03/23 23:40:58 xiphmont Exp $
+  last mod: $Id: buffer.c,v 1.1.2.10 2003/03/26 23:49:26 xiphmont Exp $
 
  ********************************************************************/
 
@@ -98,7 +98,8 @@ static ogg_buffer *_fetch_buffer(ogg_buffer_state *bs,long bytes){
     /* allocate a new buffer */
     ogg_mutex_unlock(&bs->mutex);
     ob=_ogg_malloc(sizeof(*ob));
-    ob->data=_ogg_malloc(bytes);
+    ob->data=_ogg_malloc(bytes<OGGPACK_MINCHUNKSIZE?
+			 OGGPACK_MINCHUNKSIZE:bytes);
     ob->size=bytes;
   }
 
@@ -126,7 +127,9 @@ static ogg_reference *_fetch_ref(ogg_buffer_state *bs){
   or->begin=0;
   or->length=0;
   or->next=0;
-
+#ifdef OGGBUFFER_DEBUG
+  or->used=1;
+#endif
   return or;
 }
 
@@ -160,6 +163,12 @@ ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length){
 
   /* walk past any preceeding fragments we don't want */
   while(or && begin>=or->length){
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     begin-=or->length;
     or=or->next;
   }
@@ -170,6 +179,13 @@ ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length){
     if(head)head->next=temp;
     head=temp;
     if(!ret)ret=head;
+
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
 
     head->buffer=or->buffer;
     
@@ -192,8 +208,14 @@ static void _ogg_buffer_mark_one(ogg_reference *or){
 				 pools */
   
 #ifdef OGGBUFFER_DEBUG
-  if(or->buffer->refcount==0)
+  if(or->buffer->refcount==0){
     fprintf(stderr,"WARNING: marking buffer fragment with refcount of zero!\n");
+    exit(1);
+  }
+  if(or->used==0){
+    fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+    exit(1);
+  }
 #endif
   
   or->buffer->refcount++;
@@ -211,9 +233,17 @@ ogg_reference *ogg_buffer_split(ogg_reference *or,long pos){
      b) the fragment that needs split somewhere in the middle */
   
   while(or && pos>or->length){
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     pos-=or->length;
     or=or->next;
   }
+
+  if(!or)return NULL;
 
   if(pos>=or->length){
     /* exact split, or off the end */
@@ -257,8 +287,20 @@ ogg_reference *ogg_buffer_split(ogg_reference *or,long pos){
 /* add a new fragment link to the end of a chain; return ptr to the new link */
 ogg_reference *ogg_buffer_extend(ogg_reference *or,long bytes){
   if(or){
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     while(or->next){
       or=or->next;
+#ifdef OGGBUFFER_DEBUG
+      if(or->used==0){
+	fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+	exit(1);
+      }
+#endif
     }
     or->next=ogg_buffer_alloc(or->buffer->ptr.owner,bytes);
     return(or->next);
@@ -280,8 +322,15 @@ void ogg_buffer_release_one(ogg_reference *or){
   ogg_mutex_lock(&bs->mutex);
 
 #ifdef OGGBUFFER_DEBUG
-  if(ob->refcount==0)
+  if(ob->refcount==0){
     fprintf(stderr,"WARNING: releasing buffer fragment with refcount of zero!\n");
+    exit(1);
+  }
+  if(or->used==0){
+    fprintf(stderr,"WARNING: releasing previously released reference!\n");
+    exit(1);
+  }
+  or->used=0;
 #endif
   
   ob->refcount--;
@@ -318,6 +367,12 @@ ogg_reference *ogg_buffer_pretruncate(ogg_reference *or,long pos){
     or=next;
   }
   if (or) {
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     or->begin+=pos;
     or->length-=pos;
   }
@@ -327,6 +382,12 @@ ogg_reference *ogg_buffer_pretruncate(ogg_reference *or,long pos){
 void ogg_buffer_posttruncate(ogg_reference *or,long pos){
   /* walk to the point where we want to begin truncate */
   while(or && pos>or->length){
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     pos-=or->length;
     or=or->next;
   }
@@ -340,7 +401,22 @@ void ogg_buffer_posttruncate(ogg_reference *or,long pos){
 }
 
 ogg_reference *ogg_buffer_walk(ogg_reference *or){
-  while(or->next)or=or->next;
+  if(!or)return NULL;
+  while(or->next){
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
+    or=or->next;
+  }
+#ifdef OGGBUFFER_DEBUG
+  if(or->used==0){
+    fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+    exit(1);
+  }
+#endif
   return(or);
 }
 
@@ -348,8 +424,20 @@ ogg_reference *ogg_buffer_walk(ogg_reference *or){
    be valid pointers, with *tail at the tail and *head at the head */
 ogg_reference *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head){
   while(tail->next){
+#ifdef OGGBUFFER_DEBUG
+    if(tail->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     tail=tail->next;
   }
+#ifdef OGGBUFFER_DEBUG
+  if(tail->used==0){
+    fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+    exit(1);
+  }
+#endif
   tail->next=head;
   return ogg_buffer_walk(head);
 }
@@ -357,6 +445,12 @@ ogg_reference *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head){
 long ogg_buffer_length(ogg_reference *or){
   int count=0;
   while(or){
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
     count+=or->length;
     or=or->next;
   }

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: internal/hidden data representation structures
- last mod: $Id: ogginternal.h,v 1.1.2.10 2003/03/26 07:35:20 xiphmont Exp $
+ last mod: $Id: ogginternal.h,v 1.1.2.11 2003/03/26 23:49:26 xiphmont Exp $
 
  ********************************************************************/
 
@@ -45,7 +45,11 @@ struct ogg_reference {
   struct ogg_buffer    *buffer;
   long                  begin;
   long                  length;
+
   struct ogg_reference *next;
+#ifdef OGGBUFFER_DEBUG
+  int                   used;
+#endif
 };
 
 struct oggpack_buffer {
@@ -81,10 +85,7 @@ struct ogg_sync_state {
   /* stream buffers */
   ogg_reference    *fifo_head;
   ogg_reference    *fifo_tail;
-  
   long              fifo_fill;
-  ogg_reference    *returned_header;
-  ogg_reference    *returned_body;
 
   /* stream sync management */
   int               unsynced;
@@ -101,9 +102,6 @@ struct ogg_stream_state {
   ogg_reference *header_tail;
   ogg_reference *body_head;
   ogg_reference *body_tail;
-
-  ogg_reference *returned;
-  ogg_reference *returned_header;
 
   int            e_o_s;    /* set when we have buffered the last
                               packet in the logical bitstream */
@@ -167,8 +165,10 @@ extern ogg_int64_t    oggbyte_read8(oggbyte_buffer *b,int pos);
 
 #ifdef _V_SELFTEST
 #define OGGPACK_CHUNKSIZE 3
+#define OGGPACK_MINCHUNKSIZE 1
 #else
 #define OGGPACK_CHUNKSIZE 128
+#define OGGPACK_MINCHUNKSIZE 16
 #endif
 
 #endif

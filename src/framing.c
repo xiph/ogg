@@ -1198,20 +1198,26 @@ const int head3_7[] = {0x4f,0x67,0x67,0x53,0,0x05,
 		       0xd4,0xe0,0x60,0xe5,
 		       1,0};
 
-void test_pack(const int *pl, const int **headers){
+void test_pack(const int *pl, const int **headers, int byteskip, 
+	       int pageskip, int packetskip){
   unsigned char *data=_ogg_malloc(1024*1024); /* for scripted test cases only */
   long inptr=0;
   long outptr=0;
   long deptr=0;
   long depacket=0;
   long granule_pos=7,pageno=0;
-  int i,j,packets,pageout=0;
+  int i,j,packets,pageout=pageskip;
   int eosflag=0;
   int bosflag=0;
+
+  int byteskipcount=0;
 
   ogg_stream_reset(&os_en);
   ogg_stream_reset(&os_de);
   ogg_sync_reset(&oy);
+
+  for(packets=0;packets<packetskip;packets++)
+    depacket+=pl[packets];
 
   for(packets=0;;packets++)if(pl[packets]==-1)break;
 
@@ -1250,6 +1256,10 @@ void test_pack(const int *pl, const int **headers){
 
 	outptr+=og.body_len;
 	pageno++;
+	if(pageskip){
+	  pageskip--;
+	  deptr+=og.body_len;
+	}
 
 	/* have a complete page; submit it to sync/decode */
 
@@ -1257,13 +1267,31 @@ void test_pack(const int *pl, const int **headers){
 	  ogg_page og_de;
 	  ogg_packet op_de,op_de2;
 	  char *buf=ogg_sync_buffer(&oy,og.header_len+og.body_len);
-	  memcpy(buf,og.header,og.header_len);
-	  memcpy(buf+og.header_len,og.body,og.body_len);
-	  ogg_sync_wrote(&oy,og.header_len+og.body_len);
+	  char *next=buf;
+	  byteskipcount+=og.header_len;
+	  if(byteskipcount>byteskip){
+	    memcpy(next,og.header,byteskipcount-byteskip);
+	    next+=byteskipcount-byteskip;
+	    byteskipcount=byteskip;
+	  }
 
-	  while(ogg_sync_pageout(&oy,&og_de)>0){
+	  byteskipcount+=og.body_len;
+	  if(byteskipcount>byteskip){
+	    memcpy(next,og.body,byteskipcount-byteskip);
+	    next+=byteskipcount-byteskip;
+	    byteskipcount=byteskip;
+	  }
+
+	  ogg_sync_wrote(&oy,next-buf);
+
+	  while(1){
+	    int ret=ogg_sync_pageout(&oy,&og_de);
+	    if(ret==0)break;
+	    if(ret<0)continue;
 	    /* got a page.  Happy happy.  Verify that it's good. */
 	    
+	    fprintf(stderr,"(%ld), ",pageout);
+
 	    check_page(data+deptr,headers[pageout],&og_de);
 	    deptr+=og_de.body_len;
 	    pageout++;
@@ -1363,7 +1391,7 @@ int main(void){
     const int *headret[]={head1_0,NULL};
     
     fprintf(stderr,"testing single page encoding... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
   {
@@ -1372,7 +1400,7 @@ int main(void){
     const int *headret[]={head1_1,head2_1,NULL};
     
     fprintf(stderr,"testing basic page encoding... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
   {
@@ -1381,7 +1409,7 @@ int main(void){
     const int *headret[]={head1_2,head2_2,NULL};
     
     fprintf(stderr,"testing basic nil packets... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
   {
@@ -1390,7 +1418,7 @@ int main(void){
     const int *headret[]={head1_3,head2_3,NULL};
     
     fprintf(stderr,"testing initial-packet lacing > 4k... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
   {
@@ -1399,7 +1427,7 @@ int main(void){
     const int *headret[]={head1_4,head2_4,head3_4,NULL};
     
     fprintf(stderr,"testing single packet page span... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
   /* page with the 255 segment limit */
@@ -1440,7 +1468,7 @@ int main(void){
     const int *headret[]={head1_5,head2_5,head3_5,NULL};
     
     fprintf(stderr,"testing max packet segments... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
   {
@@ -1449,7 +1477,17 @@ int main(void){
     const int *headret[]={head1_6,head2_6,head3_6,head4_6,NULL};
     
     fprintf(stderr,"testing very large packets... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
+  }
+
+  {
+    /* test for the libogg 1.1.1 resync in large continuation bug
+       found by Josh Coalson)  */
+    const int packets[]={0,100,9000,259,255,-1};
+    const int *headret[]={head1_6,head2_6,head3_6,head4_6,NULL};
+    
+    fprintf(stderr,"testing continuation resync in very large packets... ");
+    test_pack(packets,headret,100,2,3);
   }
 
   {
@@ -1458,7 +1496,7 @@ int main(void){
     const int *headret[]={head1_7,head2_7,head3_7,NULL};
     
     fprintf(stderr,"testing zero data page (1 nil packet)... ");
-    test_pack(packets,headret);
+    test_pack(packets,headret,0,0,0);
   }
 
 

@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.15 2003/09/29 14:21:24 giles Exp $
+  last mod: $Id: bitwise.c,v 1.16 2003/10/08 02:53:40 xiphmont Exp $
 
  ********************************************************************/
 
@@ -150,7 +150,8 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
 				     long bits,
 				     void (*w)(oggpack_buffer *,
 					       unsigned long,
-					       int)){
+					       int),
+				     int msb){
   unsigned char *ptr=(unsigned char *)source;
 
   long bytes=bits/8;
@@ -175,16 +176,20 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
     *b->ptr=0;
 
   }
-  if(bits)
-    w(b,(unsigned long)(ptr[bytes]),bits);    
+  if(bits){
+    if(msb)
+      w(b,(unsigned long)(ptr[bytes]>>(8-bits)),bits);    
+    else
+      w(b,(unsigned long)(ptr[bytes]),bits);    
+  }
 }
 
 void oggpack_writecopy(oggpack_buffer *b,void *source,long bits){
-  oggpack_writecopy_helper(b,source,bits,oggpack_write);
+  oggpack_writecopy_helper(b,source,bits,oggpack_write,0);
 }
 
 void oggpackB_writecopy(oggpack_buffer *b,void *source,long bits){
-  oggpack_writecopy_helper(b,source,bits,oggpackB_write);
+  oggpack_writecopy_helper(b,source,bits,oggpackB_write,1);
 }
 
 void oggpack_reset(oggpack_buffer *b){

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.12 2002/09/18 04:42:09 xiphmont Exp $
+ last mod: $Id: os_types.h,v 1.13 2003/05/23 09:41:40 msmith Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -79,6 +79,14 @@
    typedef int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;
+
+#elif defined(R5900)
+
+   /* PS2 EE */
+   typedef long ogg_int64_t;
+   typedef int ogg_int32_t;
+   typedef unsigned ogg_uint32_t;
+   typedef short ogg_int16_t;
 
 #else
 

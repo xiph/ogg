@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.16 2001/11/15 13:11:10 msmith Exp $
+ last mod: $Id: framing.c,v 1.17 2001/11/22 06:22:27 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -91,7 +91,7 @@ more page packet), the return will be:
 int ogg_page_packets(ogg_page *og){
   int i,n=og->header[26],count=0;
   for(i=0;i<n;i++)
-    if(og->header[27+i]==0)count++;
+    if(og->header[27+i]<255)count++;
   return(count);
 }
 

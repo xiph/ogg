@@ -1,4 +1,4 @@
-; $Id: ogg.def,v 1.6 2002/03/18 04:39:34 segher Exp $
+; $Id: ogg.def,v 1.7 2002/07/04 09:14:43 msmith Exp $
 ;
 ; ogg.def
 ;
@@ -45,5 +45,6 @@ oggpack_read1
 oggpack_readinit
 oggpack_reset
 oggpack_write
+oggpack_writealign
 oggpack_writeclear
 oggpack_writeinit

@@ -1,4 +1,4 @@
-libogg (1.0rc1) unstable; urgency=low
+libogg (1.0rc1-1) unstable; urgency=low
 
   * New upstream.
   * Updated config.* files (Closes: #94816)

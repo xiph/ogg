@@ -732,10 +732,13 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
       os->lacing_vals[os->lacing_fill++]=0x400;
       os->lacing_packet++;
     }
+  }
 
-    /* are we a 'continued packet' page?  If so, we'll need to skip
-       some segments */
-    if(continued){
+  /* are we a 'continued packet' page?  If so, we may need to skip
+     some segments */
+  if(continued){
+    if(os->lacing_fill<1 || 
+       os->lacing_vals[os->lacing_fill-1]==0x400){
       bos=0;
       for(;segptr<segments;segptr++){
 	int val=header[27+segptr];
@@ -1257,6 +1260,7 @@ void test_pack(const int *pl, const int **headers, int byteskip,
 	outptr+=og.body_len;
 	pageno++;
 	if(pageskip){
+	  bosflag=1;
 	  pageskip--;
 	  deptr+=og.body_len;
 	}

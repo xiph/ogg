@@ -12,7 +12,7 @@ pkgconfig_DATA = ogg.pc
 
 EXTRA_DIST = README AUTHORS CHANGES COPYING \
 	libogg.spec libogg.spec.in \
-	ogg.m4 ogg.pc.in \
+	ogg.m4 ogg.pc.in ogg-uninstalled.pc.in \
 	macos macosx
 
 dist-hook:

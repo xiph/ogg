@@ -7,3 +7,6 @@ Makefile
 *.ncb
 *.plg
 *.opt
+*.dep
+*.mak
+*.dsw

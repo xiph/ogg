@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.10 2002/07/11 09:09:07 xiphmont Exp $
+ last mod: $Id: os_types.h,v 1.11 2002/07/19 08:25:51 msmith Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -61,6 +61,10 @@
 
    /* Be */
 #  include <inttypes.h>
+   typedef int16_t ogg_int16_t;
+   typedef int32_t ogg_int32_t;
+   typedef u_int32_t ogg_uint32_t;
+   typedef int64_t ogg_int64_t;
 
 #elif defined (__EMX__)
 

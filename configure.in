@@ -47,6 +47,11 @@ else
                 CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
                 PROFILE="-pg -g -O20 -fsigned-char -mv8" 
 		;;
+	*-*-darwin*)
+		DEBUG="-fno-common -g -Wall -fsigned-char"
+		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
+		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+		;;
         *)
                 DEBUG="-g -Wall -fsigned-char"
                 CFLAGS="-O20 -fsigned-char"

@@ -12,6 +12,7 @@ URL:		http://www.xiph.org/
 Vendor:		Xiphophorus <team@xiph.org>
 Source:		ftp://ftp.xiph.org/pub/ogg/%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-root
+Prefix:		%{_prefix}
 
 %description
 Libogg is a library for manipulating ogg bitstreams.  It handles
@@ -31,9 +32,9 @@ needed to develop applications with libogg.
 
 %build
 if [ ! -f configure ]; then
-  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=/usr
+  CFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{_prefix}
 else
-  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
+  CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
 fi
 make
 
@@ -47,7 +48,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %doc CHANGES
 %doc COPYING
 %doc README
-/usr/lib/libogg.so.*
+%{_libdir}/libogg.so.*
 
 %files devel
 %doc doc/index.html
@@ -57,12 +58,12 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %doc doc/white-xifish.png
 %doc doc/stream.png
 %doc doc/ogg
-/usr/include/ogg/ogg.h
-/usr/include/ogg/os_types.h
-/usr/include/ogg/config_types.h
-/usr/lib/libogg.a
-/usr/lib/libogg.so
-/usr/share/aclocal/ogg.m4
+%{_includedir}/ogg/ogg.h
+%{_includedir}/ogg/os_types.h
+%{_includedir}/ogg/config_types.h
+%{_libdir}/libogg.a
+%{_libdir}/libogg.so
+%{_datadir}/aclocal/ogg.m4
 
 %clean 
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -74,5 +75,8 @@ make DESTDIR=$RPM_BUILD_ROOT install
 /sbin/ldconfig
 
 %changelog
+* Sun Oct 07 2001 Jack Moffitt <jack@xiph.org>
+- add support for configurable prefixes
+
 * Sat Sep 02 2000 Jack Moffitt <jack@icecast.org>
 - initial spec file created

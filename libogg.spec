@@ -9,7 +9,7 @@ Release:	%{release}
 Group:		Libraries/Multimedia
 Copyright:	LGPL
 URL:		http://www.xiph.org/
-Vendor:		Xiphophorus <team@xiph.org>
+Vendor:		Xiph.org Foundation <team@xiph.org>
 Source:		ftp://ftp.xiph.org/pub/ogg/%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-root
 Prefix:		%{_prefix}

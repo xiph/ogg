@@ -47,6 +47,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %doc COPYING
 %doc README
 /usr/lib/libogg.so*
+/usr/bin/ogg-config
 
 %files devel
 %doc doc/index.html
@@ -59,6 +60,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 /usr/include/ogg/os_types.h
 /usr/include/ogg/config_types.h
 /usr/lib/libogg.a
+/usr/share/aclocal/ogg.m4
 
 %clean 
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT

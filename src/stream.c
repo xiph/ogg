@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.7 2003/03/27 07:12:45 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.8 2003/03/27 09:10:14 xiphmont Exp $
 
  ********************************************************************/
 
@@ -291,6 +291,12 @@ static void _span_queued_page(ogg_stream_state *os){
 	  os->holeflag=1;  /* set for internal use */
 	else
 	  os->holeflag=2;  /* set for external reporting */
+
+	os->body_tail=ogg_buffer_pretruncate(os->body_tail,
+					     os->body_fill);
+	if(os->body_tail==0)os->body_head=0;
+	os->body_fill=0;
+
       }
     
       if(ogg_page_continued(&og)){
@@ -372,8 +378,8 @@ int ogg_stream_reset(ogg_stream_state *os){
 
   ogg_buffer_release(os->header_tail);
   ogg_buffer_release(os->body_tail);
-  os->header_head=0;
-  os->body_head=0;
+  os->header_tail=os->header_head=0;
+  os->body_tail=os->body_head=0;
 
   os->e_o_s=0;
   os->b_o_s=0;
@@ -1177,7 +1183,7 @@ int main(void){
       ogg_sync_pageout(oy,&temp);
       ogg_stream_pagein(os_de,&temp);
       ogg_sync_pageout(oy,&temp);
-      /* skip */
+      ogg_page_release(&temp);/* skip */
       ogg_sync_pageout(oy,&temp);
       ogg_stream_pagein(os_de,&temp);
 
@@ -1189,7 +1195,7 @@ int main(void){
       checkpacket(&test,100,1,-1);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,4079,2,3000);
-      if(ogg_stream_packetout(os_de,&test)!=-1){
+      if(ogg_stream_packetout(os_de,&test)!=OGG_HOLE){
 	fprintf(stderr,"Error: loss of page did not return error\n");
 	exit(1);
       }
@@ -1225,7 +1231,7 @@ int main(void){
       ogg_sync_pageout(oy,&temp);
       ogg_stream_pagein(os_de,&temp);
       ogg_sync_pageout(oy,&temp);
-      /* skip */
+      ogg_page_release(&temp);/* skip */
       ogg_sync_pageout(oy,&temp);
       ogg_stream_pagein(os_de,&temp);
 
@@ -1239,7 +1245,7 @@ int main(void){
       checkpacket(&test,4079,2,3000);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,2956,3,4000);
-      if(ogg_stream_packetout(os_de,&test)!=-1){
+      if(ogg_stream_packetout(os_de,&test)!=OGG_HOLE){
 	fprintf(stderr,"Error: loss of page did not return error\n");
 	exit(1);
       }
@@ -1264,7 +1270,7 @@ int main(void){
       if(ogg_sync_pageout(oy,&og_de)>0)error();
       
       /* Test fractional page inputs: incomplete header */
-      bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header,33);
+      bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header,23);
       ogg_sync_wrote(oy,5);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
       
@@ -1358,6 +1364,8 @@ int main(void){
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].body)),og[1].body);
       ogg_sync_wrote(oy,ogg_buffer_length(og[1].body));
 
+      /* garbage */
+
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[2].header)),og[2].header);
       ogg_sync_wrote(oy,ogg_buffer_length(og[2].header));
 
@@ -1370,7 +1378,7 @@ int main(void){
       ogg_sync_wrote(oy,ogg_buffer_length(og[2].body)-5);
 
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[3].header)),og[3].header);
-      ogg_sync_wrote(oy,ogg_buffer_length(og[1].header));
+      ogg_sync_wrote(oy,ogg_buffer_length(og[3].header));
 
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[3].body)),og[3].body);
       ogg_sync_wrote(oy,ogg_buffer_length(og[3].body));

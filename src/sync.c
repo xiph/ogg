@@ -12,7 +12,7 @@
 
  function: decode stream sync and memory management foundation code;
            takes in raw data, spits out packets
- last mod: $Id: sync.c,v 1.1.2.8 2003/03/27 07:12:45 xiphmont Exp $
+ last mod: $Id: sync.c,v 1.1.2.9 2003/03/27 09:10:14 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -428,7 +428,9 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
 int ogg_sync_reset(ogg_sync_state *oy){
 
   ogg_buffer_release(oy->fifo_tail);
-  oy->fifo_tail=oy->fifo_head=0;
+  oy->fifo_tail=0;
+  oy->fifo_head=0;
+  oy->fifo_fill=0;
 
   oy->unsynced=0;
   oy->headerbytes=0;

@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: centralized fragment buffer management
-  last mod: $Id: buffer.c,v 1.1.2.11 2003/03/27 07:12:45 xiphmont Exp $
+  last mod: $Id: buffer.c,v 1.1.2.12 2003/03/27 09:10:14 xiphmont Exp $
 
  ********************************************************************/
 
@@ -434,6 +434,8 @@ ogg_reference *ogg_buffer_walk(ogg_reference *or){
 /* *head is appended to the front end (head) of *tail; both continue to
    be valid pointers, with *tail at the tail and *head at the head */
 ogg_reference *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head){
+  if(!tail)return head;
+
   while(tail->next){
 #ifdef OGGBUFFER_DEBUG
     if(tail->used==0){

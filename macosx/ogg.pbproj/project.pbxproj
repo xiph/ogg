@@ -44,7 +44,7 @@
 		};
 		034768E0FF38A50411DB9C8B = {
 			isa = PBXFrameworkReference;
-			path = ogg.framework;
+			path = Ogg.framework;
 			refType = 3;
 		};
 //030
@@ -116,7 +116,7 @@
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-D__MACOSX__";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = ogg;
+				PRODUCT_NAME = Ogg;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 				WRAPPER_EXTENSION = framework;
@@ -135,7 +135,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>ogg</string>
+	<string>Ogg</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>

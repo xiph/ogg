@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.13 2003/08/15 20:31:57 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.14 2003/11/30 15:56:32 arc Exp $
 
  ********************************************************************/
 
@@ -293,8 +293,8 @@ static void _span_queued_page(ogg_stream_state *os){
       long pageno;
       oggbyte_buffer ob;
 
-      pageno=ogg_page_pageno(&og);
       og.header=os->header_tail; /* only for parsing header values */
+      pageno=ogg_page_pageno(&og);
 
       oggbyte_init(&ob,os->header_tail,0);
       os->lacing_fill=oggbyte_read1(&ob,26);

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.14 2003/09/02 05:09:14 xiphmont Exp $
+ last mod: $Id: os_types.h,v 1.15 2004/03/14 17:26:27 giles Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -24,23 +24,29 @@
 #define _ogg_realloc realloc
 #define _ogg_free    free
 
-#ifdef _WIN32 
+#if defined(_WIN32) 
 
-#  ifndef __GNUC__
-   /* MSVC/Borland */
-   typedef __int64 ogg_int64_t;
-   typedef __int32 ogg_int32_t;
-   typedef unsigned __int32 ogg_uint32_t;
-   typedef __int16 ogg_int16_t;
-   typedef unsigned __int16 ogg_uint16_t;
+#  if defined(__CYGWIN__)
+#    include <_G_config.h>
+     typedef _G_int64_t ogg_int64_t;
+     typedef _G_int32_t ogg_int32_t;
+     typedef _G_uint32_t ogg_uint32_t;
+     typedef _G_int16_t ogg_int16_t;
+     typedef _G_uint16_t ogg_uint16_t;
+#  if defined(__MINGW32__)
+     typedef short ogg_int16_t;                                                                             
+     typedef unsigned short ogg_uint16_t;                                                                   
+     typedef int ogg_int32_t;                                                                               
+     typedef unsigned int ogg_uint32_t;                                                                     
+     typedef long long ogg_int64_t;                                                                         
+     typedef unsigned long long ogg_uint64_t;  
 #  else
-   /* Cygwin */
-   #include <_G_config.h>
-   typedef _G_int64_t ogg_int64_t;
-   typedef _G_int32_t ogg_int32_t;
-   typedef _G_uint32_t ogg_uint32_t;
-   typedef _G_int16_t ogg_int16_t;
-   typedef _G_uint16_t ogg_uint16_t;
+     /* MSVC/Borland */
+     typedef __int64 ogg_int64_t;
+     typedef __int32 ogg_int32_t;
+     typedef unsigned __int32 ogg_uint32_t;
+     typedef __int16 ogg_int16_t;
+     typedef unsigned __int16 ogg_uint16_t;
 #  endif
 
 #elif defined(__MACOS__)

@@ -687,6 +687,7 @@ int main(void){
     fprintf(stderr,"failed; read past end without -1.\n");
       exit(1);
   }
+  oggpack_writeclear(&o);
   fprintf(stderr,"ok.\n");
 
   /********** lazy, cut-n-paste retest with MSb packing ***********/
@@ -772,6 +773,7 @@ int main(void){
     fprintf(stderr,"failed; read past end without -1.\n");
       exit(1);
   }
+  oggpackB_writeclear(&o);
   fprintf(stderr,"ok.\n\n");
 
 

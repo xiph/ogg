@@ -1002,6 +1002,11 @@ void copy_page(ogg_page *og){
   og->body=temp;
 }
 
+void free_page(ogg_page *og){
+  _ogg_free (og->header);
+  _ogg_free (og->body);
+}
+
 void error(void){
   fprintf(stderr,"error!\n");
   exit(1);
@@ -1733,6 +1738,13 @@ int main(void){
       if(ogg_sync_pageout(&oy,&og_de)<=0)error();
 
       fprintf(stderr,"ok.\n");
+    }
+
+    /* Free page data that was previously copied */
+    {
+      for(i=0;i<5;i++){
+	free_page(&og[i]);
+      }
     }
   }    
 

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: internal/hidden data representation structures
- last mod: $Id: ogginternal.h,v 1.1.2.12 2003/03/27 07:12:45 xiphmont Exp $
+ last mod: $Id: ogginternal.h,v 1.1.2.13 2003/03/27 21:38:16 xiphmont Exp $
 
  ********************************************************************/
 
@@ -134,35 +134,36 @@ struct ogg_stream_state {
 };
 
 extern ogg_buffer_state *ogg_buffer_create(void);
-extern void           ogg_buffer_destroy(ogg_buffer_state *bs);
-extern ogg_reference *ogg_buffer_alloc(ogg_buffer_state *bs,long bytes);
-extern void           ogg_buffer_realloc(ogg_reference *or,long bytes);
-extern ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length);
-extern ogg_reference *ogg_buffer_extend(ogg_reference *or,long bytes);
-extern void           ogg_buffer_mark(ogg_reference *or);
-extern void           ogg_buffer_release(ogg_reference *or);
-extern void           ogg_buffer_release_one(ogg_reference *or);
-extern ogg_reference *ogg_buffer_pretruncate(ogg_reference *or,long pos);
-extern void           ogg_buffer_posttruncate(ogg_reference *or,long pos);
-extern ogg_reference *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head);
-extern ogg_reference *ogg_buffer_walk(ogg_reference *or);
-extern long           ogg_buffer_length(ogg_reference *or);
-extern ogg_reference *ogg_buffer_split(ogg_reference **tail,
+extern void              ogg_buffer_destroy(ogg_buffer_state *bs);
+extern ogg_reference    *ogg_buffer_alloc(ogg_buffer_state *bs,long bytes);
+extern void              ogg_buffer_realloc(ogg_reference *or,long bytes);
+extern ogg_reference    *ogg_buffer_dup(ogg_reference *or,long begin,long length);
+extern ogg_reference    *ogg_buffer_extend(ogg_reference *or,long bytes);
+extern void              ogg_buffer_mark(ogg_reference *or);
+extern void              ogg_buffer_release(ogg_reference *or);
+extern void              ogg_buffer_release_one(ogg_reference *or);
+extern ogg_reference    *ogg_buffer_pretruncate(ogg_reference *or,long pos);
+extern void              ogg_buffer_posttruncate(ogg_reference *or,long pos);
+extern ogg_reference    *ogg_buffer_cat(ogg_reference *tail, ogg_reference *head);
+extern ogg_reference    *ogg_buffer_walk(ogg_reference *or);
+extern long              ogg_buffer_length(ogg_reference *or);
+extern ogg_reference    *ogg_buffer_split(ogg_reference **tail,
 				       ogg_reference **head,long pos);
+extern void              ogg_buffer_outstanding(ogg_buffer_state *bs);
 
-extern  int           oggbyte_init(oggbyte_buffer *b,ogg_reference *or,
+extern  int              oggbyte_init(oggbyte_buffer *b,ogg_reference *or,
 				   ogg_buffer_state *bs);
-extern void           oggbyte_clear(oggbyte_buffer *b);
-extern ogg_reference *oggbyte_return_and_reset(oggbyte_buffer *b);
-extern void           oggbyte_set1(oggbyte_buffer *b,unsigned char val,
+extern void              oggbyte_clear(oggbyte_buffer *b);
+extern ogg_reference    *oggbyte_return_and_reset(oggbyte_buffer *b);
+extern void              oggbyte_set1(oggbyte_buffer *b,unsigned char val,
 				   int pos);
-extern void           oggbyte_set2(oggbyte_buffer *b,int val,int pos);
-extern void           oggbyte_set4(oggbyte_buffer *b,ogg_uint32_t val,int pos);
-extern void           oggbyte_set8(oggbyte_buffer *b,ogg_int64_t val,int pos);
-extern unsigned char  oggbyte_read1(oggbyte_buffer *b,int pos);
-extern int            oggbyte_read2(oggbyte_buffer *b,int pos);
-extern ogg_uint32_t   oggbyte_read4(oggbyte_buffer *b,int pos);
-extern ogg_int64_t    oggbyte_read8(oggbyte_buffer *b,int pos);
+extern void              oggbyte_set2(oggbyte_buffer *b,int val,int pos);
+extern void              oggbyte_set4(oggbyte_buffer *b,ogg_uint32_t val,int pos);
+extern void              oggbyte_set8(oggbyte_buffer *b,ogg_int64_t val,int pos);
+extern unsigned char     oggbyte_read1(oggbyte_buffer *b,int pos);
+extern int               oggbyte_read2(oggbyte_buffer *b,int pos);
+extern ogg_uint32_t      oggbyte_read4(oggbyte_buffer *b,int pos);
+extern ogg_int64_t       oggbyte_read8(oggbyte_buffer *b,int pos);
 
 #ifdef _V_SELFTEST
 #define OGGPACK_CHUNKSIZE 3

@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: centralized fragment buffer management
-  last mod: $Id: buffer.c,v 1.1.2.12 2003/03/27 09:10:14 xiphmont Exp $
+  last mod: $Id: buffer.c,v 1.1.2.13 2003/03/27 21:38:16 xiphmont Exp $
 
  ********************************************************************/
 
@@ -48,6 +48,14 @@ static void _ogg_buffer_destroy(ogg_buffer_state *bs){
   ogg_reference *rt;
 
   if(bs->shutdown){
+
+#ifdef OGGBUFFER_DEBUG
+    fprintf(stderr,"\nZero-copy pool %p lazy destroy: %d buffers outstanding.\n",
+	    bs,bs->outstanding);
+    if(!bs->outstanding)
+      fprintf(stderr,"Finishing memory cleanup of %p.\n",bs);
+#endif
+
     bt=bs->unused_buffers;
     rt=bs->unused_references;
 
@@ -55,6 +63,7 @@ static void _ogg_buffer_destroy(ogg_buffer_state *bs){
       ogg_mutex_unlock(&bs->mutex);
       ogg_mutex_clear(&bs->mutex);
       _ogg_free(bs);
+      return;
     }else
       ogg_mutex_unlock(&bs->mutex);
 
@@ -64,11 +73,13 @@ static void _ogg_buffer_destroy(ogg_buffer_state *bs){
       if(b->data)_ogg_free(b->data);
       _ogg_free(b);
     }
+    bs->unused_buffers=0;
     while(rt){
       ogg_reference *r=rt;
       rt=r->next;
       _ogg_free(r);
     }
+    bs->unused_references=0;
   }
 }
 
@@ -468,4 +479,11 @@ long ogg_buffer_length(ogg_reference *or){
     or=or->next;
   }
   return count;
+}
+
+void ogg_buffer_outstanding(ogg_buffer_state *bs){
+#ifdef OGGBUFFER_DEBUG
+  fprintf(stderr,"Zero-copy pool %p: %d buffers outstanding.\n",
+	  bs,bs->outstanding);
+#endif
 }

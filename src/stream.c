@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.8 2003/03/27 09:10:14 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.9 2003/03/27 21:38:16 xiphmont Exp $
 
  ********************************************************************/
 
@@ -850,10 +850,6 @@ void test_pack(const int *pl, const int **headers){
   int eosflag=0;
   int bosflag=0;
     
-  ogg_stream_reset(os_en);
-  ogg_stream_reset(os_de);
-  ogg_sync_reset(oy);
-
   for(packets=0;;packets++)if(pl[packets]==-1)break;
 
   for(i=0;i<packets;i++){
@@ -977,6 +973,7 @@ void test_pack(const int *pl, const int **headers){
 	    }
 	  }
 	}
+	ogg_page_release(&og);
       }
     }
   }
@@ -1006,6 +1003,16 @@ void test_pack(const int *pl, const int **headers){
     exit(1);
   }
   fprintf(stderr,"ok.\n");
+
+  ogg_stream_reset(os_en);
+  ogg_stream_reset(os_de);
+  ogg_sync_reset(oy);
+
+
+  ogg_buffer_outstanding(os_en->bufferpool);
+  ogg_buffer_outstanding(os_de->bufferpool);
+  ogg_buffer_outstanding(oy->bufferpool);
+  ogg_buffer_outstanding(bs);
 
 }
 
@@ -1159,7 +1166,11 @@ int main(void){
 	exit(1);
       }
     }
-
+    if(ogg_stream_pageout(os_en,&og[0])>0){
+      fprintf(stderr,"Too many pages output building sync tests!\n");
+      exit(1);
+    }
+    
     /* Test lost pages on pagein/packetout: no rollback */
     {
       ogg_page temp;
@@ -1191,18 +1202,24 @@ int main(void){
       
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,0,0,0);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,100,1,-1);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,4079,2,3000);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=OGG_HOLE){
 	fprintf(stderr,"Error: loss of page did not return error\n");
 	exit(1);
       }
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,76,5,-1);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,34,6,-1);
+      ogg_packet_release(&test);
       fprintf(stderr,"ok.\n");
     }
 
@@ -1239,18 +1256,24 @@ int main(void){
       
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,0,0,0);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,100,1,-1);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,4079,2,3000);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,2956,3,4000);
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=OGG_HOLE){
 	fprintf(stderr,"Error: loss of page did not return error\n");
 	exit(1);
       }
+      ogg_packet_release(&test);
       if(ogg_stream_packetout(os_de,&test)!=1)error();
       checkpacket(&test,300,13,14000);
+      ogg_packet_release(&test);
       fprintf(stderr,"ok.\n");
     }
     
@@ -1263,30 +1286,36 @@ int main(void){
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header);
       ogg_sync_wrote(oy,3);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       
       /* Test fractional page inputs: incomplete fixed header */
       bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header,3);
       ogg_sync_wrote(oy,20);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       
       /* Test fractional page inputs: incomplete header */
       bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header,23);
       ogg_sync_wrote(oy,5);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       
       /* Test fractional page inputs: incomplete body */
       
       bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header,28);
       ogg_sync_wrote(oy,ogg_buffer_length(og[1].header)-28);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].body)),og[1].body);
       ogg_sync_wrote(oy,1000);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       
       bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].body)),og[1].body,1000);
       ogg_sync_wrote(oy,ogg_buffer_length(og[1].body)-1000);
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
       
       fprintf(stderr,"ok.\n");
     }
@@ -1306,7 +1335,9 @@ int main(void){
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header);
       ogg_sync_wrote(oy,20);
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
 
       bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[1].header)),og[1].header,20);
       ogg_sync_wrote(oy,ogg_buffer_length(og[1].header)-20);
@@ -1315,6 +1346,7 @@ int main(void){
       ogg_sync_wrote(oy,ogg_buffer_length(og[1].body));
 
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
 
       fprintf(stderr,"ok.\n");
     }
@@ -1339,8 +1371,11 @@ int main(void){
       ogg_sync_wrote(oy,20);
 
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
 
       bufcpy2(ogg_sync_bufferin(oy,ogg_buffer_length(og[2].header)),og[2].header,20);
       ogg_sync_wrote(oy,ogg_buffer_length(og[2].header)-20);
@@ -1348,6 +1383,7 @@ int main(void){
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[2].body)),og[2].body);
       ogg_sync_wrote(oy,ogg_buffer_length(og[2].body));
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
 
       fprintf(stderr,"ok.\n");
     }
@@ -1373,6 +1409,7 @@ int main(void){
       ogg_sync_wrote(oy,ogg_buffer_length(og[2].header));
 
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
 
       bufcpy(ogg_sync_bufferin(oy,ogg_buffer_length(og[2].body)),og[2].body);
       ogg_sync_wrote(oy,ogg_buffer_length(og[2].body)-5);
@@ -1384,11 +1421,19 @@ int main(void){
       ogg_sync_wrote(oy,ogg_buffer_length(og[3].body));
 
       if(ogg_sync_pageout(oy,&og_de)>0)error();
+      ogg_page_release(&og_de);
       if(ogg_sync_pageout(oy,&og_de)<=0)error();
+      ogg_page_release(&og_de);
 
       fprintf(stderr,"ok.\n");
     }
-  }    
+    ogg_stream_destroy(os_en);
+    for(i=0;i<5;i++)
+      ogg_page_release(&og[i]);
+  }
+
+  ogg_stream_destroy(os_de);
+  ogg_sync_destroy(oy);
 
   ogg_buffer_destroy(bs);
   return 0;

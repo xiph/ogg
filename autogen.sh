@@ -73,7 +73,7 @@ fi
 
 echo -n "checking for libtool... "
 for LIBTOOLIZE in libtoolize glibtoolize nope; do
-  (which $LIBTOOLIZE) > /dev/null 2>&1 && break
+  ($LIBTOOLIZE --version) < /dev/null > /dev/null 2>&1 && break
 done
 if test x$LIBTOOLIZE = xnope; then
   echo "nope."

@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.18 2004/03/08 04:10:00 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.19 2004/03/16 18:31:49 xiphmont Exp $
 
  ********************************************************************/
 
@@ -170,7 +170,7 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
       b->ptr=b->buffer+b->endbyte;
     }
 
-    bcopy(source,b->ptr,bytes);
+    memmove(b->ptr,source,bytes);
     b->ptr+=bytes;
     b->buffer+=bytes;
     *b->ptr=0;

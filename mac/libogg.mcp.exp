@@ -50,6 +50,8 @@ ogg_stream_reset_serialno
 ogg_stream_destroy
 ogg_stream_eos
 
+ogg_page_checksum_set
+
 ogg_page_version
 ogg_page_continued
 ogg_page_bos

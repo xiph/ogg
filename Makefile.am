@@ -7,10 +7,12 @@ SUBDIRS = src include doc win32 debian
 m4datadir = $(datadir)/aclocal
 m4data_DATA = ogg.m4
 
-EXTRA_DIST = README AUTHORS CHANGES COPYING libogg.spec ogg.m4 macos
+EXTRA_DIST = README AUTHORS CHANGES COPYING libogg.spec ogg.m4 \
+	macos macosx
 
 dist-hook:
 	rm -rf `find $(distdir)/macos -name CVS`
+	rm -rf `find $(distdir)/macosx -name CVS`
 
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"

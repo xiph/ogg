@@ -1,4 +1,4 @@
-Source: ogg
+Source: libogg
 Section: devel
 Priority: optional
 Maintainer: Christopher L Cheney <ccheney@debian.org>

@@ -1,0 +1,6 @@
+usr/bin/ogg-config
+usr/include/ogg/*.h
+usr/lib/*.a
+usr/lib/*.la
+usr/lib/*.so
+usr/share/aclocal/ogg.m4

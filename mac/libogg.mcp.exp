@@ -3,15 +3,16 @@
 # Ogg BITSTREAM PRIMITIVES: bitstream
 
 oggpack_writeinit
+oggpack_writetrunc
+oggpack_writealign
+oggpack_writecopy
 oggpack_reset
 oggpack_writeclear
 oggpack_readinit
 oggpack_write
 oggpack_look
-oggpack_look_huff
 oggpack_look1
 oggpack_adv
-oggpack_adv_huff
 oggpack_adv1
 oggpack_read
 oggpack_read1
@@ -38,12 +39,14 @@ ogg_sync_pageseek
 ogg_sync_pageout
 ogg_stream_pagein
 ogg_stream_packetout
+ogg_stream_packetpeek
 
 # Ogg BITSTREAM PRIMITIVES: general
 
 ogg_stream_init
 ogg_stream_clear
 ogg_stream_reset
+ogg_stream_reset_serialno
 ogg_stream_destroy
 ogg_stream_eos
 
@@ -55,3 +58,5 @@ ogg_page_granulepos
 ogg_page_serialno
 ogg_page_pageno
 ogg_page_packets
+
+ogg_packet_clear

@@ -1,4 +1,4 @@
-; $Id: ogg.def,v 1.5 2002/01/19 06:01:26 jack Exp $
+; $Id: ogg.def,v 1.6 2002/03/18 04:39:34 segher Exp $
 ;
 ; ogg.def
 ;
@@ -24,6 +24,7 @@ ogg_stream_packetpeek
 ogg_stream_pagein
 ogg_stream_pageout
 ogg_stream_reset
+ogg_stream_reset_serialno
 ogg_sync_buffer
 ogg_sync_clear
 ogg_sync_destroy

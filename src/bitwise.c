@@ -1,18 +1,18 @@
 /********************************************************************
  *                                                                  *
- * THIS FILE IS PART OF THE Ogg Vorbis SOFTWARE CODEC SOURCE CODE.  *
+ * THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.   *
  * USE, DISTRIBUTION AND REPRODUCTION OF THIS SOURCE IS GOVERNED BY *
- * THE GNU PUBLIC LICENSE 2, WHICH IS INCLUDED WITH THIS SOURCE.    *
- * PLEASE READ THESE TERMS DISTRIBUTING.                            *
+ * THE GNU LESSER/LIBRARY PUBLIC LICENSE, WHICH IS INCLUDED WITH    *
+ * THIS SOURCE. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.        *
  *                                                                  *
- * THE OggSQUISH SOURCE CODE IS (C) COPYRIGHT 1994-2000             *
- * by Monty <monty@xiph.org> and The XIPHOPHORUS Company            *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2000             *
+ * by Monty <monty@xiph.org> and the XIPHOPHORUS Company            *
  * http://www.xiph.org/                                             *
  *                                                                  *
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.2 2000/09/07 00:38:33 jack Exp $
+  last mod: $Id: bitwise.c,v 1.3 2000/11/05 23:50:21 xiphmont Exp $
 
  ********************************************************************/
 
@@ -36,7 +36,7 @@ static unsigned long mask[]=
 
 void oggpack_writeinit(oggpack_buffer *b){
   memset(b,0,sizeof(oggpack_buffer));
-  b->ptr=b->buffer=malloc(BUFFER_INCREMENT);
+  b->ptr=b->buffer=_ogg_malloc(BUFFER_INCREMENT);
   b->buffer[0]='\0';
   b->storage=BUFFER_INCREMENT;
 }
@@ -61,7 +61,7 @@ void oggpack_readinit(oggpack_buffer *b,unsigned char *buf,int bytes){
 /* Takes only up to 32 bits. */
 void oggpack_write(oggpack_buffer *b,unsigned long value,int bits){
   if(b->endbyte+4>=b->storage){
-    b->buffer=realloc(b->buffer,b->storage+BUFFER_INCREMENT);
+    b->buffer=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
     b->storage+=BUFFER_INCREMENT;
     b->ptr=b->buffer+b->endbyte;
   }

@@ -1,11 +1,11 @@
 /********************************************************************
  *                                                                  *
- * THIS FILE IS PART OF THE Ogg Vorbis SOFTWARE CODEC SOURCE CODE.  *
+ * THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.   *
  * USE, DISTRIBUTION AND REPRODUCTION OF THIS SOURCE IS GOVERNED BY *
- * THE GNU PUBLIC LICENSE 2, WHICH IS INCLUDED WITH THIS SOURCE.    *
- * PLEASE READ THESE TERMS DISTRIBUTING.                            *
+ * THE GNU LESSER/LIBRARY PUBLIC LICENSE, WHICH IS INCLUDED WITH    *
+ * THIS SOURCE. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.        *
  *                                                                  *
- * THE OggSQUISH SOURCE CODE IS (C) COPYRIGHT 1994-2000             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2000             *
  * by Monty <monty@xiph.org> and the XIPHOPHORUS Company            *
  * http://www.xiph.org/                                             *
  *                                                                  *
@@ -13,7 +13,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.6 2000/10/10 05:46:06 xiphmont Exp $
+ last mod: $Id: framing.c,v 1.7 2000/11/05 23:50:21 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -63,7 +63,7 @@ int ogg_page_serialno(ogg_page *og){
 	 (og->header[17]<<24));
 }
  
-int ogg_page_pageno(ogg_page *og){
+long ogg_page_pageno(ogg_page *og){
   return(og->header[18] |
 	 (og->header[19]<<8) |
 	 (og->header[20]<<16) |
@@ -137,11 +137,11 @@ int ogg_stream_init(ogg_stream_state *os,int serialno){
   if(os){
     memset(os,0,sizeof(ogg_stream_state));
     os->body_storage=16*1024;
-    os->body_data=malloc(os->body_storage*sizeof(char));
+    os->body_data=_ogg_malloc(os->body_storage*sizeof(char));
 
     os->lacing_storage=1024;
-    os->lacing_vals=malloc(os->lacing_storage*sizeof(int));
-    os->granule_vals=malloc(os->lacing_storage*sizeof(ogg_int64_t));
+    os->lacing_vals=_ogg_malloc(os->lacing_storage*sizeof(int));
+    os->granule_vals=_ogg_malloc(os->lacing_storage*sizeof(ogg_int64_t));
 
     /* initialize the crc_lookup table if not done */
     _ogg_crc_init();
@@ -179,15 +179,15 @@ int ogg_stream_destroy(ogg_stream_state *os){
 static void _os_body_expand(ogg_stream_state *os,int needed){
   if(os->body_storage<=os->body_fill+needed){
     os->body_storage+=(needed+1024);
-    os->body_data=realloc(os->body_data,os->body_storage);
+    os->body_data=_ogg_realloc(os->body_data,os->body_storage);
   }
 }
 
 static void _os_lacing_expand(ogg_stream_state *os,int needed){
   if(os->lacing_storage<=os->lacing_fill+needed){
     os->lacing_storage+=(needed+32);
-    os->lacing_vals=realloc(os->lacing_vals,os->lacing_storage*sizeof(int));
-    os->granule_vals=realloc(os->granule_vals,os->lacing_storage*sizeof(ogg_int64_t));
+    os->lacing_vals=_ogg_realloc(os->lacing_vals,os->lacing_storage*sizeof(int));
+    os->granule_vals=_ogg_realloc(os->granule_vals,os->lacing_storage*sizeof(ogg_int64_t));
   }
 }
 
@@ -462,9 +462,9 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
     long newsize=size+oy->fill+4096; /* an extra page to be nice */
 
     if(oy->data)
-      oy->data=realloc(oy->data,newsize);
+      oy->data=_ogg_realloc(oy->data,newsize);
     else
-      oy->data=malloc(newsize);
+      oy->data=_ogg_malloc(newsize);
     oy->storage=newsize;
   }
 
@@ -627,7 +627,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   int eos=ogg_page_eos(og);
   ogg_int64_t granulepos=ogg_page_granulepos(og);
   int serialno=ogg_page_serialno(og);
-  int pageno=ogg_page_pageno(og);
+  long pageno=ogg_page_pageno(og);
   int segments=header[26];
   
   /* clean up 'returned data' */
@@ -894,12 +894,12 @@ void print_header(ogg_page *og){
 	  og->header[0],og->header[1],og->header[2],og->header[3],
 	  (int)og->header[4],(int)og->header[5]);
 
-  fprintf(stderr,"  granulepos: %d  serialno: %d  pageno: %d\n",
+  fprintf(stderr,"  granulepos: %d  serialno: %d  pageno: %ld\n",
 	  (og->header[9]<<24)|(og->header[8]<<16)|
 	  (og->header[7]<<8)|og->header[6],
 	  (og->header[17]<<24)|(og->header[16]<<16)|
 	  (og->header[15]<<8)|og->header[14],
-	  (og->header[21]<<24)|(og->header[20]<<16)|
+	  ((long)(og->header[21])<<24)|(og->header[20]<<16)|
 	  (og->header[19]<<8)|og->header[18]);
 
   fprintf(stderr,"  checksum: %02x:%02x:%02x:%02x\n  segments: %d (",
@@ -913,11 +913,11 @@ void print_header(ogg_page *og){
 }
 
 void copy_page(ogg_page *og){
-  unsigned char *temp=malloc(og->header_len);
+  unsigned char *temp=_ogg_malloc(og->header_len);
   memcpy(temp,og->header,og->header_len);
   og->header=temp;
 
-  temp=malloc(og->body_len);
+  temp=_ogg_malloc(og->body_len);
   memcpy(temp,og->body,og->body_len);
   og->body=temp;
 }
@@ -1114,13 +1114,13 @@ const int head3_7[] = {0x4f,0x67,0x67,0x53,0,0x05,
 		       1,0};
 
 void test_pack(const int *pl, const int **headers){
-  unsigned char *data=malloc(1024*1024); /* for scripted test cases only */
+  unsigned char *data=_ogg_malloc(1024*1024); /* for scripted test cases only */
   long inptr=0;
   long outptr=0;
   long deptr=0;
   long depacket=0;
-  long granule_pos=7;
-  int i,j,packets,pageno=0,pageout=0;
+  long granule_pos=7,pageno=0;
+  int i,j,packets,pageout=0;
   int eosflag=0;
   int bosflag=0;
 
@@ -1154,7 +1154,7 @@ void test_pack(const int *pl, const int **headers){
       while(ogg_stream_pageout(&os_en,&og)){
 	/* We have a page.  Check it carefully */
 
-	fprintf(stderr,"%d, ",pageno);
+	fprintf(stderr,"%ld, ",pageno);
 
 	if(headers[pageno]==NULL){
 	  fprintf(stderr,"coded too many pages!\n");
@@ -1371,7 +1371,7 @@ int main(void){
 
   {
     /* build a bunch of pages for testing */
-    unsigned char *data=malloc(1024*1024);
+    unsigned char *data=_ogg_malloc(1024*1024);
     int pl[]={0,100,4079,2956,2057,76,34,912,0,234,1000,1000,1000,300,-1};
     int inptr=0,i,j;
     ogg_page og[5];

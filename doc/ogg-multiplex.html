@@ -84,21 +84,22 @@ without the need for explicitly declared buffer-ahead hinting.<p>
 
 <h3>Whole-stream navigation</h3>
 
-Ogg is designed sot hat the simplest navigation operations are one
-that best treat the physical Ogg stream as whole summary of its
-streams, rather than navigating each interleaved stream as a seperate
-entity.  <p>
+Ogg is designed so that the simplest navigation operations treat the
+physical Ogg stream as a whole summary of its streams, rather than
+navigating each interleaved stream as a seperate entity.  <p>
 
-Example: the simplest method of seeking to a desired
-position in a multiplexed (or unmultiplexed) Ogg stream is to
-bisection search by time position (as encoded in the granule
-position).  <p>
+First Example: seeking to a desired time position in a multiplexed (or
+unmultiplexed) Ogg stream can be accomplished through a bisection
+search on time position of all pages int he stream (as encoded in the
+granule position). More powerful searches (such as a keyframe-aware
+seek within video) are also possible with additional search
+complexity, but similar computational compelxity.<p>
 
-Example: A bitstream section may consist of three multiplexed streams
-of differing lenghts.  The result of multiplexing these streams should
-be thought of as a single mixed stream with a length that happens to
-equal the longest of the three component streams.  Although it is also
-possible to think of the multiplexed results as three concurrent
+Second Example: A bitstream section may consist of three multiplexed
+streams of differing lenghts.  The result of multiplexing these
+streams should be thought of as a single mixed stream with a length
+equal to the longest of the three component streams.  Although it is
+also possible to think of the multiplexed results as three concurrent
 streams of different lenghts and it is possible to recover the three
 original streams, it will also become obvious that once multiplexed,
 it isn't possible to find the internal lenghts of the component
@@ -217,14 +218,15 @@ handled through the granule position mapping mechanism.  Here we
 arrange the granule position in such a way that granule positions of
 keyframes are easy to find.  Divide the granule position <p>
 
+[FINISH DESCRIBING "THE GRANPOS HACK" HERE.  ELOQUENCE IS CURRENTLY
+ELUDING ME, BUT FOR NOW THE CORE TEAM UNDERSTANDS THIS ONE.  Do be
+sure to fill me in before this doc is public :-]
 
-
-
-
-
+<pre>
      Can seek quickly to any keyframe without index
-     Naieve seeking algorithm still availble; juyst lower performance
+     Naieve seeking algorithm still availble; just lower performance
      Bisection seeking used anyway
+</pre>
 
 <h3>granule position, packets and pages</h3>
 
@@ -250,12 +252,21 @@ represents the point in time immediately after the last data decoded
 from a page.  In a "start-time" encoded page, it represents the point
 in time immediately before the first data decoded from the page.<p>
 
-Start-time or end-time positioning is flagged in bit 3 of byte 5 in the
-Ogg page header. A set bit indicates start-time positioning.  Version 0
-Ogg streams are restricted to using end-time positioning; version 1 may
-use either or both start-time and end-time positioning. A single logical stream
-within the multiplexed physical Ogg version 1 stream may also mix
-start-time and end-time positioning.<p>
+Start-time or end-time positioning is flagged in bit 3 of byte 5 in
+the Ogg page header. A set bit indicates start-time positioning.
+Version 0 Ogg streams are restricted to using end-time positioning;
+version 1 may use either or both start-time and end-time
+positioning. A single logical stream within the multiplexed physical
+Ogg version 1 stream may also mix start-time and end-time
+positioning.<p>
+
+[POINT OF DISCUSSION: this flag can be added without upping the
+bitstream revision.  However, old software is unaware of start-time
+ordering; the result is as harmless as seeking inaccuracies or as
+serious as crashing poorly designed code.  Upping the Ogg bitstream
+revision would force old code to reject these new streams; although
+old code generally doesn;t verify that any reserved flags are zero as
+the spec mandates, the do check bitstream revision number]<p>
 
  Start- and end-time do not affect multiplexing sort-order; pages are
 still sorted by the absolute time a given granulepos maps to

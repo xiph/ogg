@@ -71,7 +71,7 @@ typedef struct {
   long  b_o_s;
   long  e_o_s;
 
-  ogg_int64_t  frameno;
+  ogg_int64_t  granulepos;
   ogg_int64_t  packetno;       /* sequence number for decode; the framing
                              knows where there's a hole in the data,
                              but we need coupling so that the codec
@@ -142,7 +142,7 @@ extern int      ogg_page_version(ogg_page *og);
 extern int      ogg_page_continued(ogg_page *og);
 extern int      ogg_page_bos(ogg_page *og);
 extern int      ogg_page_eos(ogg_page *og);
-extern ogg_int64_t  ogg_page_frameno(ogg_page *og);
+extern ogg_int64_t  ogg_page_granulepos(ogg_page *og);
 extern int      ogg_page_serialno(ogg_page *og);
 extern int      ogg_page_pageno(ogg_page *og);
 

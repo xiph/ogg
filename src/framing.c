@@ -13,7 +13,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.1 2000/09/03 05:54:28 jack Exp $
+ last mod: $Id: framing.c,v 1.2 2000/09/26 17:55:58 jack Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -43,7 +43,7 @@ int ogg_page_eos(ogg_page *og){
   return((int)(og->header[5]&0x04));
 }
 
-ogg_int64_t ogg_page_frameno(ogg_page *og){
+ogg_int64_t ogg_page_granulepos(ogg_page *og){
   unsigned char *page=og->header;
   ogg_int64_t granulepos=page[13]&(0xff);
   granulepos= (granulepos<<8)|(page[12]&0xff);
@@ -217,7 +217,7 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
     os->granule_vals[os->lacing_fill+i]=os->granulepos;
   }
   os->lacing_vals[os->lacing_fill+i]=(op->bytes)%255;
-  os->granulepos=os->granule_vals[os->lacing_fill+i]=op->frameno;
+  os->granulepos=os->granule_vals[os->lacing_fill+i]=op->granulepos;
 
   /* flag the first segment as the beginning of the packet */
   os->lacing_vals[os->lacing_fill]|= 0x100;
@@ -590,7 +590,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   int continued=ogg_page_continued(og);
   int bos=ogg_page_bos(og);
   int eos=ogg_page_eos(og);
-  ogg_int64_t granulepos=ogg_page_frameno(og);
+  ogg_int64_t granulepos=ogg_page_granulepos(og);
   int serialno=ogg_page_serialno(og);
   int pageno=ogg_page_pageno(og);
   int segments=header[26];
@@ -770,7 +770,7 @@ int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
     }
 
     op->packetno=os->packetno;
-    op->frameno=os->granule_vals[ptr];
+    op->granulepos=os->granule_vals[ptr];
     op->bytes=bytes;
 
     os->body_returned+=bytes;
@@ -795,7 +795,7 @@ void checkpacket(ogg_packet *op,int len, int no, int pos){
     fprintf(stderr,"incorrect packet length!\n");
     exit(1);
   }
-  if(op->frameno!=pos){
+  if(op->granulepos!=pos){
     fprintf(stderr,"incorrect packet position!\n");
     exit(1);
   }
@@ -1103,7 +1103,7 @@ void test_pack(const int *pl, const int **headers){
     op.packet=data+inptr;
     op.bytes=len;
     op.e_o_s=(pl[i+1]<0?1:0);
-    op.frameno=granule_pos;
+    op.granulepos=granule_pos;
 
     granule_pos+=1024;
 
@@ -1182,8 +1182,8 @@ void test_pack(const int *pl, const int **headers){
 	      if(op_de.e_o_s)eosflag=1;
 
 	      /* check granulepos flag */
-	      if(op_de.frameno!=-1){
-		fprintf(stderr," granule:%ld ",(long)op_de.frameno);
+	      if(op_de.granulepos!=-1){
+		fprintf(stderr," granule:%ld ",(long)op_de.granulepos);
 	      }
 	    }
 	  }
@@ -1350,7 +1350,7 @@ int main(void){
       op.packet=data+inptr;
       op.bytes=len;
       op.e_o_s=(pl[i+1]<0?1:0);
-      op.frameno=(i+1)*1000;
+      op.granulepos=(i+1)*1000;
 
       for(j=0;j<len;j++)data[inptr++]=i+j;
       ogg_stream_packetin(&os_en,&op);

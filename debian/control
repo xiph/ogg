@@ -5,14 +5,14 @@ Maintainer: Christopher L Cheney <ccheney@debian.org>
 Build-Depends: debhelper
 Standards-Version: 3.1.1
 
-Package: libogg-dev
+Package: libogg0-dev
 Architecture: any
-Depends: libogg (= ${Source-Version}), libc6-dev
+Depends: libogg0 (= ${Source-Version}), libc6-dev
 Description: Ogg Bitstream Library Development
  Libogg is a library for manipulating ogg bitstreams.  It handles
  both making ogg bitstreams and getting packets from ogg bitstreams.
 
-Package: libogg
+Package: libogg0
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: Ogg Bitstream Library

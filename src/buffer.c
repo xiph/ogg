@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: centralized fragment buffer management
-  last mod: $Id: buffer.c,v 1.1.2.14 2003/03/28 22:37:16 xiphmont Exp $
+  last mod: $Id: buffer.c,v 1.1.2.15 2003/07/18 04:45:21 xiphmont Exp $
 
  ********************************************************************/
 
@@ -374,10 +374,12 @@ void ogg_buffer_release_one(ogg_reference *or){
 
 #ifdef OGGBUFFER_DEBUG
   if(ob->refcount==0){
+    ogg_mutex_unlock(&bs->mutex);
     fprintf(stderr,"WARNING: releasing buffer fragment with refcount of zero!\n");
     exit(1);
   }
   if(or->used==0){
+    ogg_mutex_unlock(&bs->mutex);
     fprintf(stderr,"WARNING: releasing previously released reference!\n");
     exit(1);
   }
@@ -394,6 +396,7 @@ void ogg_buffer_release_one(ogg_reference *or){
   bs->outstanding--; /* for the returned reference */
   or->next=bs->unused_references;
   bs->unused_references=or;
+  ogg_mutex_unlock(&bs->mutex);
 
   _ogg_buffer_destroy(bs); /* lazy cleanup (if needed) */
 

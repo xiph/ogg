@@ -4,10 +4,10 @@ AUTOMAKE_OPTIONS = foreign
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_builddir)/include
 
-lib_LTLIBRARIES = libogg.la
+lib_LTLIBRARIES = libogg2.la
 
-libogg_la_SOURCES = sync.c stream.c bitwise.c bytewise.c
-libogg_la_LDFLAGS = -version-info @LIB_CURRENT@:@LIB_REVISION@:@LIB_AGE@
+libogg2_la_SOURCES = sync.c stream.c bitwise.c bytewise.c buffer.c
+libogg2_la_LDFLAGS = -version-info @LIB_CURRENT@:@LIB_REVISION@:@LIB_AGE@
 
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"

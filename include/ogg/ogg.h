@@ -147,6 +147,8 @@ extern int      ogg_page_serialno(ogg_page *og);
 extern long     ogg_page_pageno(ogg_page *og);
 extern int      ogg_page_packets(ogg_page *og);
 
+extern void     ogg_packet_clear(ogg_packet *op);
+
 
 #ifdef __cplusplus
 }

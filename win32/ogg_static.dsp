@@ -86,10 +86,28 @@ LIB32=link.exe -lib
 # Begin Source File
 
 SOURCE=..\src\bitwise.c
+
+!IF  "$(CFG)" == "ogg_static - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ogg_static - Win32 Debug"
+
+# ADD CPP /MDd
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\src\framing.c
+
+!IF  "$(CFG)" == "ogg_static - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ogg_static - Win32 Debug"
+
+# ADD CPP /MDd
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"

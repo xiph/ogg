@@ -47,8 +47,8 @@ fi
 
 echo "Generating configuration files for $package, please wait...."
 
-echo "  aclocal $ACLOCAL_FLAGS"
-aclocal $ACLOCAL_FLAGS
+echo "  aclocal -I $srcdir $ACLOCAL_FLAGS"
+aclocal -I $srcdir $ACLOCAL_FLAGS
 #echo "  autoheader"
 #autoheader
 echo "  libtoolize --automake"

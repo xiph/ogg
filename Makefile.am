@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign dist-zip
 
-SUBDIRS = src include doc win32
+SUBDIRS = src include doc win32 debian
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = ogg.m4

@@ -1,12 +1,12 @@
 This package was debianized by Christopher L Cheney <ccheney@debian.org> on
 Sun, 29 Oct 2000 01:11:57 -0500.
 
-It was downloaded from http://www.vorbis.com/download_unix.psp
+It was downloaded from http://downloads.xiph.org/releases/ogg/
 
-Upstream Author(s): Monty <monty@xiph.org>
+Upstream Author(s): Christopher Montgomery <monty@xiph.org>
 
 Copyright:
-Copyright (c) 2002, Xiph.org Foundation
+Copyright (c) 2002-2004, Xiph.org Foundation
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions

@@ -40,7 +40,7 @@ if test -r Makefile.am; then
     echo -n "checking for automake $AM_NEEDED or later... "
     for am in automake-$AM_NEEDED automake$AM_NEEDED automake; do
       ($am --version < /dev/null > /dev/null 2>&1) || continue
-      ver=`$am --version < /dev/null | head -1 | $VERSIONGREP | $VERSIONMKINT`
+      ver=`$am --version < /dev/null | head -n -1 | $VERSIONGREP | $VERSIONMKINT`
       verneeded=`echo $AM_NEEDED | $VERSIONMKINT`
       if test $ver -ge $verneeded; then
         AUTOMAKE=$am
@@ -52,7 +52,7 @@ if test -r Makefile.am; then
     echo -n "checking for aclocal $AM_NEEDED or later... "
     for ac in aclocal-$AM_NEEDED aclocal$AM_NEEDED aclocal; do
       ($ac --version < /dev/null > /dev/null 2>&1) || continue
-      ver=`$ac --version < /dev/null | head -1 | $VERSIONGREP | $VERSIONMKINT`
+      ver=`$ac --version < /dev/null | head -n -1 | $VERSIONGREP | $VERSIONMKINT`
       verneeded=`echo $AM_NEEDED | $VERSIONMKINT`
       if test $ver -ge $verneeded; then
         ACLOCAL=$ac

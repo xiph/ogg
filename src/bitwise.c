@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.16 2003/10/08 02:53:40 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.17 2003/11/10 13:06:08 xiphmont Exp $
 
  ********************************************************************/
 
@@ -272,7 +272,7 @@ long oggpackB_look(oggpack_buffer *b,int bits){
       }
     }
   }
-  return(ret>>m);
+  return (ret>>(m>>1))>>((m+1)>>1);
 }
 
 long oggpack_look1(oggpack_buffer *b){
@@ -369,7 +369,7 @@ long oggpackB_read(oggpack_buffer *b,int bits){
       }
     }
   }
-  ret>>=m;
+  ret=(ret>>(m>>1))>>((m+1)>>1);
   
  overflow:
 

@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.14 2001/05/24 21:22:52 xiphmont Exp $
+ last mod: $Id: framing.c,v 1.15 2001/10/02 00:15:03 segher Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -134,13 +134,13 @@ static void _ogg_crc_init(void){
 
 int ogg_stream_init(ogg_stream_state *os,int serialno){
   if(os){
-    memset(os,0,sizeof(ogg_stream_state));
+    memset(os,0,sizeof(*os));
     os->body_storage=16*1024;
-    os->body_data=_ogg_malloc(os->body_storage*sizeof(char));
+    os->body_data=_ogg_malloc(os->body_storage*sizeof(*os->body_data));
 
     os->lacing_storage=1024;
-    os->lacing_vals=_ogg_malloc(os->lacing_storage*sizeof(int));
-    os->granule_vals=_ogg_malloc(os->lacing_storage*sizeof(ogg_int64_t));
+    os->lacing_vals=_ogg_malloc(os->lacing_storage*sizeof(*os->lacing_vals));
+    os->granule_vals=_ogg_malloc(os->lacing_storage*sizeof(*os->granule_vals));
 
     /* initialize the crc_lookup table if not done */
     _ogg_crc_init();
@@ -159,7 +159,7 @@ int ogg_stream_clear(ogg_stream_state *os){
     if(os->lacing_vals)_ogg_free(os->lacing_vals);
     if(os->granule_vals)_ogg_free(os->granule_vals);
 
-    memset(os,0,sizeof(ogg_stream_state));    
+    memset(os,0,sizeof(*os));    
   }
   return(0);
 } 
@@ -178,15 +178,15 @@ int ogg_stream_destroy(ogg_stream_state *os){
 static void _os_body_expand(ogg_stream_state *os,int needed){
   if(os->body_storage<=os->body_fill+needed){
     os->body_storage+=(needed+1024);
-    os->body_data=_ogg_realloc(os->body_data,os->body_storage);
+    os->body_data=_ogg_realloc(os->body_data,os->body_storage*sizeof(*os->body_data));
   }
 }
 
 static void _os_lacing_expand(ogg_stream_state *os,int needed){
   if(os->lacing_storage<=os->lacing_fill+needed){
     os->lacing_storage+=(needed+32);
-    os->lacing_vals=_ogg_realloc(os->lacing_vals,os->lacing_storage*sizeof(int));
-    os->granule_vals=_ogg_realloc(os->granule_vals,os->lacing_storage*sizeof(ogg_int64_t));
+    os->lacing_vals=_ogg_realloc(os->lacing_vals,os->lacing_storage*sizeof(*os->lacing_vals));
+    os->granule_vals=_ogg_realloc(os->granule_vals,os->lacing_storage*sizeof(*os->granule_vals));
   }
 }
 
@@ -221,7 +221,7 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
     os->body_fill-=os->body_returned;
     if(os->body_fill)
       memmove(os->body_data,os->body_data+os->body_returned,
-	      os->body_fill*sizeof(char));
+	      os->body_fill);
     os->body_returned=0;
   }
  
@@ -368,8 +368,8 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   /* advance the lacing data and set the body_returned pointer */
   
   os->lacing_fill-=vals;
-  memmove(os->lacing_vals,os->lacing_vals+vals,os->lacing_fill*sizeof(int));
-  memmove(os->granule_vals,os->granule_vals+vals,os->lacing_fill*sizeof(ogg_int64_t));
+  memmove(os->lacing_vals,os->lacing_vals+vals,os->lacing_fill*sizeof(*os->lacing_vals));
+  memmove(os->granule_vals,os->granule_vals+vals,os->lacing_fill*sizeof(*os->granule_vals));
   os->body_returned+=bytes;
   
   /* calculate the checksum */
@@ -422,7 +422,7 @@ int ogg_stream_eos(ogg_stream_state *os){
 /* initialize the struct to a known state */
 int ogg_sync_init(ogg_sync_state *oy){
   if(oy){
-    memset(oy,0,sizeof(ogg_sync_state));
+    memset(oy,0,sizeof(*oy));
     _ogg_crc_init();
   }
   return(0);
@@ -451,8 +451,7 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
   if(oy->returned){
     oy->fill-=oy->returned;
     if(oy->fill>0)
-      memmove(oy->data,oy->data+oy->returned,
-	      (oy->fill)*sizeof(char));
+      memmove(oy->data,oy->data+oy->returned,oy->fill);
     oy->returned=0;
   }
 
@@ -646,9 +645,9 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
       /* segment table */
       if(os->lacing_fill-lr){
 	memmove(os->lacing_vals,os->lacing_vals+lr,
-		(os->lacing_fill-lr)*sizeof(int));
+		(os->lacing_fill-lr)*sizeof(*os->lacing_vals));
 	memmove(os->granule_vals,os->granule_vals+lr,
-		(os->lacing_fill-lr)*sizeof(ogg_int64_t));
+		(os->lacing_fill-lr)*sizeof(*os->granule_vals));
       }
       os->lacing_fill-=lr;
       os->lacing_packet-=lr;
@@ -830,7 +829,7 @@ int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
 
 void ogg_packet_clear(ogg_packet *op) {
   free(op->packet);
-  memset(op, 0, sizeof(ogg_packet));
+  memset(op, 0, sizeof(*op));
 }
 
 #ifdef _V_SELFTEST
@@ -1210,7 +1209,7 @@ void test_pack(const int *pl, const int **headers){
 	      ogg_stream_packetout(&os_de,&op_de); /* just catching them all */
 	      
 	      /* verify peek and out match */
-	      if(memcmp(&op_de,&op_de2,sizeof(ogg_packet))){
+	      if(memcmp(&op_de,&op_de2,sizeof(op_de))){
 		fprintf(stderr,"packetout != packetpeek! pos=%ld\n",
 			depacket);
 		exit(1);

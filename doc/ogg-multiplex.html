@@ -6,7 +6,7 @@
 Page Multiplexing and Ordering in a Physical Ogg Stream
 </font></h1>
 
-<em>Last update to this document: May 7, 2004</em><br> 
+<em>Last update to this document: May 17, 2004</em><br> 
 <p>
 
 The low-level mechanisms of an Ogg stream (as described in the Ogg
@@ -33,19 +33,6 @@ encoding) or interactive decoding (such as scrubbing or instant
 replay) is not disallowed or discouraged, however no bitstream feature
 must require nonlinear operation on the bitstream.<p>
 
-<h3>Seeking</h3> 
-
-Ogg is designed to use a bisection search to implement exact
-positional seeking rather than building an index; an index requires
-two-pass encoding and as such is not acceptible according to original
-design requirements.  <p>
-
-<i>Even making an index optional then requires an
-application to support multiple methods (bisection search for a
-one-pass stream, indexing for a two-pass stream), which adds no
-additional functionality as bisection search delivers the same
-functionality for both stream types.</i><p>
-
 <h3>Multiplexing</h3>
 
 Ogg bitstreams multiplex multiple logical streams into a single
@@ -65,22 +52,93 @@ packets span multiple pages; the specifics of handling this special
 case are described later under 'Continuous and Discontinuous
 Streams'.<p>
 
+<h3>Seeking</h3> 
+
+Ogg is designed to use a bisection search to implement exact
+positional seeking rather than building an index; an index requires
+two-pass encoding and as such is not acceptible given the requirement
+for full-featured linear encoding.<p>
+
+<i>Even making an index optional then requires an
+application to support multiple methods (bisection search for a
+one-pass stream, indexing for a two-pass stream), which adds no
+additional functionality as bisection search delivers the same
+functionality for both stream types.</i><p>
+
+Seek operations are by absolute time; a direct bisection search must
+find the exact time position requested.  Information in the Ogg
+bitstream is arranged such that all information to be presented for
+playback fromt he desired seek point will occur at or after the
+desired seek point.  Seek operations are neither 'fuzzy' nor
+heuristic.<p>
+
+<i>Although keyframe handling in video appears to be an exception to
+"all needed playback information lies ahead of a given seek",
+keyframes can still be handled directly within this indexless
+framework. Seeking to a keyframe in video (as well as seeking in other
+media types with analagous restraints) is handled as two seeks; first
+a seek to the desired time which extracts state information that
+decodes to the time of the last keyframe, followed by a second seek
+directly to the keyframe.  The location of the previous keyframe is
+embedded as state information in the granulepos; this mechanism is
+described in more detail later.</i>
+
+<h3>Continuous and Discontinuous Streams</h3>
+
+Logical streams within a physical Ogg stream belong to one of two
+categories, "Continuous" streams and "Discontinuous" streams.
+Although these are discussed in more detail later, the distinction is
+important to a high-level understanding of how to buffer an Ogg
+stream.<p>
+
+A stream that provides a gapless, time-continuous media type with a
+fine-grained timebase is considered to be 'Continuous'.  A continuous
+stream should never be starved of data.  Clear examples of continuous
+data types include broadcast audio and video.<p>
+
+A stream that delivers data in a potentially irregular pattern or with
+widely spaced timing gaps is considered to be 'Discontinuous'.  A
+discontinuous stream may be best thought of as data representing
+scattered events; although they happen in order, they are typically
+unconnected data often located far apart. One possible example of a
+discontinuous stream types would be captioning.  Although it's
+possible to design captions as a continuous stream type, it's most
+natural to think of captions as widely spaced pieces of text with
+little happing between.<p>
+
+The fundamental design distinction between continuous and
+discontinuous streams concerns buffering.<p>
+
 <h3>Buffering</h3>
 
-Ogg's multiplexing design minimizes extraneous buffering required to
-maintain audio/video sync by arranging audio, video and other data in
-chronological order.  Thus, a normally streamed file delivers all
-data for decode 'just in time'; pages arrive in the order they must
-be consumed.<p>
+Because a continuous stream is, by definition, gapless, Ogg buffering
+is based on the simple premise of never allowing any active continuous
+stream to starve for data during decode; buffering proceeds ahead
+until all continuous streams in a physical stream have data ready to
+decode on demand.  <p>
+
+Discontinuous stream data may occur on a farily regular basis, but the
+timing of, for example, a specific caption is impossible to predict
+with certainty in most captioning systems. Thus the buffering system
+should take discontinuous data 'as it comes' rather than working ahead
+(for a potentially unbounded period) to look for future discontinuous
+data.  As such, discontinuous streams are ingored when managing
+buffering; their pages simply 'fall out' of the stream when continuous
+streams are handled properly.<p>
 
 Buffering requirements need not be explicitly declared or managed for
 the encoded stream; the decoder simply reads as much data as is
 necessary to keep all continuous stream types gapless (also ensuring
 discontinuous data arrives in time) and no more, resulting in optimum
-buffer usage for free.  Because all pages of all data types are
-stamped with absolute timing information within the stream,
-inter-stream synchronization timing is always explicitly maintained
-without the need for explicitly declared buffer-ahead hinting.<p>
+implicit buffer usage for a given stream.  Because all pages of all
+data types are stamped with absolute timing information within the
+stream, inter-stream synchronization timing is always explicitly
+maintained without the need for explicitly declared buffer-ahead
+hinting.<p>
+
+Further details, mechanisms and reasons for the differing arrangement
+and behavior of continuous and discontinuous streams is discussed
+later.<p>
 
 <h3>Whole-stream navigation</h3>
 
@@ -90,19 +148,19 @@ navigating each interleaved stream as a seperate entity.  <p>
 
 First Example: seeking to a desired time position in a multiplexed (or
 unmultiplexed) Ogg stream can be accomplished through a bisection
-search on time position of all pages int he stream (as encoded in the
+search on time position of all pages in the stream (as encoded in the
 granule position). More powerful searches (such as a keyframe-aware
 seek within video) are also possible with additional search
 complexity, but similar computational compelxity.<p>
 
 Second Example: A bitstream section may consist of three multiplexed
-streams of differing lenghts.  The result of multiplexing these
+streams of differing lengths.  The result of multiplexing these
 streams should be thought of as a single mixed stream with a length
 equal to the longest of the three component streams.  Although it is
 also possible to think of the multiplexed results as three concurrent
 streams of different lenghts and it is possible to recover the three
 original streams, it will also become obvious that once multiplexed,
-it isn't possible to find the internal lenghts of the component
+it isn't possible to find the internal lengths of the component
 streams without a linear search of the whole bitstream section.
 However, it is possible to find the length of the whole bitstream
 section easily (in near-constant time per section) just as it is for a
@@ -117,7 +175,7 @@ of every Ogg page.  Although the granule position represents absolute
 time within a logical stream, its value does not necessarily directly
 encode a simple timestamp.  It may represent frames elapsed (as in
 Vorbis), a simple timestamp, or a more complex bit-division encoding
-(such as in Theora).  The exact meaning of the granule position is up
+(such as in Theora).  The exact encoding of the granule position is up
 to a specific codec.<p>
 
 The granule position is governed by the following rules:
@@ -216,17 +274,22 @@ codec's initial header, and the rest is just arithmetic.<p>
 The third point appears trickier at first glance, but it too can be
 handled through the granule position mapping mechanism.  Here we
 arrange the granule position in such a way that granule positions of
-keyframes are easy to find.  Divide the granule position <p>
+keyframes are easy to find.  Divide the granule position into two
+fields; the most-significant bits are an absolute frame counter, but
+it's only updated at each keyframe.  The least significant bits encode
+the number of frames since the last keyframe.  In this way, each
+granule position both encodes the absolute time of the current frame
+as well as the absolute time of the last keyframe.<p>
 
-[FINISH DESCRIBING "THE GRANPOS HACK" HERE.  ELOQUENCE IS CURRENTLY
-ELUDING ME, BUT FOR NOW THE CORE TEAM UNDERSTANDS THIS ONE.  Do be
-sure to fill me in before this doc is public :-]
-
-<pre>
-     Can seek quickly to any keyframe without index
-     Naieve seeking algorithm still availble; just lower performance
-     Bisection seeking used anyway
-</pre>
+Seeking to a most recent preceeding keyframe is then accomplished by
+first seeking to the original desired point, inspecting the granulepos
+of the resulting video page, extracting from that granulepos the
+absolute time of the desired keyframe, and then seeking directly to
+that keyframe's page.  Of course, it's still possible for an
+application to ignore keyframes and use a simpler seeking algorithm
+(decode would be unable to present decoded video until the next
+keyframe).  Surprisingly many player applications do choose the
+simpler approach.<p>
 
 <h3>granule position, packets and pages</h3>
 
@@ -240,115 +303,33 @@ is not intended to be the general case.<p>
 Because Ogg functions at the page, not packet, level, this
 once-per-page time information provides Ogg with the finest-grained
 time information is can use.  Ogg passes this granule positioning data
-to the codec (along with the packets extracted from a page); it is
-intended to be the responsibility of codecs to track timing
-information at granularities finer than a single page.<p>
+to the codec (along with the packets extracted from a page); it is the
+responsibility of codecs to track timing information at granularities
+finer than a single page.<p>
 
 <h3>start-time and end-time positioning</h3>
 
 A granule position represents the <em>instantaneous time location
-between two pages</em>. In an "end-time" encoded page, the granulepos
-represents the point in time immediately after the last data decoded
-from a page.  In a "start-time" encoded page, it represents the point
-in time immediately before the first data decoded from the page.<p>
+between two pages</em>.  However, continuous streams and discontinuous
+streams differ on whether the granulepos represents the end-time of
+the data on a page or the start-time.  Continuous streams are
+'end-time' encoded; the granulepos represents the point in time
+immediately after the last data decoded from a page.  Discontinuous
+streams are 'start-time' encoded; the granulepos represents the point
+in time of the first data decoded from the page.<p>
 
-Start-time or end-time positioning is flagged in bit 3 of byte 5 in
-the Ogg page header. A set bit indicates start-time positioning.
-Version 0 Ogg streams are restricted to using end-time positioning;
-version 1 may use either or both start-time and end-time
-positioning. A single logical stream within the multiplexed physical
-Ogg version 1 stream may also mix start-time and end-time
-positioning.<p>
+An Ogg stream type is declared continuous or discontinuous by its
+codec.  A given codec may support both continuous and discontinuous
+operation so long as any given logical stream is continuous or
+discontinuous for its entirety and the codec is able to ascertain (and
+inform the Ogg layer) as to which after decoding the initial stream
+header.  The majority of codecs will always be continuous (such as
+Vorbis) or discontinuous (such as Writ).<p>
 
-[POINT OF DISCUSSION: this flag can be added without upping the
-bitstream revision.  However, old software is unaware of start-time
-ordering; the result is as harmless as seeking inaccuracies or as
-serious as crashing poorly designed code.  Upping the Ogg bitstream
-revision would force old code to reject these new streams; although
-old code generally doesn;t verify that any reserved flags are zero as
-the spec mandates, the do check bitstream revision number]<p>
-
- Start- and end-time do not affect multiplexing sort-order; pages are
-still sorted by the absolute time a given granulepos maps to
+Start- and end-time encoding do not affect multiplexing sort-order;
+pages are still sorted by the absolute time a given granulepos maps to
 regardless of whether that granulepos prepresents start- or
 end-time.<p>
-
-<h4>use of end-time positioning</h4>
-
-End-time positioning is most useful in unmultiplexed streams.  It allows
-two useful features relatively more easily:
-<ol>
-<li>"short" beginning-of-stream and end-of-stream packets can be represented entirely using granulepos; the codec does not need to store auxiliary sizing information in the codec's data packets.<br>
-<li>Retrieving the exact end-time of a stream is the trivial operation of inspecting the granule posiiton of the last page.<br>
-</ol>
-
-However, end-time coding results in sightly less efficient buffering
-usage in a multiplexed stream.
-
-<h4>use of start-time positioning</h4>
-
-Multiplexed streams of start-time encoded pages yield optimal
-buffering behavior; it requires the minimum theoretical buffer space
-of any possible arrangement of pages.  This is the primary benefit of
-start-time positioning.<p>
-
-The drawbacks of start-time positioning mirror the benefits attributed to
-end-time positioning.  Namely:<p>
-
-<ol>
-<li>
-
-Codecs that generate short packets can no longer infer the presence of
-a short packet from granulepos context; the 'shortness' of the packet
-must be encoded in the packet itself.  This drawback is minor, however
-it does mean that codecs like Vorbis (which relies on granpos context
-to detect sort packets) absolutely must use end-time positioning to
-handle short packets.<br>
-<li>
-Determining ending time position of a stream requires slightly more
-work than in an end-time encoded stream; the packets of the final
-stream page must be counted forward to find ending time.
-<br>
-</ol>
-
-Despite these minor drawbacks, the additional buffer efficiency of
-start-time positioning strongly recommends its use in both multiplexed
-and unmultiplexed streams.  Use of end-time positioning should largely be
-treated as a legacy means of supporting codecs that use
-granulepos-context to determine short packets (such as Vorbis I).<p>
-
-<h4>mixed start-time and end-time positioning</h4>
-
-Mixed positioning may refer to either multiplexing two or more streams
-that use different time positionings, or using more than one time
-positioning within a logical stream. <p>
-
-Mixed positioning mostly affects only buffer efficiency; although
-end-time positioning is less efficient than start-time, mixed-time
-positioning will often be less efficient than both.  The inefficiency is
-relative however; buffer efficiency can still be excellent in all
-three cases.<p>
-
-One possible use of mixed-time positioning is combine the benefits of
-end-time and start-time positioning, for example, use start-time positioning
-for all but the last page of a stream, which is then coded in end-time
-format.  This way, a short packet can be flagged using granulepos
-context and the end-time position of the stream is immediately obvious
-from inspecting the last granule position.<p>
-
-[POINT OF DISCUSSION: the above suggestion looks like it may be worth
-considering as the suggested way of positioning the stream, thus doing
-away entirely with the need to 'count time forward through packets' on
-the last page of a start-time encoded stream to find final steam
-length.  However, a truncated stream will be missing the end-time last
-page.
-
-1) We could say 'mixed time is the way to go' and just let a
-damaged/truncated stream suffer.
-
-2) We could say 'counting time forward through packets is just the way
-it has to be done' and do away with the possibility of mixed coding
-entirely]
 
 <h2>Multiplex/Demultiplex Division of Labor</h2>
 
@@ -364,7 +345,7 @@ knowledge, however.  Unlike other framing systems, Ogg maintains
 strict seperation between framing and the framed bistream data; Ogg
 does not replicate codec-specific information in the page/framing
 data, nor does Ogg blur the line between framing and stream
-data/metadata.  Because Ogg is fully data agnostic toward the data it
+data/metadata.  Because Ogg is fully data-agnostic toward the data it
 frames, operations which require specifics of bitstream data (such as
 'seek to keyframe') also require interaction with the codec layer
 (because, in this example, the Ogg layer is not aware of the concept
@@ -378,33 +359,6 @@ For this reason, however, complex seeking operations require
 interaction with the codecs in order to decode the granule position of
 a given stream type back to absolute time or in order to find
 'decodable points' such as keyframes in video.
-
-<h2>Continuous and Discontinuous Streams</h2>
-
-<h3>continuous description</h3>
-A stream that provides a gapless, time-continuous media type is
-considered to be 'Continuous'.  Clear examples of continuous data
-types include broadcast audio and video. Such a stream should never
-allow a playback buffer to starve, and Ogg implementations must buffer
-ahead sufficient pages such that all continuous streams in a physical
-stream have data ready to decode on demand.<p>
-
-<h3>discontinuous description</h3>
-A stream that delivers data in a potentially irregular pattern or with
-widely spaced timing gaps is considered to be 'Discontinuous'.  An
-examples of a discontinuous stream types would be captioning.
-Although captions still occur on a regular basis, the timing of a
-specific caption is impossible to predict with certainty in most
-captioning systems.<p>
-
-<h3>declaration</h3> An Ogg stream type is defined to be continuous or
-discontinuous by its codec.  A given codec may support both continuous
-and discontinuous operation so long as any given logical stream is
-continuous or discontinuous for its entirety and the codec is able to
-ascertain (and inform the Ogg layer) as to which after decoding the
-initial stream header.  The majority of codecs will always be
-continuous (such as Vorbis) or discontinuous (such as Writ).
-
 
 <h2>Unsorted Discussion Points</h2>
 

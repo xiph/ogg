@@ -13,7 +13,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.4 2000/09/28 05:01:56 jack Exp $
+ last mod: $Id: framing.c,v 1.5 2000/10/10 05:42:34 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -29,6 +29,10 @@
 
 int ogg_page_version(ogg_page *og){
   return((int)(og->header[4]));
+}
+
+int ogg_page_continued(ogg_page *og){
+  return((int)(og->header[5]&0x01));
 }
 
 int ogg_page_continued(ogg_page *og){
@@ -69,6 +73,33 @@ int ogg_page_pageno(ogg_page *og){
 	 (og->header[20]<<16) |
 	 (og->header[21]<<24));
 }
+
+
+
+/* returns the number of packets that are completed on this page (if
+   the leading packet is begun on a previous page, but ends on this
+   page, it's counted */
+
+/* NOTE:
+If a page consists of a packet begun on a previous page, and a new
+packet begun (but not completed) on this page, the return will be:
+  ogg_page_packets(page)   ==1, 
+  ogg_page_continued(page) !=0
+
+If a page happens to be a single packet that was begun on a
+previous page, and spans to the next page (in the case of a three or
+more page packet), the return will be: 
+  ogg_page_packets(page)   ==0, 
+  ogg_page_continued(page) !=0
+*/
+
+int ogg_page_packets(ogg_page *og){
+  int i,n=og->header[26],count=0;
+  for(i=0;i<n;i++)
+    if(og->header[27+i]==0)count++;
+  return(count);
+}
+
 
 /* helper to initialize lookup for direct-table CRC */
 

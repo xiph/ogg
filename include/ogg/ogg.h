@@ -145,6 +145,7 @@ extern int      ogg_page_eos(ogg_page *og);
 extern ogg_int64_t  ogg_page_granulepos(ogg_page *og);
 extern int      ogg_page_serialno(ogg_page *og);
 extern int      ogg_page_pageno(ogg_page *og);
+  extern int      ogg_page_packets(ogg_page *og);
 
 
 #ifdef __cplusplus

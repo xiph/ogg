@@ -23,4 +23,5 @@ mkinstalldirs
 .libs
 .deps
 *.tar.gz
+*.zip
 ogg-config

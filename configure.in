@@ -17,6 +17,8 @@ AM_PROG_LIBTOOL
 
 dnl Set some options based on environment
 
+cflags_save="$CFLAGS"
+ldflags_save="$LDFLAGS"
 if test -z "$GCC"; then
         case $host in 
         *-*-irix*)
@@ -59,6 +61,8 @@ else
 		;;
         esac
 fi
+CFLAGS="$CFLAGS $cflags_save"
+LDFLAGS="$LDFLAGS $ldflags_save"
 
 dnl Checks for programs.
 

@@ -9,7 +9,7 @@ doc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
 	ogg_page_bos.html ogg_page_continued.html ogg_page_eos.html\
 	ogg_page_granulepos.html ogg_page_pageno.html ogg_page_serialno.html\
 	ogg_page_version.html ogg_stream_clear.html ogg_stream_destroy.html\
-	ogg_stream_eof.html ogg_stream_eos.html ogg_stream_flush.html\
+	ogg_page_packets.html ogg_stream_eos.html ogg_stream_flush.html\
 	ogg_stream_init.html ogg_stream_packetin.html ogg_stream_packetout.html\
 	ogg_stream_pagein.html ogg_stream_pageout.html ogg_stream_reset.html\
 	ogg_stream_state.html ogg_sync_buffer.html ogg_sync_clear.html\
@@ -22,6 +22,6 @@ doc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
 	oggpack_read1.html oggpack_readinit.html oggpack_reset.html\
 	oggpack_write.html oggpack_writeclear.html oggpack_writeinit.html\
 	overview.html reference.html style.css vorbis_comment.html\
-	vorbis_info.html
+	vorbis_info.html ogg_packet_clear.html ogg_page_checksum_set.html
 
 EXTRA_DIST = $(doc_DATA)

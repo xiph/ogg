@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: packing variable sized words into an octet stream
-  last mod: $Id: bitwise.c,v 1.14 2002/09/15 23:48:03 xiphmont Exp $
+  last mod: $Id: bitwise.c,v 1.15 2003/09/29 14:21:24 giles Exp $
 
  ********************************************************************/
 
@@ -34,7 +34,7 @@ static unsigned long mask[]=
  0x3fffffff,0x7fffffff,0xffffffff };
 
 static unsigned int mask8B[]=
-{0x00,0x80,0xc0,0xe0,0xf0,0xf8,0xfc,0xfe0,0xff};
+{0x00,0x80,0xc0,0xe0,0xf0,0xf8,0xfc,0xfe,0xff};
 
 void oggpack_writeinit(oggpack_buffer *b){
   memset(b,0,sizeof(*b));

@@ -4,5 +4,5 @@ AUTOMAKE_OPTIONS = foreign
 
 oggincludedir = $(includedir)/ogg
 
-ogginclude_HEADERS = ogg.h os_types.h config_types.h
-
+ogginclude_HEADERS = ogg.h os_types.h
+nodist_ogginclude_HEADERS = config_types.h

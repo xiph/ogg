@@ -2,5 +2,5 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-EXTRA_DIST = changelog control copyright libogg-dev.docs libogg-dev.files \
-	libogg0.README.Debian libogg0.files rules
+EXTRA_DIST = changelog control copyright libogg-dev.docs libogg-dev.install \
+	libogg0.README.Debian libogg0.install rules

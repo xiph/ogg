@@ -1,4 +1,4 @@
-; $Id: ogg.def,v 1.4 2001/10/23 13:26:41 cwolf Exp $
+; $Id: ogg.def,v 1.5 2002/01/19 06:01:26 jack Exp $
 ;
 ; ogg.def
 ;
@@ -34,13 +34,11 @@ ogg_sync_reset
 ogg_sync_wrote
 oggpack_adv
 oggpack_adv1
-oggpack_adv_huff
 oggpack_bits
 oggpack_bytes
 oggpack_get_buffer
 oggpack_look
 oggpack_look1
-oggpack_look_huff
 oggpack_read
 oggpack_read1
 oggpack_readinit

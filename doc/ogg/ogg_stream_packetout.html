@@ -9,7 +9,7 @@
 <table border=0 width=100%>
 <tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.0 - 20000615</p></td>
+<td align=right><p class=tiny>libogg release 1.1.3 - 20040927</p></td>
 </tr>
 </table>
 
@@ -37,7 +37,9 @@ int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op);
 <dd>Pointer to a previously declared <a
 href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this function is called, an <a href="ogg_page.html">ogg_page</a> should be submitted to the stream using <a href="ogg_stream_pagein.html">ogg_stream_pagein()</a>.</dd>
 <dt><i>op</i></dt>
-<dd>Pointer to the packet that will be submitted to the decoding layer after this function is called.</dd>
+<dd>Pointer to the packet to be filled in with pointers to the new data. 
+This will typically be submitted to a codec for decode after this 
+function is called.</dd>
 </dl>
 
 
@@ -45,6 +47,7 @@ href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this function 
 <blockquote>
 <ul>
 <li>-1 if we are out of sync and there is a gap in the data. Usually this will not be a fatal error.</li>
+<li>0 if there is no data available, or only a partial packet.
 <li>1 in all other cases.</li>
 </ul>
 </blockquote>
@@ -59,7 +62,7 @@ href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this function 
 <td align=right><p class=tiny><a href="http://www.xiph.org/ogg/vorbis/index.html">Ogg Vorbis</a><br><a href="mailto:team@xiph.org">team@xiph.org</a></p></td>
 </tr><tr>
 <td><p class=tiny>libogg documentation</p></td>
-<td align=right><p class=tiny>libogg release 1.0 - 20000615</p></td>
+<td align=right><p class=tiny>libogg release 1.1.3 - 20040927</p></td>
 </tr>
 </table>
 

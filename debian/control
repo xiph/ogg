@@ -3,7 +3,7 @@ Section: libs
 Priority: optional
 Maintainer: Christopher L Cheney <ccheney@debian.org>
 Build-Depends: debhelper
-Standards-Version: 3.5.1.0
+Standards-Version: 3.5.2.0
 
 Package: libogg-dev
 Architecture: any

@@ -12,7 +12,7 @@
 
  function: decode stream sync and memory management foundation code;
            takes in raw data, spits out packets
- last mod: $Id: sync.c,v 1.1.2.10 2003/03/27 21:38:16 xiphmont Exp $
+ last mod: $Id: sync.c,v 1.1.2.11 2003/03/28 22:37:16 xiphmont Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -26,10 +26,6 @@
 			    libogg compile */
 
 /* A complete description of Ogg framing exists in docs/framing.html */
-
-/* Below we have stream buffer and memory management which is
-   handled by physical stream and centralized in the ogg_sync_state
-   structure. */
 
 int ogg_page_version(ogg_page *og){
   oggbyte_buffer ob;
@@ -336,7 +332,9 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
   if(og){
     /* set up page output */
     og->header=ogg_buffer_split(&oy->fifo_tail,&oy->fifo_head,oy->headerbytes);
+    og->header_len=oy->headerbytes;
     og->body=ogg_buffer_split(&oy->fifo_tail,&oy->fifo_head,oy->bodybytes);
+    og->body_len=oy->bodybytes;
   }else{
     /* simply advance */
     oy->fifo_tail=
@@ -489,6 +487,7 @@ int ogg_sync_pagein(ogg_sync_state *oy,ogg_page *og){
   else
     oy->fifo_head=ogg_buffer_walk(oy->fifo_tail=og->header);
   oy->fifo_head=ogg_buffer_cat(oy->fifo_head,og->body);
+  memset(og,0,sizeof(*og));
   return OGG_SUCCESS;
 }
 
@@ -517,4 +516,21 @@ int ogg_sync_read(ogg_sync_state *oy, long bytes){
   if(!oy->fifo_tail)oy->fifo_head=0;
 
   return OGG_SUCCESS;
+}
+
+void ogg_page_dup(ogg_page *dup,ogg_page *orig){
+  dup->header_len=orig->header_len;
+  dup->body_len=orig->body_len;
+  dup->header=ogg_buffer_dup(orig->header);
+  dup->body=ogg_buffer_dup(orig->body);
+}
+
+void ogg_packet_dup(ogg_packet *dup,ogg_packet *orig){
+  dup->bytes=orig->bytes;
+  dup->b_o_s=orig->b_o_s;
+  dup->e_o_s=orig->e_o_s;
+  dup->granulepos=orig->granulepos;
+  dup->packetno=orig->packetno;
+
+  dup->packet=ogg_buffer_dup(orig->packet);
 }

@@ -12,7 +12,7 @@
 
  function: code raw packets into framed Ogg logical stream and
            decode Ogg logical streams back into raw packets
- last mod: $Id: stream.c,v 1.1.2.10 2003/03/28 04:51:33 xiphmont Exp $
+ last mod: $Id: stream.c,v 1.1.2.11 2003/03/28 22:37:16 xiphmont Exp $
 
  ********************************************************************/
 
@@ -54,7 +54,7 @@ int ogg_stream_destroy(ogg_stream_state *os){
   return OGG_SUCCESS;
 } 
 
-/* finish building a header then flush the current packet header and
+/* finish building a header then flush the current page header and
    body to the output buffer */
 static void _packet_flush(ogg_stream_state *os,int nextcomplete){
   oggbyte_buffer *obb=&os->header_build;
@@ -123,8 +123,11 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
   int  remainder=bytes%255;
   int  i;
 
-  if(os->e_o_s)return OGG_EEOS;
-  
+  if(os->e_o_s){
+    ogg_packet_release(op);
+    return OGG_EEOS;
+  }
+
   if(!os->lacing_fill)
     oggbyte_init(&os->header_build,0,os->bufferpool);
 
@@ -157,7 +160,8 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
      os->body_fill>=os->watermark ||
      !os->b_o_s ||
      os->lacing_fill==255)_packet_flush(os,0);
-  
+
+  memset(op,0,sizeof(*op));
   return OGG_SUCCESS;
 }
 
@@ -169,7 +173,10 @@ int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
   int i;
 
   /* is there a page waiting to come back? */
-  if(!os->header_tail) return 0;
+  if(!os->header_tail){
+    if(og)memset(og,0,sizeof(*og));
+    return 0;
+  }
 
   /* get header and body sizes */
   oggbyte_init(&ob,os->header_tail,0);
@@ -180,7 +187,9 @@ int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
   /* split page references out of the fifos */
   if(og){
     og->header=ogg_buffer_split(&os->header_tail,&os->header_head,header_bytes);
+    og->header_len=header_bytes;
     og->body=ogg_buffer_split(&os->body_tail,&os->body_head,body_bytes);
+    og->body_len=body_bytes;
 
     /* checksum */
     ogg_page_checksum_set(og);
@@ -355,8 +364,14 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   int version=ogg_page_version(og);
 
   /* check the serial number */
-  if(serialno!=os->serialno)return OGG_ESERIAL;
-  if(version>0)return OGG_EVERSION ;
+  if(serialno!=os->serialno){
+    ogg_page_release(og);
+    return OGG_ESERIAL;
+  }
+  if(version>0){
+    ogg_page_release(og);
+    return OGG_EVERSION;
+  }
 
   /* add to fifos */
   if(!os->body_tail){
@@ -373,6 +388,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
     os->header_head=ogg_buffer_cat(os->header_head,og->header);
   }
 
+  memset(og,0,sizeof(*og));
   return OGG_SUCCESS;
 }
 
@@ -420,6 +436,7 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
       os->holeflag=1;
     if(temp==2){
       os->packetno++;
+      if(op)memset(op,0,sizeof(*op));
       return OGG_HOLE;
     }
   }
@@ -431,11 +448,15 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
       os->spanflag=1;
     if(temp==2){
       os->packetno++;
+      if(op)memset(op,0,sizeof(*op));
       return OGG_SPAN;
     }
   }
 
-  if(!(os->body_fill&FINFLAG))return 0;
+  if(!(os->body_fill&FINFLAG)){
+    if(op)memset(op,0,sizeof(*op));
+    return 0;
+  }
   if(!op && !adv)return 1; /* just using peek as an inexpensive way
                                to ask if there's a whole packet
                                waiting */
@@ -459,6 +480,7 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
     /* split the body contents off */
     if(op){
       op->packet=ogg_buffer_split(&os->body_tail,&os->body_head,os->body_fill&FINMASK);
+      op->bytes=os->body_fill&FINMASK;
     }else{
       os->body_tail=ogg_buffer_pretruncate(os->body_tail,os->body_fill&FINMASK);
       if(os->body_tail==0)os->body_head=0;
@@ -468,7 +490,10 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
     os->body_fill=os->body_fill_next;
     _next_lace(&ob,os);
   }else{
-    if(op)op->packet=ogg_buffer_dup(os->body_tail,0,os->body_fill&FINMASK);
+    if(op){
+      op->packet=ogg_buffer_sub(os->body_tail,0,os->body_fill&FINMASK);
+      op->bytes=os->body_fill&FINMASK;
+    }
   }
   
   if(adv){
@@ -1010,12 +1035,6 @@ void test_pack(const int *pl, const int **headers){
   ogg_stream_reset(os_de);
   ogg_sync_reset(oy);
 
-
-  ogg_buffer_outstanding(os_en->bufferpool);
-  ogg_buffer_outstanding(os_de->bufferpool);
-  ogg_buffer_outstanding(oy->bufferpool);
-  ogg_buffer_outstanding(bs);
-
 }
 
 int main(void){
@@ -1168,9 +1187,12 @@ int main(void){
 	exit(1);
       }
     }
-    if(ogg_stream_pageout(os_en,&og[0])>0){
-      fprintf(stderr,"Too many pages output building sync tests!\n");
-      exit(1);
+    {
+      ogg_page temp;
+      if(ogg_stream_pageout(os_en,&temp)>0){
+	fprintf(stderr,"Too many pages output building sync tests!\n");
+	exit(1);
+      }
     }
     
     /* Test lost pages on pagein/packetout: no rollback */

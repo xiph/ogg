@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.1.2.3 2003/03/26 23:49:40 xiphmont Exp $
+ last mod: $Id: ogg.h,v 1.1.2.4 2003/03/28 22:37:16 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -39,7 +39,7 @@ typedef struct oggpack_buffer oggpack_buffer;
 
 typedef struct {
   ogg_reference *packet;
-
+  long           bytes;
   long           b_o_s;
   long           e_o_s;
   ogg_int64_t    granulepos;
@@ -52,7 +52,9 @@ typedef struct {
 
 typedef struct {
   ogg_reference *header;
+  int            header_len;
   ogg_reference *body;
+  int            body_len;
 } ogg_page;
 
 /* Ogg BITSTREAM PRIMITIVES: bitstream ************************/

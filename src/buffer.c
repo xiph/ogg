@@ -11,7 +11,7 @@
  ********************************************************************
 
   function: centralized fragment buffer management
-  last mod: $Id: buffer.c,v 1.1.2.13 2003/03/27 21:38:16 xiphmont Exp $
+  last mod: $Id: buffer.c,v 1.1.2.14 2003/03/28 22:37:16 xiphmont Exp $
 
  ********************************************************************/
 
@@ -169,7 +169,7 @@ void ogg_buffer_realloc(ogg_reference *or,long bytes){
    of range, NULL is returned; if the desired segment is simply zero
    length, a zero length ref is returned.  Partial range overlap
    returns the overlap of the ranges */
-ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length){
+ogg_reference *ogg_buffer_sub(ogg_reference *or,long begin,long length){
   ogg_reference *ret=0,*head=0;
 
   /* walk past any preceeding fragments we don't want */
@@ -209,6 +209,35 @@ ogg_reference *ogg_buffer_dup(ogg_reference *or,long begin,long length){
     
     begin=0;
     length-=head->length;
+    or=or->next;
+  }
+
+  ogg_buffer_mark(ret);
+  return ret;
+}
+
+ogg_reference *ogg_buffer_dup(ogg_reference *or){
+  ogg_reference *ret=0,*head=0;
+
+  /* duplicate the reference chain; increment refcounts */
+  while(or){
+    ogg_reference *temp=_fetch_ref(or->buffer->ptr.owner);
+    if(head)
+      head->next=temp;
+    else
+      ret=temp;
+    head=temp;
+
+#ifdef OGGBUFFER_DEBUG
+    if(or->used==0){
+      fprintf(stderr,"\nERROR: Using reference marked as usused.\n");
+      exit(1);
+    }
+#endif
+
+    head->buffer=or->buffer;
+    head->begin=or->begin;
+    head->length=or->length;
     or=or->next;
   }
 

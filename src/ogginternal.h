@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: internal/hidden data representation structures
- last mod: $Id: ogginternal.h,v 1.1.2.13 2003/03/27 21:38:16 xiphmont Exp $
+ last mod: $Id: ogginternal.h,v 1.1.2.14 2003/03/28 22:37:16 xiphmont Exp $
 
  ********************************************************************/
 
@@ -137,7 +137,8 @@ extern ogg_buffer_state *ogg_buffer_create(void);
 extern void              ogg_buffer_destroy(ogg_buffer_state *bs);
 extern ogg_reference    *ogg_buffer_alloc(ogg_buffer_state *bs,long bytes);
 extern void              ogg_buffer_realloc(ogg_reference *or,long bytes);
-extern ogg_reference    *ogg_buffer_dup(ogg_reference *or,long begin,long length);
+extern ogg_reference    *ogg_buffer_sub(ogg_reference *or,long begin,long length);
+extern ogg_reference    *ogg_buffer_dup(ogg_reference *or);
 extern ogg_reference    *ogg_buffer_extend(ogg_reference *or,long bytes);
 extern void              ogg_buffer_mark(ogg_reference *or);
 extern void              ogg_buffer_release(ogg_reference *or);

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h,v 1.11 2002/07/19 08:25:51 msmith Exp $
+ last mod: $Id: os_types.h,v 1.12 2002/09/18 04:42:09 xiphmont Exp $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -32,6 +32,7 @@
    typedef __int32 ogg_int32_t;
    typedef unsigned __int32 ogg_uint32_t;
    typedef __int16 ogg_int16_t;
+   typedef unsigned __int16 ogg_uint16_t;
 #  else
    /* Cygwin */
    #include <_G_config.h>
@@ -39,12 +40,14 @@
    typedef _G_int32_t ogg_int32_t;
    typedef _G_uint32_t ogg_uint32_t;
    typedef _G_int16_t ogg_int16_t;
+   typedef _G_uint16_t ogg_uint16_t;
 #  endif
 
 #elif defined(__MACOS__)
 
 #  include <sys/types.h>
    typedef SInt16 ogg_int16_t;
+   typedef UInt16 ogg_uint16_t;
    typedef SInt32 ogg_int32_t;
    typedef UInt32 ogg_uint32_t;
    typedef SInt64 ogg_int64_t;
@@ -53,6 +56,7 @@
 
 #  include <sys/types.h>
    typedef int16_t ogg_int16_t;
+   typedef u_int16_t ogg_uint16_t;
    typedef int32_t ogg_int32_t;
    typedef u_int32_t ogg_uint32_t;
    typedef int64_t ogg_int64_t;
@@ -62,6 +66,7 @@
    /* Be */
 #  include <inttypes.h>
    typedef int16_t ogg_int16_t;
+   typedef u_int16_t ogg_uint16_t;
    typedef int32_t ogg_int32_t;
    typedef u_int32_t ogg_uint32_t;
    typedef int64_t ogg_int64_t;
@@ -70,6 +75,7 @@
 
    /* OS/2 GCC */
    typedef short ogg_int16_t;
+   typedef unsigned short ogg_uint16_t;
    typedef int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;

@@ -127,6 +127,22 @@ has_uint32_t=no
 )])
 AC_MSG_RESULT($has_uint32_t)
 
+AC_MSG_CHECKING(for uint16_t)
+AC_CACHE_VAL(has_uint16_t,
+[AC_TRY_RUN([
+#ifdef __BEOS__
+#include <inttypes.h>
+#endif
+#include <sys/types.h>
+uint16_t foo;
+int main() {return 0;}
+],
+has_uint16_t=yes,
+has_uint16_t=no,
+has_uint16_t=no
+)])
+AC_MSG_RESULT($has_uint16_t)
+
 AC_MSG_CHECKING(for u_int32_t)
 AC_CACHE_VAL(has_u_int32_t,
 [AC_TRY_RUN([
@@ -142,6 +158,22 @@ has_u_int32_t=no,
 has_u_int32_t=no
 )])
 AC_MSG_RESULT($has_u_int32_t)
+
+AC_MSG_CHECKING(for u_int16_t)
+AC_CACHE_VAL(has_u_int16_t,
+[AC_TRY_RUN([
+#ifdef __BEOS__
+#include <inttypes.h>
+#endif
+#include <sys/types.h>
+u_int16_t foo;
+int main() {return 0;}
+],
+has_u_int16_t=yes,
+has_u_int16_t=no,
+has_u_int16_t=no
+)])
+AC_MSG_RESULT($has_u_int16_t)
 
 AC_MSG_CHECKING(for int64_t)
 AC_CACHE_VAL(has_int64_t,
@@ -198,6 +230,20 @@ else
         fi
 fi
 
+if test x$has_uint16_t = "xyes" ; then
+        USIZE16="uint16_t"
+else
+        if test x$has_u_int16_t = "xyes" ; then
+                USIZE16="u_int16_t"
+        else
+                case 2 in
+                        $ac_cv_sizeof_short) USIZE16="unsigned short";;
+                        $ac_cv_sizeof_int) USIZE16="unsigned int";;
+                        $ac_cv_sizeof_long) USIZE16="unsigned long";;
+                esac
+        fi
+fi
+
 if test x$has_int64_t = "xyes" ; then
         SIZE64="int64_t"
 else
@@ -210,6 +256,9 @@ fi
 
 if test -z "$SIZE16"; then
         AC_MSG_ERROR(No 16 bit type found on this platform!)
+fi
+if test -z "$USIZE16"; then
+        AC_MSG_ERROR(No unsigned 16 bit type found on this platform!)
 fi
 if test -z "$SIZE32"; then
         AC_MSG_ERROR(No 32 bit type found on this platform!)
@@ -228,6 +277,7 @@ dnl Make substitutions
 
 AC_SUBST(LIBTOOL_DEPS)
 AC_SUBST(SIZE16)
+AC_SUBST(USIZE16)
 AC_SUBST(SIZE32)
 AC_SUBST(USIZE32)
 AC_SUBST(SIZE64)

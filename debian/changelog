@@ -1,3 +1,9 @@
+libogg (1.0.1-1) unstable; urgency=low
+
+  * New upstream.
+
+ -- Christopher L Cheney <ccheney@debian.org>  Tue,  2 Sep 2003 23:45:00 -0500
+
 libogg (1.0.0-1) unstable; urgency=low
 
   * New upstream.

@@ -1,5 +1,5 @@
 %define name	libogg
-%define version	1.0rc1
+%define version	1.0rc2
 %define release 1
 
 Summary:	Ogg Bitstream Library

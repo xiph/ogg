@@ -58,7 +58,7 @@ binary-arch: build install
 
 	dh_movefiles
 
-	dh_installdocs debian/tmp/usr/share/doc/libogg-1.0rc1/*
+	dh_installdocs debian/tmp/usr/share/doc/libogg-1.0rc2/*
 	dh_installexamples
 	dh_installmanpages
 	dh_installchangelogs

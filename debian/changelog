@@ -1,3 +1,11 @@
+libogg (1.0rc1) unstable; urgency=low
+
+  * New upstream.
+  * Updated config.* files (Closes: #94816)
+  * Changed clean to distclean.
+
+ -- Christopher L Cheney <ccheney@debian.org>  Sun, 17 Jun 2001 20:00:00 -0500
+
 libogg (1.0beta4-1) unstable; urgency=low
 
   *  New upstream.

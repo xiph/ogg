@@ -114,7 +114,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "-D__MACOSX__";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = ogg;
 				SECTORDER_FLAGS = "";
@@ -160,7 +160,6 @@
 			files = (
 				F5825565019164DF01A802FE,
 				F586EB5C0191DDEA01A802FE,
-				F586EB5D0191DDEA01A802FE,
 			);
 			isa = PBXHeadersBuildPhase;
 			name = Headers;
@@ -291,35 +290,12 @@
 			children = (
 				F58255530191644401A802FE,
 				F58255540191644401A802FE,
-				F58255500191644401A802FE,
-				F58255550191644401A802FE,
-				F58255560191644401A802FE,
 				F58255570191644401A802FE,
-				F58255580191644401A802FE,
 			);
 			isa = PBXGroup;
 			name = src;
 			path = ../src;
 			refType = 2;
-		};
-		F58255500191644401A802FE = {
-			children = (
-				F58255510191644401A802FE,
-				F58255520191644401A802FE,
-			);
-			isa = PBXGroup;
-			path = .deps;
-			refType = 4;
-		};
-		F58255510191644401A802FE = {
-			isa = PBXFileReference;
-			path = bitwise.Plo;
-			refType = 4;
-		};
-		F58255520191644401A802FE = {
-			isa = PBXFileReference;
-			path = framing.Plo;
-			refType = 4;
 		};
 		F58255530191644401A802FE = {
 			isa = PBXFileReference;
@@ -331,24 +307,9 @@
 			path = framing.c;
 			refType = 4;
 		};
-		F58255550191644401A802FE = {
-			isa = PBXFileReference;
-			path = libogg.la;
-			refType = 4;
-		};
-		F58255560191644401A802FE = {
-			isa = PBXFileReference;
-			path = Makefile;
-			refType = 4;
-		};
 		F58255570191644401A802FE = {
 			isa = PBXFileReference;
 			path = Makefile.am;
-			refType = 4;
-		};
-		F58255580191644401A802FE = {
-			isa = PBXFileReference;
-			path = Makefile.in;
 			refType = 4;
 		};
 		F582555A0191644401A802FE = {
@@ -366,22 +327,12 @@
 		F582555C019164DF01A802FE = {
 			children = (
 				F582555E019164DF01A802FE,
-				F582555D019164DF01A802FE,
 				F582555F019164DF01A802FE,
-				F5825560019164DF01A802FE,
-				F5825561019164DF01A802FE,
-				F5825562019164DF01A802FE,
-				F5825563019164DF01A802FE,
 			);
 			isa = PBXGroup;
 			name = Headers;
 			path = ../include/ogg;
 			refType = 2;
-		};
-		F582555D019164DF01A802FE = {
-			isa = PBXFileReference;
-			path = config_types.h;
-			refType = 4;
 		};
 		F582555E019164DF01A802FE = {
 			isa = PBXFileReference;
@@ -391,26 +342,6 @@
 		F582555F019164DF01A802FE = {
 			isa = PBXFileReference;
 			path = os_types.h;
-			refType = 4;
-		};
-		F5825560019164DF01A802FE = {
-			isa = PBXFileReference;
-			path = config_types.h.in;
-			refType = 4;
-		};
-		F5825561019164DF01A802FE = {
-			isa = PBXFileReference;
-			path = Makefile;
-			refType = 4;
-		};
-		F5825562019164DF01A802FE = {
-			isa = PBXFileReference;
-			path = Makefile.am;
-			refType = 4;
-		};
-		F5825563019164DF01A802FE = {
-			isa = PBXFileReference;
-			path = Makefile.in;
 			refType = 4;
 		};
 		F5825565019164DF01A802FE = {
@@ -424,15 +355,6 @@
 		};
 		F586EB5C0191DDEA01A802FE = {
 			fileRef = F582555F019164DF01A802FE;
-			isa = PBXBuildFile;
-			settings = {
-				ATTRIBUTES = (
-					Public,
-				);
-			};
-		};
-		F586EB5D0191DDEA01A802FE = {
-			fileRef = F582555D019164DF01A802FE;
 			isa = PBXBuildFile;
 			settings = {
 				ATTRIBUTES = (

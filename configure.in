@@ -5,9 +5,9 @@ AM_INIT_AUTOMAKE(libogg,1.0beta4)
 
 dnl Library versioning
 
-LIB_CURRENT=0
-LIB_REVISION=1
-LIB_AGE=0
+LIB_CURRENT=1
+LIB_REVISION=0
+LIB_AGE=1
 AC_SUBST(LIB_CURRENT)
 AC_SUBST(LIB_REVISION)
 AC_SUBST(LIB_AGE)
@@ -230,4 +230,4 @@ AC_SUBST(DEBUG)
 AC_SUBST(CFLAGS)
 AC_SUBST(PROFILE)
 
-AC_OUTPUT(Makefile src/Makefile doc/Makefile include/Makefile include/ogg/Makefile include/ogg/config_types.h win32/Makefile debian/Makefile)
+AC_OUTPUT(Makefile src/Makefile doc/Makefile doc/ogg/Makefile include/Makefile include/ogg/Makefile include/ogg/config_types.h win32/Makefile debian/Makefile)

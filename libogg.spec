@@ -56,6 +56,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 %doc doc/white-ogg.png
 %doc doc/white-xifish.png
 %doc doc/stream.png
+%doc doc/ogg
 /usr/include/ogg/ogg.h
 /usr/include/ogg/os_types.h
 /usr/include/ogg/config_types.h

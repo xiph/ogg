@@ -369,7 +369,7 @@ long oggpackB_read(oggpack_buffer *b,int bits){
       }
     }
   }
-  ret=((ret&0xffffffff)>>(m>>1))>>((m+1)>>1);
+  ret=((ret&0xffffffffUL)>>(m>>1))>>((m+1)>>1);
   
  overflow:
 

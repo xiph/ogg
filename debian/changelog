@@ -2,7 +2,7 @@ ogg (1.0beta3-1) unstable; urgency=low
 
   * Initial Release.
 
- -- Chris Cheney <ccheney@debian.org>  Sun, 29 Oct 2000 01:11:57 -0500
+ -- Christopher L Cheney <ccheney@debian.org>  Sun, 29 Oct 2000 01:11:57 -0500
 
 Local variables:
 mode: debian-changelog

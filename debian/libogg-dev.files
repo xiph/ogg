@@ -1,4 +1,3 @@
-usr/bin/ogg-config
 usr/include/ogg/*.h
 usr/lib/*.a
 usr/lib/*.la

@@ -61,7 +61,6 @@ make DESTDIR=$RPM_BUILD_ROOT install
 /usr/lib/libogg.a
 /usr/lib/libogg.so
 /usr/share/aclocal/ogg.m4
-/usr/bin/ogg-config
 
 %clean 
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT

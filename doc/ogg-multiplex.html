@@ -1,0 +1,1177 @@
+<HTML><HEAD><TITLE>xiph.org: Ogg documentation</TITLE>
+<BODY bgcolor="#ffffff" text="#202020" link="#006666" vlink="#000000">
+<nobr><a href="http://www.xiph.org/ogg/index.html"><img src="white-ogg.png" border=0><img src="vorbisword2.png" border=0></a></nobr><p>
+
+<h1><font color=#000070>
+Page Multiplexing and Ordering in a Physical Ogg Stream
+</font></h1>
+
+<em>Last update to this document: February 13, 2004</em><br> 
+<p>
+
+The low-level mechanisms of an Ogg stream (as described in the Ogg
+Bitstream Overview) provide means for mixing multiple logical streams
+and media types into a single linear-chronological stream.  This
+document discusses the high-level arrangement and use of page
+structure to multiplex multiple streams of mixed media type within a
+physical Ogg stream.
+
+<h2>Design Elements</h2>
+
+<h3>Chronological arrangement</h3>
+
+The Ogg bitstream is designed to provide data in a chronological
+(time-linear) fashion.  This design is such that an application can
+encode and/or decode a full-featured bitstream in one pass with no
+seeking an minimal buffering.  Seeking to provide optimized encoding
+(such as two-pass encoding) or interactive decoding (such as scrubbing
+or instant replay) is not disallowed or discouraged, however no
+bitstream feature must require nonlinear operation on the
+bitstream.<p>
+
+<i>As an example, this is why Ogg specifies bisection-based exact seeking
+rather than building an index; an index requires two-pass encoding and
+as such is not acceptible according to original design requirements.
+Even making an index optional then requires an application to support
+multiple methods (bisection search for a one-pass stream, indexing for
+a two-pass stream), which adds no additional functionality as
+bisection search delivers the same functionality for both stream
+types.</i><p>
+
+<h4>Multiplexing</h4>
+
+Ogg bitstreams multiplex multiple logical streams into a single
+physical stream at the page level.  Each page contains an abstract
+time stamp (the Granule Position) that represents an absolute time
+landmark within the stream.  After the pages representing stream
+headers (all logical stream headers occur at the beginning of a
+physical bitstream section before any logical stream data), logical
+stream data pages are arranged in order of chronological absolute time
+as specified by the granule position.  <p>
+
+The only exception to arranging pages in strictly ascending time order
+by granule position is those pages that do not set the granule
+position value.  This is a special case when exceptionally large
+packets span multiple pages; the specifics of handling this special
+case are described later under 'Continuous and Discontinuous
+Streams'.<p>
+
+<h4>Buffering</h4>
+
+Ogg's multiplexing design minimizes extraneous buffering required to
+maintain audio/video sync by arranging audio, video and other data in
+chronological order.  Thus, a normally streamed file delivers all
+data for decode 'just in time'; pages arrive in the order they must
+be consumed.<p>
+
+Buffering requirements need not be explicitly declared or managed for
+the encoded stream; the decoder simply reads as much data as is
+necessary to keep all continuous stream types gapless (also ensuring
+discontinuous data arrives in time) and no more, resulting in optimum
+buffer usage for free.  Because all pages of all data types are
+stamped with absolute timing information within the stream,
+inter-stream synchronization timing is always explicitly
+maintained.<p>
+
+<h2>Granule Position</h2>
+
+<h3>Description</h3>
+
+The Granule Position is a signed 64 bit field appearing in the header
+of every Ogg page.  Although the granule position represents absolute
+time within a logical stream, its value does not necessarily directly
+encode a simple timestamp.  It may represent frames elapsed (as in
+Vorbis), a simple timestamp, or a more complex bit-division encoding
+(such as in Theora).  The exact meaning of the granule position is up
+to a specific codec.<p>
+
+The granule position is governed by the following rules:
+<ul>
+
+<li>Granule Position must always increase forward from page to page,
+be unset, or be zero for a header page.<br>
+
+<li>Granule position may only be unset if there no packet defining a
+time boundary on the page (that is, if no packet in a continuous
+stream ends on the page, or no packet in a discontinuous stream begins
+on the page.  This will be discussed in more detail under Continuous
+and Discontinuous streams).<br>
+
+<li>A codec must be able to translate a given granule position value
+to a unique, exact absolute time value through direct calculation.  A
+codec is not required to be able to translate an absolute time value
+into a unique granule position value.<br>
+
+<li>Codecs shall choose a granule position definition that allows that
+codec means to seek as directly as possible to an immediately
+decodable point, such as the bit-divided granule position encoding of
+Theora allows the codec to seek efficiently to keyframes without using
+an index.
+</ul>
+
+<h3>granule position, packets and pages</h3>
+
+Although each packet of data in a logical stream theoretically has a
+unique granule position, only one granule position is encoded per
+page.  It is possible to encode a logical stream such that each page
+contains only a single packet (so that granule positions are preserved
+for each packet), however a one-to-one packet/page mapping is not
+intended for the general case.<p>
+
+A granule position represents the <em>instantaneous time location
+between two pages</em>.  In a continuous stream, the granulepos
+represents the point in time immediately after the last data decoded
+from a page.  In a discontinuous stream, it represents the point in
+time immediately before the first data decoded from the page.<p>
+
+Because Ogg functions at the page, not packet, level, this
+once-per-page time information provides Ogg with the finest-grained
+time information is can use.  Ogg passes this granule positioning data
+to the codec (along with the packets extracted from a page); it is
+intended to be the responsibility of codecs to track timing
+information at granularities finer than a single page.<p>
+
+<h3>Example: timestamp</h3>
+
+In general, a codec/stream type should choose the simplest granule
+position encoding that addresses its requirements.  The examples here
+are by no means exhaustive of the possibilities within Ogg.<p>
+
+A simple granule position could encode a timestamp directly. For
+example, a granule position that encoded milliseconds from beginning
+of stream would allow a logical stream length of over 100,000,000,000
+days before beginning a new logical stream (to avoid the granule
+position wrapping).<p>
+
+<h3>Example: framestamp</h3>
+
+A simple millisecond timestamp granule encoding might suit many stream
+types, but a millisecond resolution is inappropriate to, eg, most
+audio encodings where exact single-sample resolution is generally a
+requirement.  A millisecond is both too large a granule and often does
+not represent an integer number of samples.<p>
+
+In the event that a audio frames always encode the same number of
+samples, the granule position could simple be a linear count of frames
+since beginning of stream. This has the advantages of being exact and
+efficient.  Position in time would simply be <tt>[granule_position] *
+[samples_per_frame] / [samples_per_second]</tt>.
+
+<h3>Example: samplestamp (Vorbis)</h3>
+
+Frame counting is insufficient in codecs such as Vorbis where an audio
+frame [packet] encodes a variable number of samples.  In Vorbis's
+case, the granule position is a count of the number of raw samples
+from the beginning of stream; the absolute time of
+a granule position is <tt>[granule_position] /
+[samples_per_second]</tt>.
+ 
+<h3>Example: bit-divided framestamp (Theora)</h3>
+
+Some video codecs may be able to use the simple framestamp scheme for
+granule position.  However, most modern video codecs introduce at
+least the following complications:<p>
+<ul>
+
+<li>video frames are relatively far apart compared to audio samples;
+for this reason, the point at which a video frame changes to the next
+frame is usually a strictly defined offset within the frme 'period'.
+That is, video at 50fps could just as easily define frame transitions
+<.015, .035, .055...> as at <.00, .02, .04...>
+
+<li>frame rates often include drop-frames, leap-frames or other
+rational-but-non-integer timings
+
+<li>Decode must begin at a 'keyframe' or 'I frame'.  Keyframes usually
+occur relatively seldom.
+</ul>
+
+
+
+     Can seek quickly to any keyframe without index
+     Naieve seeking algorithm still availble; juyst lower performance
+     Bisection seeking used anyway
+
+<h2>Multiplex/Demultiplex Division of Labor</h2>
+
+The Ogg multiplex/deultiplex layer provides mechanisms for encoding
+raw packets into Ogg pages, decoding Ogg pages back into the original
+codec packets, determining the logical structure of an Ogg stream, and
+navigating through and synchronizing with an Ogg stream at a desired
+stream location.  Strict multiplex/demultiplex operations are entirely
+in the Ogg domain and require no intervention from codecs.<p>
+
+Implementation of more complex operations does require codec
+knowledge, however.  Unlike other framing systems, Ogg maintains
+strict seperation between framing and the framed bistream data; Ogg
+does not replicate codec-specific information in the page/framing
+data, nor does Ogg blur the line between framing and stream
+data/metadata.  Because Ogg is fully data agnostic toward the data it
+frames, operations which require specifics of bitstream data (such as
+'seek to keyframe') also require interaction with the codec layer
+(because, in this example, the Ogg layer is not aware of the concept
+of keyframes).  This is different from systems that blur the
+seperation between framing and stream data in order to simplify the
+seperation of code.  The Ogg system purposely keeps the distinction in
+data simple so that later codec innovations are not constrained by
+framing design.<p>
+
+For this reason, however, complex seeking operations require
+interaction with the codecs in order to decode the granule position of
+a given stream type back to absolute time or in order to find
+'decodable points' such as keyframes in video.
+
+<h2>Continuous and Discontinuous Streams</h2>
+
+<h3>continuous description</h3>
+A stream that provides a gapless, time-continuous media type is
+considered to be 'Continuous'.  Clear examples of continuous data
+types include broadcast audio and video. Such a stream should never
+allow a playback buffer to starve, and Ogg implementations must buffer
+ahead sufficient pages such that all continuous streams in a physical
+stream have data ready to decode on demand.<p>
+
+<h3>discontinuous description</h3>
+A stream that delivers data in a potentially irregular pattern or with
+widely spaced timing gaps is considered to be 'Discontinuous'.  An
+examples of a discontinuous stream types would be captioning.
+Although captions still occur on a regular basis, the timing of a
+specific caption is impossible to predict with certainty in most
+captioning systems.<p>
+
+<h3>declaration</h3> An Ogg stream type is defined to be continuous or
+discontinuous by its codec.  A given codec may support both continuous
+and discontinuous operation so long as any given logical stream is
+continuous or discontinuous for its entirety and the codec is able to
+ascertain (and inform the Ogg layer) as to which after decoding the
+initial stream header.  The majority of codecs will always be
+continuous (such as Vorbis) or discontinuous (such as Writ).
+
+<h3>continuous granule position</h3>
+
+
+
+<h3>discontinuous granule position</h3>
+
+it is able to definitively  from the Ogg layer
+
+
+
+
+Topics:
+
+Granpos mapping set by decoder
+  header decode (codec plugin) required to decode granpos
+    rationale: 
+  must map back to absolute time
+
+Examples of granpos mappings
+  a) Vorbis (fixed rate)
+  b) Theora (bit-field for keyframe)
+  c) absolute time
+
+Continuous Stream Type
+Discontinuous stream type
+
+MNG: variable framerate, possibly discontinuous; two code mappings?
+
+flushes around keyframes?  RFC suggestion: repaginating or building a
+  stream this way is nice but not required
+
+
+<h2>Appendix A: discussion excerpts</h2>
+
+Developers at Xiph.Org have discussed the details of Ogg multiplexing
+on many occasions on Internet Relay Chat.  The earliest conversations
+regarding discontinuous streams and granule ordering between Monty
+&lt;xiphmont&gt; and Jack Moffitt from 1999 weren't logged, but much
+of the same material is rehashed in the three excerpts below.<p>
+
+The primary purpose of these excerpts is to illuminate a number of
+subtle points through logged conversations. The cornerstones of the
+Ogg muxing specification were long set at this point, however the
+excerpts capture discussion of proposed innovations within the
+original specification and the reasoning behind each proposal as well
+as discussing long-decided details.<p>
+
+These excerpts have been edited from the original verbatim IRC log to
+remove off-topic chatter and correct occasional typos.<p>
+
+<h3>excerpt one</h3>
+
+This excerpt discusses:
+<ol>
+<li>video keyframe flagging via granule position bit-division technique.
+<li>Division of labor during seeking between codec and Ogg demuxer
+</ol>
+
+<pre>
+
+&lt;mau&gt;      guys, how can we test seeking, etc? are changes needed in the
+	   ogg framework?
+&lt;mau&gt;      like seeking to keyframes?
+&lt;rillian&gt;  mau: nope, just player support
+&lt;mau&gt;      ok, so what would be the strategy? seek to an arbitrary time,
+           and wait for a keyframe?
+&lt;mau&gt;      yeah, currently there is the hack in granulepos, right?
+&lt;mau&gt;      maybe just a macro?
+&lt;danx0r&gt;   I've heard about it -- some sort of bitfield division
+&lt;danx0r&gt;   lower bits are frames after a key
+&lt;xiphmont&gt; you can seek to a given location.  the hack in granpos
+	   gives you the number for every keyframe.
+&lt;danx0r&gt;   keyframes increase by some set increment -- can someone confirm?
+&lt;xiphmont&gt; yes
+&lt;rillian&gt;  xiphmont: I thought it wasn't necessarily fixed
+&lt;mau&gt;      or is it up to the player?
+&lt;xiphmont&gt; it's fixed for a given stream section.
+&lt;danx0r&gt;   so if you seek naively now, you'll get garbage until the next kf?
+&lt;mau&gt;      I think it is up to the player to freeze the last known good image
+&lt;mau&gt;      until a keyframe passes, much like windows media, etc
+&lt;xiphmont&gt; you know if you're not in sequence.
+&lt;danx0r&gt;   the right thing is to go to the previous keyframe and parse up to 
+	   your seek frame faster than realtime, but...
+&lt;danx0r&gt;   for now, something like what WMP does should be fine
+&lt;Mike&gt;     mau: or, if it's a smart player (and the data source allows it), 
+	   to deliberately seek forwards to the next keyframe.
+&lt;rillian&gt;  are you talking about the radix rather than the actual keyframe 
+	   rate?
+&lt;mau&gt;      mike: going forward is ok, but in wmp you can still read audio 
+	   for example, until the next video keyframe, where video resumes
+&lt;mau&gt;      it is also a good strategy, guess it depends on the player
+&lt;xiphmont&gt; rillian: the stream is set up to have a maximum keyframe spacing.  
+	   Granpos is updated by a fixed amount at each keyframe.  The 
+	   granpos is not [necessarily] monotonically increasing
+&lt;Mike&gt;     true. 
+&lt;rillian&gt;  it's monotonic, but not (necessarily) linear
+&lt;mau&gt;      xiphmont: so ideally the player would look at the granulepos and 
+	   count how many frames since the last key, and seek back that many 
+	   pages?
+&lt;xiphmont&gt; mau: Ogg seeking is all done as predicted bisection search.
+&lt;xiphmont&gt; look in vorbisfile to see code that does it.
+&lt;derf&gt;     If one encodes in a frame how many frames it has been since a 
+	   keyframe, couldn't you do the same thing?
+&lt;derf&gt;     Without imposing a maximum keyframe spacing?
+&lt;xiphmont&gt; that data does not exist in an ogg header.
+&lt;xiphmont&gt; Ogg headers use absolute counters.
+&lt;derf&gt;     I meant in the packet data, but I see what you're saying.
+&lt;xiphmont&gt; you get that out of the granpos hack anyway.
+&lt;derf&gt;     You have to start decoding the packet to tell where to get the 
+	   keyframe.
+&lt;xiphmont&gt; Seeking in an ogg stream does not look at packets.
+&lt;rillian&gt;  (except you have to parse the header to do granulepos conversion)
+&lt;xiphmont&gt; yes.
+&lt;xiphmont&gt; although it may be sensible to change that.
+&lt;derf&gt;     You already need at least a page worth of data to check the CRC 
+	   on the ogg header to seek.
+&lt;derf&gt;     It would seem reasonable to require a full packet instead, and 
+	   pass this to the codec when asking where to seek next.
+&lt;xiphmont&gt; derf: a page does not necessarily give you a packet.
+&lt;derf&gt;     xiphmont: I know.
+&lt;derf&gt;     xiphmont: But, allowing the codec to look at the packet better 
+	   supports embedding codecs which might not be able to determine 
+	   the position of a keyframe from their granpos alone.
+&lt;xiphmont&gt; derf: why wouldn't they?  Blind refusal to use the mechanisms at 
+	   hand?
+&lt;derf&gt;     The reason this concerns me is that the case where you want to 
+	   have really long spaces between key frames (streaming) is also 
+	   exactly the place where you want to allow very long streams.
+&lt;xiphmont&gt; you have a 64 bit granpos.
+&lt;derf&gt;     And if I never want a keyframe except at the first frame, I now 
+	   have only 32.
+&lt;xiphmont&gt; ...and you're welcome to use as many logical sections as you want.
+&lt;xiphmont&gt; so, now you have 96 bits.
+&lt;derf&gt;     Okay. I guess I can live with a keyframe every 4 billion frames.
+&lt;xiphmont&gt; if you want unique serialnos; you're allowed to wrap them in 
+	   streaming, so it becomes infinite.
+&lt;xiphmont&gt; if you're streaming with one keyframe every 4G, you'll have no 
+	   viewers anyway :-)
+&lt;derf&gt;     That's what out-of-band synch points are for.
+&lt;xiphmont&gt; sure, that works.
+&lt;xiphmont&gt; Now, it's possible to do a 'seek requests are handed to the codec,
+	   not to ogg' infrastructure, then the codec makes bisection calls 
+	   into the ogg layer.
+&lt;xiphmont&gt; it's more complex, and I'm not sure what I really get out of it.
+&lt;derf&gt;     Well, the codec doesn't really need to do that.
+&lt;xiphmont&gt; in fact, I'm beginning to wonder if moving the granpos parsing 
+	   away from relying on header at all might be a good idea.
+&lt;derf&gt;     The codec really just wants "give me the packet at this granpos"
+&lt;derf&gt;     The bisection can still be done in the ogg layer to find that 
+	   packet.
+&lt;xiphmont&gt; derf: same basic division of labor.
+&lt;xiphmont&gt; the request still originates at the codec.
+</pre>
+
+
+<h3>excerpt two</h3>
+
+This excerpt discusses:
+<ol>
+<li>keyframe pagination in video
+<li>keyframe seeking using granule position bit-division
+<li>alternate keyframe location proposals
+</ol>
+
+<pre>
+
+&lt;rillian&gt;  afaik that's just a detail of smpte timecode
+&lt;xiphmont&gt; ...and preserving pulldown and non-interval-centered frames.
+&lt;rillian&gt;  ugh
+&lt;xiphmont&gt; (ie, what offset in the sample period is the frame)
+&lt;xiphmont&gt; yeah, ugliness.
+&lt;xiphmont&gt; but not really representationally difficult.
+&lt;rillian&gt;  speaking of, do you see any advantage to doing page flushes 
+	   before or after keyframes?
+&lt;rillian&gt;  either to simplify seeking or initialization retention in 
+	   something like icecast
+&lt;xiphmont&gt; it doesn't affect seeking any, really. It makes streaming 
+	   slightly easier for lazy programmers.
+&lt;rillian&gt;  xiphmont: do you mean icecast should pull out the keyframe packet 
+	   and repage it?
+&lt;xiphmont&gt; rillian: if there's no flush, then it should as an optimization.  
+	   It's not necessary, but it's nice.
+&lt;xiphmont&gt; either the streamer or the source should be smart enough to start 
+	   streaming at a nice sync point for a and v.
+&lt;rillian&gt;  xiphmont: so how would you do frame-accurate seeking with the 
+	   current design?
+&lt;rillian&gt;  the concern as I understand was that there wasn't a page/packet 
+	   that was specifically labelled 'this is a keyframe' at the ogg layer
+&lt;xiphmont&gt; rillian: same way vorbis does.  Each frame does have a granpos,
+	    they're just not monotonic.
+&lt;rillian&gt;  s/wasn't/might not be/
+&lt;xiphmont&gt; ah, yes there is.
+&lt;derf&gt;     Wait, they're not monotonic?
+&lt;xiphmont&gt; no, just guaranteed to increase.
+&lt;derf&gt;     Oh... whew.
+&lt;derf&gt;     Different definitions of monotonic.
+&lt;mau&gt;      sorry for being slow, but when you say "Frame" is this a packet, 
+	   a page?
+&lt;derf&gt;     I thought the encoding was 
+	   frame_number_of_keyframe&lt;&lt;n|frames_since_keyframe
+&lt;xiphmont&gt; right now, each theora frame is one packet.
+&lt;xiphmont&gt; derf: yes.
+&lt;derf&gt;     As far as I can see, we can work backwards and reconstruct a 
+	   packet-level granpos for each packet so long as that is still true.
+&lt;derf&gt;     Once you include data partitioning a la MPEG, you lose that ability.
+&lt;mau&gt;      k, but if you put many packets in a page, then you do not have one 
+	   for each, right? It is just a matter of counting up, and not 
+	   allowing keyframes in the middle of a page?
+&lt;xiphmont&gt; 'monotonically increasing' == 'increasing by one'
+&lt;derf&gt;     mau: No.
+&lt;derf&gt;     You can still put keyframes anywhere.
+&lt;xiphmont&gt; actually, my Ogg algos counts forward from previous page generally.
+&lt;mau&gt;      simple question: if there are multiple frames in a page, does the 
+	   ogg layer maintains a granulepos for each?
+&lt;xiphmont&gt; mau: It could, it doesn't.
+&lt;xiphmont&gt; (requires being even more in bed with the codec.  And that is 
+	   currently the greatest point of contention in my own mind)
+&lt;mau&gt;      ok. and how to detect when a keyframe arrives in the middle of a 
+	   page?
+&lt;xiphmont&gt; mau: the codec knows.  Ogg doesn't.
+&lt;mau&gt;      that's what I needed to know. So the codec initiates the seeking 
+	   request
+&lt;xiphmont&gt; Ogg knows only how to get to a requested granpos.
+&lt;derf&gt;     Oh, no, you can't always get a granpos back for every packet.
+&lt;xiphmont&gt; mau: it doesn't have to; that's one possible way to do it, yes.
+&lt;derf&gt;     You can still put keyframes in the middle of pages, but if you put 
+	   two of them in one page...
+&lt;xiphmont&gt; derf: you can, but only going forward.
+&lt;xiphmont&gt; Ogg is built on the idea of chronological decode; data propagates 
+	   forward in time.
+&lt;derf&gt;     If I encode PIPPIP in one page, I have no way of knowing the first 
+	   I is there just by looking at granposes.
+&lt;xiphmont&gt; no, but you have other data in the page; namely, the codec should 
+	   be able to tell by looking at first byte.
+&lt;xiphmont&gt; It is a consequence of Ogg having no codec-specific awareness.
+&lt;derf&gt;     Yes, but even the codec cannot tell with just the granposes.
+&lt;xiphmont&gt; correct, but the codec need not function only with granpos.
+&lt;xiphmont&gt; the codec knows its own keyframes.
+&lt;derf&gt;     If the codec need not function only with granposes, then why are 
+	   we trying to build a seeking mechanism that works with just them?
+&lt;xiphmont&gt; division of labor;  Ogg is able to hand you any *page*, not any 
+	   *packet*.
+&lt;xiphmont&gt; even Vorbis does this.
+&lt;mau&gt;      ok, wouldn't it be better to require each new keyframe to start a 
+	   new page then?
+&lt;xiphmont&gt; Ogg hands you the nearest preceding page for the codec to then 
+	   discard the minimum amount of page data to get to the packet it 
+	   wants.
+&lt;mau&gt;      to make seeking easier/faster/lazier?
+&lt;xiphmont&gt; but it doesn't.
+&lt;xiphmont&gt; Seek to page.  Start grabbing packets.
+&lt;derf&gt;     xiphmont: Yes, I understand this, but...
+&lt;xiphmont&gt; Discard packets until you see a keyframe
+&lt;mau&gt;      k
+&lt;xiphmont&gt; Ogg would have to do the same thing.
+&lt;mau&gt;      I see
+&lt;xiphmont&gt; You *can* if you want to, certainly.
+&lt;derf&gt;     Say that page I gave above starts on frame n.
+&lt;xiphmont&gt; There's nothing stopping or even discouraging you ;-)
+&lt;xiphmont&gt; derf: OK
+&lt;derf&gt;     I want to seek to frame n+3.
+&lt;xiphmont&gt; OK
+&lt;derf&gt;     I get that page's granpos, and discover there's a keyframe at frame
+	   n+4.
+&lt;xiphmont&gt; Ogg, in seeking, hands you the page that is guaranteed to have the 
+	   start of n+3.
+&lt;derf&gt;     I know nothing about the type of packets n to n+3.
+&lt;xiphmont&gt; (or, more importantly, hands you the page guaranteed to have the 
+	   keyframe you need to decode n+3)
+&lt;derf&gt;     Without physically examining the packets.
+&lt;xiphmont&gt; true.  Neither does Ogg.
+&lt;derf&gt;     So I have to go all the way back to the previous keyframe to 
+	   decode them.
+&lt;xiphmont&gt; No.
+&lt;xiphmont&gt; You already have it for free.
+&lt;xiphmont&gt; Assume the keyframe shift in granpos is 8.
+&lt;derf&gt;     Okay.
+&lt;xiphmont&gt; (you get a new keyframe at most every 256 packets)
+&lt;derf&gt;     Yeah, I know what this translates to.
+&lt;xiphmont&gt; but the current actual pattern is: IPPPPPIPPPPPIPPPP....
+&lt;xiphmont&gt; your granposes are:
+&lt;xiphmont&gt; 0 1 2 3 4 5 600 601 602 603 604 605 c00 c01 c02....
+&lt;xiphmont&gt; you want to decode frame 602; seek to 600.
+&lt;xiphmont&gt; and you know you have to seek directly to 600 because you know how 
+	   the granpos works.
+&lt;xiphmont&gt; 600 is your keyframe.
+&lt;xiphmont&gt; if 600 does not start the page, ogg hands you the page with 600 on 
+	   it.
+&lt;rillian&gt;  so you get a page with, for example, the end of 4, 5, 600, and the 
+	   start of 601
+&lt;rillian&gt;  you start pulling out packets
+&lt;rillian&gt;  discard until you get to 600, which you decode
+&lt;derf&gt;     xiphmont: But, I don't know the frame is called 602.
+&lt;rillian&gt;  pull in the next page, pull out 601 and discard it
+&lt;derf&gt;     I want to seek to frame 8.
+&lt;rillian&gt;  then pull out 602 and resume normal decode
+&lt;derf&gt;     All I know is that its granpos is &lt;= 800.
+&lt;xiphmont&gt; now, you're right; always having a keyframe start a page 
+	   eliminates some amount of inspect/discard; but you can 
+	   inspect/discard in a few processor cycles.
+&lt;rillian&gt;  xiphmont: aye. seems a requirement to avoid the discard isn't needed
+&lt;xiphmont&gt; derf: OK, then it's a 2-stage bisection.  you ask ogg for 'page 
+	   before 800'; you see that the granpos is 600+whatever.  
+	   then seek to 600.
+&lt;xiphmont&gt; (or, Ogg could do that internally with knowledge of the granpos 
+	   structure)
+&lt;mau&gt;      k, this last one explained it for me
+&lt;derf&gt;     xiphmont: Right, but here's the issue:
+&lt;derf&gt;     In my PIPPIP example, Ogg doesn't know the granpos of the first 4
+	    packets.
+&lt;xiphmont&gt; sure.
+&lt;derf&gt;     And the codec can reconstruct them just from the granpos of the 
+	   page.
+&lt;derf&gt;     s/can/can't
+&lt;xiphmont&gt; sure it can.
+&lt;derf&gt;     How?
+&lt;xiphmont&gt; the count is *reducible* to a monotonically increasing function :-)
+&lt;xiphmont&gt; (assuming you have two granposes)
+&lt;xiphmont&gt; you're always counting up or down one frame.
+&lt;rillian&gt;  i.e. you actually need the previous page in derf's example
+&lt;derf&gt;     rillian: But the previous page doesn't tell you anything about 
+	   packets 1-4.
+&lt;xiphmont&gt; yes, the first 'P' is undefined granpos without previous page.
+&lt;xiphmont&gt; ...but if your stream is not starting with a keyframe, that P 
+	   frame is not decodable anyway.
+&lt;derf&gt;     Let's say the previous granpos is 0|F0
+&lt;rillian&gt;  derf: ok, I see. I was misunderstanding the granulepos hack.
+&lt;xiphmont&gt; derf: yes it does.  If gives you the granpos of the first packet.
+&lt;xiphmont&gt; (ie, it gives you the granpos of the last frame of the previous 
+	   packet, and you can always count forward)
+&lt;derf&gt;     Then the granpos for those frames can be F1|00 F1|01 F1|02 F1|03 
+	   or 0|F1 F2|00 F2|01 F2|02 or ...
+&lt;xiphmont&gt; you [the codec] knows if they're keyframes or not. 
+&lt;derf&gt;     Only if I look at the packets themselves.
+&lt;xiphmont&gt; yes.
+&lt;derf&gt;     My claim was that there was no way to do it without looking at the 
+	   packets.
+&lt;xiphmont&gt; blow 10 cycles on inspecting, and avoid the need for a 64 bit 
+	   timestamp on every packet :-)
+&lt;derf&gt;     I'm not arguing for a timestamp.
+&lt;xiphmont&gt; Oh. Yes, your claim is correct.  Apologies.
+&lt;rillian&gt;  but it still doesn't matter much, because discarding as you go 
+	   through a single page is cheap
+&lt;xiphmont&gt; You need to inspect the packets.  It is the responsibility of the 
+	   codec definition to make that easy.
+&lt;derf&gt;     My argument is this: If I have to inspect the packets ANYWAY for 
+	   this to work right, why am I going through this complicated granpos
+	   scheme instead of just using a normal, sane mapping of 
+	   frame=granpos, and storing an offset to the keyframe in the packet?
+&lt;xiphmont&gt; (Vorbis places that information in the first byte)
+&lt;xiphmont&gt; derf: the information is redundant.
+&lt;xiphmont&gt; Yes, you certainly *can* do it that way.
+&lt;xiphmont&gt; I'm even still considering it.  it does have advantages.
+&lt;mau&gt;      monty: if the granulepos hack is made "official" and mandatory 
+	   for other video codecs however, you could have ogg doing the 
+	   inspection, right?
+&lt;xiphmont&gt; OTOH, I'm also considering hardwiring a number of granpos 
+	   mechanisms into Ogg such that it can seek without any codec 
+	   knowledge.
+&lt;xiphmont&gt; the two approaches are mutually exclusive (at least, rationally so)
+&lt;xiphmont&gt; mau: yes, what you said.
+&lt;derf&gt;     I do not see how you're going to be able to accomplish seeking 
+	   without codec knowledge.
+&lt;derf&gt;     I thought I had just demonstrated why your current scheme cannot 
+	   do this.
+&lt;xiphmont&gt; derf: not entirely; however, you could achieve enough to avoid 
+	   the need for two-way feedback between the mux and codec layers.  
+	   The current proposal (which includes this two way feedback) is 
+	   very unusual and causing outside developers fits.
+&lt;xiphmont&gt; for example, it means the Ogg demux has to interface with an 
+	   Ogg-like codec glue.
+&lt;derf&gt;     I had always assumed this was part of the design.
+&lt;derf&gt;     By saying, to begin with, "the codec decides what granpos means".
+&lt;xiphmont&gt; the current normal division of demux and decode has a different 
+	   division; it would make it hard to use Ogg as a generic demux 
+	   system in something like xine, where the 'vorbis' codec could 
+	   just as easily handle the output from AVI or Ogg demux.
+&lt;xiphmont&gt; derf: it always has been.  That doesn't mean I'm ignoring the 
+	   advantages of alternatives.
+&lt;xiphmont&gt; it is not yet at the point where changing my mind would break 
+	   existing installations, so it's still worth debating.  That said, 
+	   I've seen nothing yet to change my mind.
+&lt;derf&gt;     The vorbis "codec" really has two pieces.
+&lt;derf&gt;     One manages decoding the packets.
+&lt;xiphmont&gt; one manages the Ogg mapping.
+&lt;derf&gt;     Right.
+&lt;derf&gt;     The first can be separated out and used for other container formats.
+&lt;derf&gt;     The other containers are then responsible for providing an 
+	   equivalent of the second.
+&lt;xiphmont&gt; ...and we probably can't escape needing *some* glue for any given 
+	   codec.
+&lt;xiphmont&gt; even if we strive to make the division similar.
+&lt;xiphmont&gt; 'similar' is not 'identical'.
+&lt;xiphmont&gt; that is the primary reason I've not changed my mind.  Being in 
+	   bed with the codec makes possible demux/decode lib APIs with some 
+	   very nice features.
+&lt;xiphmont&gt; (ala Vorbisfile)
+&lt;xiphmont&gt; So, it sounds like we're entirely on the same page.
+&lt;xiphmont&gt; [pun not intended]
+&lt;derf&gt;     Yes, except that if you're in bed with the Theora codec, you 
+	   shouldn't need this complicated of a granpos mapping.
+&lt;derf&gt;     And I still don't see what it gets you.
+&lt;mau&gt;      let me see if I understand you derf: if you are going to have to 
+	   inspect the packets anyway
+&lt;mau&gt;      why don't you use a linear count?
+&lt;mau&gt;      is this it?
+&lt;derf&gt;     mau: Correct.
+&lt;mau&gt;      guess the hack can possibly give you a closer location
+&lt;rillian&gt;  the case with mng is interesting. it's natively variable framerate 
+	   (or more properly can be) so some realtime base (it has a field for
+	   mapping 'ticks' to seconds) is the obvious granulepos. Except it 
+	   has the same keyframe problem theora does, and it's worse because 
+	   while identifying a restart point is easy (there's a special chunk 
+	   type) the codec has to do quite a bit more work to determine which 
+	   pieces are skippable
+&lt;derf&gt;     Actually, it gives you a farther one.
+&lt;xiphmont&gt; derf: it wastes space.
+&lt;xiphmont&gt; you certainly can do it that way.  You'll sink additional bitrate 
+	   to do it.
+&lt;derf&gt;     xiphmont: Yes, it does move a few bits that are currently in the 
+	   granpos into the packets.
+&lt;derf&gt;     mau: If I want to seek to frame 8, and I ask for the granpos 
+	   closest to 800, I get 605... three packets beyond where I want to 
+	   be.
+&lt;xiphmont&gt; yeah, you'll lose ~ half a kilobit to it.
+&lt;xiphmont&gt; depending on framerate/keyframe freq.
+&lt;derf&gt;     I don't have my H.264 spec on hand, but IIRC, they do the same 
+	   thing.
+&lt;xiphmont&gt; However:
+&lt;xiphmont&gt; If you're a minimalist demux layer without precise seek....
+&lt;xiphmont&gt; you can go straight to a keyframe with the granpos hack.
+&lt;xiphmont&gt; (without asking the codec)
+&lt;xiphmont&gt; that's probably the last minor perq.
+&lt;derf&gt;     "without precise seek" can be up to 2**keyframe_shift frames off.
+&lt;xiphmont&gt; ...which is exactly what mplayer and xine do.
+&lt;xiphmont&gt; you get the next following keyframe past what you ask for.
+&lt;xiphmont&gt; ...and they could continue to use their demux framework.
+&lt;xiphmont&gt; ...and it will give the results they're already getting.
+&lt;xiphmont&gt; (something tells me there will be outside devs wedded to their 
+	   current libs)
+&lt;rillian&gt;  which is why you did this in the first place?
+&lt;xiphmont&gt; well, yeah.
+&lt;xiphmont&gt; *I* want everything to always be perfect and correct :-)
+&lt;xiphmont&gt; you can do it either way.  Which is not to say derf doesn't have a 
+	   point.
+&lt;derf&gt;     xiphmont: Perfection can take an awful lot of effort, as exhibited 
+	   by this long drawn out conversation, which I'm sure is not the first
+	   one.
+&lt;xiphmont&gt; you could still do the Xine way with explicit keyframe offset in 
+	   the packet, you just get a blank video until you hit a keyframe, 
+	   or just discard alot.
+&lt;xiphmont&gt; (note that xine/mplayer also do that in alot of codecs.  Actually 
+	   xine has an annoying tendency to start decoding P and B frames 
+	   starting with a uniform green field)
+&lt;derf&gt;     Heh.
+&lt;xiphmont&gt; and not bothering to wait for keyframe.
+&lt;xiphmont&gt; So, in summary, derf's offset gives a much simpler mechanism, but 
+	   eats a bit of bitrate (.5-1 kilobit) and makes it harder for 
+	   pansy-ass demux layers to get to keyframes.  The granpos hack 
+	   method has the drawback of conceptual complexity although I 
+	   maintain the code isn't actually any more difficult.
+&lt;xiphmont&gt; you need to know the additional information of 'keyframe shift'.
+&lt;derf&gt;     It also adds a limit to the amount of frames between a keyframe.
+&lt;derf&gt;     One which, unlike MPEG, the underlying codec doesn't actually need.
+&lt;xiphmont&gt; yes, but for seekable video, if you're only having a keyframe 
+	   every 30,000 frames, you're being a little too 1337.
+&lt;xiphmont&gt; it is also the case that if we settle on one mapping, and it 
+	   turns out to be a bad idea, we change the glue.  Supporting both 
+	   would require little.
+&lt;xiphmont&gt; it looks like a 'new' codec, but uses all the same infrastructure. 
+&lt;derf&gt;     That just means you have all the software inadequacies of both, 
+	   since players will then be required to support both.
+&lt;derf&gt;     So any arguments of "simpler" become meaningless.
+&lt;xiphmont&gt; you were just now arguing 'more flexible' (no keyframe spacing 
+	   restriction)
+&lt;derf&gt;     I didn't say the other arguments were meaningless.
+&lt;xiphmont&gt; no.
+&lt;xiphmont&gt; you didn't.
+&lt;xiphmont&gt; I'm just saying the penalty for being wrong is pretty mild.
+&lt;derf&gt;     I'm suggesting that the reality of the situation is that whatever 
+	   you decide now is going to be it, because no one will want to 
+	   complicate matters that much for the relatively mild gains of 
+	   "slightly more flexible".
+&lt;derf&gt;     Or, for that matter, "slightly easier braindead demuxers".
+&lt;xiphmont&gt; In any case, I don't actually want to cut the lightweight 
+	   mplayer style approach out of the picture.
+&lt;xiphmont&gt; the granpos hack does give him slightly more rope, should he 
+	   choose to use it.  I realize it's a weak argument, but it's there.
+&lt;derf&gt;     Oh, and if you really wanted to, you could eliminate the stream 
+	   space overhead for the keyframe offset.
+&lt;derf&gt;     You have to load all the previous pages ANYWAY, to decode back to 
+	   that point.
+&lt;derf&gt;     So you could load them, scan them backwards for keyframes, and 
+	   then turn around and decode them forward.
+&lt;derf&gt;     The only overhead is the additional buffer space. Or time for 
+	   multiple I/Os if you run out of that.
+&lt;xiphmont&gt; derf: seeking backward is more expensive than forward.
+</pre>
+
+<h3>excerpt three</h3>
+
+This excerpt discusses:
+<ol>
+<li>introduction of discontinuous streams
+<li>ordering of pages in a multiplexed Ogg stream
+<li>ordering differences between continuous and discontinuous streams
+<li>text/captioning streams and captioning examples
+<li>seeking withing a multiplexed Ogg stream
+</ol>
+
+<pre>
+
+&lt;Arc&gt;      hey monty
+&lt;Arc&gt;      have some questions about oggfile w/ streaming servers
+&lt;Arc&gt;      and how codecs get interlaced in a physical bitstream
+&lt;Arc&gt;      first, whats the process for codecs to get concurrently 
+	   multiplexed. i know how pages etc etc, but how do the pages get 
+	   paced?
+&lt;xiphmont&gt; chronological order by granpos.
+&lt;Arc&gt;      the granulepos of vorbis means nothing in relationship to theora
+&lt;Arc&gt;      and in the case of writ, it means nothing at all. they're ordered 
+	   by granulepos but they're needed by their start time, which is 
+	   something only libwrit would know
+&lt;Arc&gt;      how is theora and vorbis being synced, i mean, their pages as 
+	   close to each other as needed by the player?
+&lt;xiphmont&gt; chronological order.  Ogg will ask the codec to translate granpos 
+	   to absolute time if it needs to know.
+&lt;Arc&gt;      um ok so that isn't going to work at all for writ
+&lt;Arc&gt;      granulepos = end time, not start time.
+&lt;Arc&gt;      but for seeking it needs end time
+&lt;xiphmont&gt; granpos *is* end-time :-)
+&lt;xiphmont&gt; granpos is 'timing of last valid data to come out of this page'.
+&lt;Arc&gt;      but if writ packets are put into the stream in the chronological 
+	   position of their end time they wont be available for their start 
+	   time, which is a variable length before their end time
+&lt;Arc&gt;      writ packets cover time ranges. "this packet is valid between this 
+	   granule and this granule", so there's a start and end time
+&lt;xiphmont&gt; right.
+&lt;xiphmont&gt; so do vorbis packets.
+&lt;Arc&gt;      currently the spec is setup to allow overlap of these times by 
+	   different phrases and page granulepos = endtime, packets ordered 
+	   by end time (so some phrases may be put into the bitstream before
+	    they're started)
+&lt;xiphmont&gt; the seeking alg depends on end time.
+&lt;Arc&gt;      yes im not concerned with seeking, we have seeking in the bag 
+	   except for long term phrases + streaming, lets ignore that for now 
+	   tho
+&lt;Arc&gt;      im concerned about they're ordering in the logical bitstream
+&lt;xiphmont&gt; You may have opened too large a can of worms with overlapping.
+&lt;Arc&gt;      if a writ phrase lasts 10 seconds it needs to be in the physical 
+	   bitstream close to or before its start time, relative to the 
+	   vorbis/theora, you can expect the vorbis + theora layer to be 
+	   buffered for ten seconds
+&lt;derf&gt;     xiphmont: Overlapping does not complicate the problem at all.
+&lt;xiphmont&gt; derf: actually it kills the current seeking algo.
+&lt;Arc&gt;      no it doesn't actually
+&lt;derf&gt;     You can replace any group of overlapped captions by a single 
+	   caption that lasts the entire duration of it.
+&lt;derf&gt;     And reproduce any problems.
+&lt;Arc&gt;      the granulepos's are in order. the granulepos's are ordered by end 
+	   time, their start times are not in order, but they must be defined 
+	   before they're needed (or close to it) in relation to the other 
+	   logical bitstreams for them to be useful
+&lt;xiphmont&gt; One caption that begins before and ends after another.
+&lt;derf&gt;     xiphmont: Which exhibits the exact same problems as just one 
+	   caption.
+&lt;xiphmont&gt; design a seeking algo that works for that.
+&lt;derf&gt;     Conceptually, you can take any group of overlapping captions and 
+	   stick them all in one packet.
+&lt;Arc&gt;      we do. you seek to the position that you need and begin processing 
+	   from there. you'll have everything.
+&lt;xiphmont&gt; actually, yes, you're right.
+&lt;Arc&gt;      my first question (these are very related) is how OggFile, 
+	   oggmerge, whatever - how does that sync. do they ask the codec to 
+	   pace per realtime, or does it ask the codec for a granulerate
+&lt;xiphmont&gt; if the packet ended after the seek point, it wouldn't have 
+	   appeared yet.
+&lt;Arc&gt;      because the latter will break our current spec bigtime
+&lt;xiphmont&gt; there are two possibilities; still working out which to use.
+&lt;xiphmont&gt; One is two codec types: continuous and discontinuous.
+&lt;xiphmont&gt; a continuous codec specifies 'buffer as much as you need to 
+	   prevent any time gaps in my data presentation'.  A discontinuous 
+	   stream type has to 'fall out' of the stream; seeking and sync are 
+	   according to continuous streams, and the stream assembly has to 
+	   make sure the discontinuous pages magically arrive in time
+&lt;xiphmont&gt; [as the buffering/sync algo will not look arbitrarily far head for 
+	   them]
+&lt;derf&gt;     This sounds much like what I suggested to Arc.
+&lt;xiphmont&gt; the second possibility is to require a hint in the metaheader for 
+	   how long each stream type has to look ahead.
+&lt;xiphmont&gt; Audio and video would be obvious continuous types.
+&lt;xiphmont&gt; discontinuous types would not be used for sync; the granpos is 
+	   allowed to appear out of order.
+&lt;Arc&gt;      well my question is, will libwrit/etc be asked "where does this 
+	   packet belong in the physical bitstream" or will OggFile/etc place 
+	   it by granulepos
+&lt;xiphmont&gt; Oggfile will place it.
+&lt;Arc&gt;      yes but how
+&lt;Arc&gt;      will it ask the codec?
+&lt;xiphmont&gt; You don't muck with pages and raw ogg stream in Oggfile.  packets 
+	   in, packets out.
+&lt;xiphmont&gt; In encode, all packets are submitted with timing info.
+&lt;xiphmont&gt; Oggfile builds and places pages as needed to obey timing magically.
+&lt;xiphmont&gt; [it would be a serious asspain to require each app to do it]
+&lt;Arc&gt;      yes I know that. but I see two ways for OggFile to place it. 
+	   by asking the codec for a granulerate (ie, 88200 granules per 
+	   second with 44.1/stereo vorbis or 29.95 granules per second with 
+	   NTSC theora) and calculate its position based on granulepos or 
+	   will the codec tell OggFile "this belongs at 19.23 seconds"
+&lt;derf&gt;     Assuming a fixed granulerate is bad.
+&lt;Arc&gt;      because the prior would require a spec rewrite, the latter is 
+	   perfect
+&lt;derf&gt;     Current Theora's granulerate is not constant.
+&lt;Arc&gt;      derf, yea but assuming API for something that isn't public yet is 
+	   also bad :-)
+&lt;xiphmont&gt; Arc: we can have a packet show up with begin and end timing.
+&lt;Arc&gt;      xiphmont, awesome. thanks :-)
+&lt;xiphmont&gt; Ogg won't necessarily know that on decode side (it will have to 
+	   ask the codec), but on encode side, just have codec provide it.
+&lt;xiphmont&gt; It makes no sense for continuous streams, but for discontinuous it 
+	   seems handy.
+&lt;Arc&gt;      second question, do you feel it would be a good idea for OggFile 
+	   (which I very much assume icecast2/libshout will use) to put the 
+	   job of keeping track of and reporting "state information", ie, 
+	   headers
+&lt;xiphmont&gt; yes
+&lt;Arc&gt;      vorbis would just spit out the headers for state information
+&lt;xiphmont&gt; Actually, your grammar doesn't parse.
+&lt;Arc&gt;      writ, however, could spit out any pages whose granulepos has not 
+	   expired yet (to current) thus preventing the need in the spec to 
+	   have phrases "expire" by time and need to be "refreshed" every few 
+	   seconds for streaming clients
+&lt;xiphmont&gt; well, without readahead hinting, you still have an issue.
+&lt;xiphmont&gt; You either see a long-time caption too late.... or you miss it on 
+	   seek.
+&lt;Arc&gt;      thus the writ codec on icecast's side could buffer the last few 
+	   pages (those that are still valid), on a new client connecting, 
+	   spit out the header + however many packets are in the buffer
+&lt;xiphmont&gt; [eg... how does Oggfile need to know it has to buffer a full 
+	   minute of video?]
+&lt;Arc&gt;      how big is that window?
+&lt;xiphmont&gt; in continuous/discont... there is no window.
+&lt;derf&gt;     The problem is that icecast needs to buffer some data from a 
+	   discontinuous stream.
+&lt;xiphmont&gt; A discontinuous stream will need a hint.
+&lt;derf&gt;     i.e., it needs to know the granpos&lt;-&gt;time mapping.
+&lt;Arc&gt;      or it could be outside icecast
+&lt;Arc&gt;      right now icecast is buffering the vorbis headers
+&lt;xiphmont&gt; yes.  But it will also need to know window ahead of time without 
+	   reading the whole file.
+&lt;derf&gt;     So it can tell if it has to buffer packets from a stream if they 
+	   appear in the stream long before the granpos time.
+&lt;Arc&gt;      but if icecast is using OggFile this could be part of the API, the 
+	   stream state info, a buffer of pages which are needed to bring a 
+	   new client "up to speed"
+&lt;xiphmont&gt; yes
+&lt;xiphmont&gt; It should be.
+&lt;derf&gt;     I don't see why it needs any kind of window.
+&lt;Arc&gt;      i don't understand the "hint" as you call it, why does it need to 
+	   read ahead at all?
+&lt;derf&gt;     With cont/discont streams.
+&lt;xiphmont&gt; you have a ten minute caption with a 20 minute gap ahead of where 
+	   it appears.
+&lt;xiphmont&gt; Do you really want to buffer 20 minutes of video to find it?
+&lt;Arc&gt;      with seeking or streaming? two different things
+&lt;xiphmont&gt; What if the caption stream ends early?  You stop and wait for the 
+	   whole stream to buffer to figure that out.
+&lt;xiphmont&gt; I'm speaking streaming.
+&lt;Arc&gt;      why would you stop playing audio/video? you either receive a 
+	   caption or you don't
+&lt;derf&gt;     Arc's idea was that packets always appear before they're needed.
+&lt;derf&gt;     In the stream.
+&lt;xiphmont&gt; OK.  Now seeking.  If it appeared early, you miss em when you seek.
+&lt;derf&gt;     So if you haven't seen it when you find audio/video that comes 
+	   later, then they're not there.
+&lt;Arc&gt;      xiphmont, how so? wont it seek each logical bitstream based on 
+	   its granulepos?
+&lt;xiphmont&gt; No.
+&lt;xiphmont&gt; Seeking is global.
+&lt;Arc&gt;      what is the window then?
+&lt;xiphmont&gt; You seek to *one* point in the stream, based on all granposes.
+&lt;derf&gt;     xiphmont: I can't see how that one point is well-defined.
+&lt;xiphmont&gt; right.  what is the window then?
+&lt;Arc&gt;      but discontinuous streams..
+&lt;xiphmont&gt; derf: granposes are all in chronological order.
+&lt;xiphmont&gt; Arc: discontinuous streams to not contribute to sync, they 
+	   piggyback off of it.
+&lt;xiphmont&gt; A continuous stream is just a stream with a readahead window of 
+	   'infinite'.
+&lt;Arc&gt;      yes but they're going to vary by a certain %, sometimes the audio 
+	   will be ahead of the video, sometimes vice versa. they're both VBR 
+	   so there needs to be a window of some sort
+&lt;xiphmont&gt; A continuous stream has a readahead window of infinite.  "Buffer 
+	   as much as necessary to keep all queues nonempty"
+&lt;Arc&gt;      the continuous/discontinuous status of a stream is provided by the 
+	   OggFile codec, right?
+&lt;xiphmont&gt; yes
+&lt;xiphmont&gt; that's current design.,
+&lt;Arc&gt;      ok. then, whats the window for discontinuous
+&lt;xiphmont&gt; exactly.
+&lt;xiphmont&gt; It would need to be set somewhere.
+&lt;Arc&gt;      see it's easy, in writ, for us just to say "this is the maximum 
+	   realtime length of a caption compared to its placement in the 
+	   stream" and then prematurely end then refresh the phrases that 
+	   need it
+&lt;derf&gt;     And this limits the length of your captions.
+&lt;xiphmont&gt; sure.
+&lt;Arc&gt;      exactly.
+&lt;Arc&gt;      not the apparent, or source, length of the captions. its all 
+	   internal to libwrit
+&lt;derf&gt;     Right.
+&lt;xiphmont&gt; ...but be careful; your maximum duration/gap will set the 
+	   buffering requirements of the entire stream.
+&lt;Arc&gt;      "if a caption's end-time minus physical placement time is greater 
+	   than x, then terminate all current phrases early, then immediately 
+	   redefine them in the same order and location"
+&lt;xiphmont&gt; sorry, no, just duration.
+&lt;Arc&gt;      well thats why I'm asking you about this, because this is global to 
+	   Ogg
+&lt;xiphmont&gt; OK, I think we're on the same page right now.
+&lt;Arc&gt;      well it has to be physical placement time because some captions 
+	   will need to be defined before other captions, remember they need 
+	   to be ordered by their end time. that will determine if they get 
+	   cut, and if they get cut before their start time, they wont need 
+	   to be defined yet at all.
+&lt;Arc&gt;      i was up to 6am this morning running through different projections 
+	   for how this could work with seeking/streaming. derf's overlapping 
+	   durations idea does play out well
+&lt;derf&gt;     Except that if you want to cut, you may need to drop out packets 
+	   from the middle (or just keep the extraneous data).
+&lt;Arc&gt;      see I originally had it "all captions are FIFO, the first to be 
+	   defined are also the first to end, otherwise they need to be cut 
+	   and recreated, always". that can become a very bloated mess with 
+	   text constantly getting redefined
+&lt;xiphmont&gt; that's the same with other codec types.
+&lt;derf&gt;     When cutting off the end of something.
+&lt;Arc&gt;      ?
+&lt;xiphmont&gt; derf: that's the same with other codec types.
+&lt;xiphmont&gt; editing is always messy.  Ogg is not intended to be easy to edit.
+&lt;derf&gt;     Yes.
+&lt;derf&gt;     Editing is messy in general.
+&lt;Arc&gt;      by cut I mean "while encoding the bitstream, if such conditions 
+	   exist, split a single set of phrases into two butted end to end, 
+	   ie, ending and immediately re-defining it"
+&lt;derf&gt;     Just having global headers with different codebooks makes 
+	   combining different streams hard.
+&lt;Arc&gt;      i don't mean ala vcut
+&lt;derf&gt;     (without imposing overhead of adding new headers in each segment)
+&lt;Arc&gt;      the logical bitstream wont get a EOS/BOS
+&lt;derf&gt;     Oh, I was talking about someone actually cutting an 
+	   already-multiplexed stream into two pieces.
+&lt;Arc&gt;      its just the phrases, the captions, that will get cut. their 
+	   durations split at the window mark, processed as needed, 
+	   redefined/copied to start at the same time their original was 
+	   prematurely terminated, process repeated as needed so a single 
+	   very long phrase (aka caption/subtitle) can be split-copied into 
+	   hundreds of phrases, each redefining the same data for another 
+	   X second window
+&lt;Arc&gt;      derf, yea lets not get too complicated here :-)
+&lt;derf&gt;     Well, it is still a use case to consider.
+&lt;derf&gt;     People might want to actually do such a thing.
+&lt;Arc&gt;      I'm not concerned with cutting, this is just text. lossless.
+&lt;derf&gt;     Even though there are currently no tools for it.
+&lt;Arc&gt;      people could use the same mechanism icecast does for cutting a 
+	   bitstream. each OggFile codec keeps track of "state information", 
+	   which typically is just the header but for discontinuous streams 
+	   could be the last few buffered pages..
+&lt;Arc&gt;      if OggFile has such an API it would make cutting child's play.
+&lt;Arc&gt;      monty, so, is this going to be variable? or is it going to get set 
+	   at some point? because i might as well build functionality for 
+	   that into the design here while I'm working on it
+&lt;xiphmont&gt; Ogg needs to be able to ask the codec what the readahead window is.
+&lt;xiphmont&gt; the codec can have that set inherently or git it from the logical 
+	   stream header.
+&lt;Arc&gt;      yea but what should this be
+&lt;Arc&gt;      are we talking a minute? 10 seconds? 1 second?
+&lt;xiphmont&gt; actually thinking a sec...
+&lt;Arc&gt;      ok :-)
+&lt;derf&gt;     A second could be as much as 700k of video.
+&lt;derf&gt;     Which is probably reasonable.
+&lt;xiphmont&gt; OK, thinking over, no change in state.
+&lt;derf&gt;     But captions typically last 3 to 6 seconds.
+&lt;xiphmont&gt; 'what derf said'.
+&lt;derf&gt;     Which means you've quadrupled to quintupled the size of your 
+	   caption stream.
+&lt;xiphmont&gt; Or you could just decide 'losing last one is no big deal'.
+&lt;Arc&gt;      yea, exactly.
+&lt;xiphmont&gt; ...and go to placing in the bitstream according to start time.
+&lt;derf&gt;     xiphmont: That's what current DVD players do, IIRC.
+&lt;xiphmont&gt; derf: good to know.
+&lt;Arc&gt;      the smaller the window the less buffering on the player's side, 
+	   but the greater the codec size grows
+&lt;xiphmont&gt; yes.
+&lt;derf&gt;     A player that really did care could do a separate seek for each 
+	   discontinuous stream instead of one global one.
+&lt;Arc&gt;      it makes things so much easier to have it ordered by end time
+&lt;xiphmont&gt; So.... perhaps the window should be set... and left up to the 
+	   application if it cares to use it or not.  We go to ordering 
+	   discontinuous stream types by begin time, and make sure we're 
+	   tolerant of losing 'the one before' if the application chooses to 
+	   do it that way.
+&lt;Arc&gt;      i mean, coding is easier by start time, duh, no buffering, no 
+	   changing the order, just drop it in and let it fly or not
+&lt;derf&gt;     And then buffer just the discontinuous data (which one would 
+	   expect to be far less than the continuous) until it caught up to 
+	   the global seek point.
+&lt;xiphmont&gt; derf: yes.
+&lt;xiphmont&gt; no, you don't want to do separate seek... for example, in the 
+	   streaming case... you can't whether you care or not.
+&lt;Arc&gt;      ok but if they're ordered by start time we still need a "window" 
+	   for very long captions, otherwise seeking would never have them 
+	   appear
+&lt;xiphmont&gt; ...so don't turn it into supporting multiple cases.  Make it 
+	   multiple possibilities in a single case.
+&lt;xiphmont&gt; Arc: yes.
+&lt;xiphmont&gt; And the application can decide to mind the window or not...
+&lt;Arc&gt;      the encoding application
+&lt;xiphmont&gt; A PC software player will always want to mind.  An embedded 
+	   player may simply not be able to.
+&lt;xiphmont&gt; No, decoding.
+&lt;xiphmont&gt; encoding always requests a hint... but the decoder can ignore 
+	   the readahead hint without ill-effect if it wishes.
+&lt;Arc&gt;      no i mean, the encoder would have to "refresh" a phrase periodically
+&lt;xiphmont&gt; unless you want to miss a few, yes.
+&lt;Arc&gt;      if ordered by start time, the player simply seeks and runs. 
+&lt;Arc&gt;      well its not missing a few that bothers me, its missing a very 
+	   long one
+&lt;xiphmont&gt; you can't have everything you want here :-)  Very long would need 
+	   to refresh in either case.
+&lt;Arc&gt;      ok so there would need to be a refresh window variable that the 
+	   encoder could set, but could default to a certain number
+&lt;Arc&gt;      yes I know, refresh is unavoidable.
+&lt;xiphmont&gt; ok
+&lt;Arc&gt;      yea for all cases ordering discontinuous streams by start time is 
+	   easier.
+&lt;Arc&gt;      less elegant, tho
+&lt;xiphmont&gt; 'however the codec wants to do it'.  It could be a hardcoded 
+	   number in the codec for all I care (I know that's not really 
+	   sensible)
+&lt;derf&gt;     Placed in the stream by start time can have a much longer refresh 
+	   time than placed by end time.
+&lt;xiphmont&gt; derf: yes.
+&lt;xiphmont&gt; lookin' like a win all around.
+&lt;xiphmont&gt; ...and this can be added to spec without breaking a single thing.
+&lt;Arc&gt;      if the encoding application chose it could set this window 
+	   extremely high, understanding that long term captions would never
+	    appear if it's seeked
+&lt;Arc&gt;      or streamed.
+&lt;xiphmont&gt; Arc: yes.
+&lt;xiphmont&gt; If ordered by start time, I think the granpos should also be 
+	   start-time.
+&lt;Arc&gt;      and this would eliminate the need to monitor "state information" 
+	   with streaming, it'd act no different from a seek
+&lt;xiphmont&gt; but that's a minor detail I'd rather debate another time.
+&lt;Arc&gt;      well yea that'd have to be the case or you'd have out of order 
+	   granulepos and that'd create chaos
+&lt;Arc&gt;      ok so, the behavior part of the spec should change so that 
+	   packets are ordered by start time, in sequence, and it doesn't 
+	   matter if they overlap
+&lt;xiphmont&gt; Arc: yes, seems like it.
+&lt;derf&gt;     One could always look at that stuff to see how it wound up being 
+	   implemented.
+&lt;Arc&gt;      derf, you had a great idea, in any case, on how to handle 
+	   overlapping when granulepos was by end time
+&lt;Arc&gt;      i hate to erase it all, I'm going to copy this to another location 
+	   on the wiki...
+&lt;derf&gt;     I don't know how you make seeking work with granpos as the start 
+	   time.
+&lt;xiphmont&gt; OggFile would need to distinguish between cont and discont.  
+&lt;xiphmont&gt; It needs to ask codecs for granpos mappings anyway.
+&lt;Arc&gt;      easy. you seek to a point, you only display new phrases. long term 
+	   phrases are periodically refreshed, so the player just displays 
+	   them as they come in.
+&lt;xiphmont&gt; if it's end-time and packets are in chron order, discont streams 
+	   are useless for sync and seek.  If it's start-time, they can 
+	   contribute.
+&lt;xiphmont&gt; I think derf was concerned about complicating the seeking algo.
+&lt;derf&gt;     Mostly.
+&lt;xiphmont&gt; I don;t think this would complicate it much.
+&lt;xiphmont&gt; It just changes the 'boundary was at head or at tail' of page.  
+	   The bisection is identical.
+&lt;xiphmont&gt; ...and the meaning of seek points is the same.
+&lt;xiphmont&gt; you still seek to the largest granpos in the stream preceding 
+	   requesting time position.
+&lt;xiphmont&gt; [preceding or equal to]
+&lt;derf&gt;     "the page with..."
+&lt;xiphmont&gt; well, you either seek *to* that page [if it's discont] or just 
+	   past that page [if it's cont]
+&lt;i&gt;Actually, if it's continuous, you seek just past that page if the
+last packet is not continued, or to that page is the packet is
+continued -- Monty&lt;/i&gt;
+&lt;xiphmont&gt; you have both those boundaries.  You just use cont/discont to 
+	   decide which.
+&lt;xiphmont&gt; I think of seeking as an operation of going to a specific page 
+	   boundary, not a specific page.
+&lt;xiphmont&gt; [and that makes this extension much cleaner]
+&lt;derf&gt;     Okay, I think I see now... I was holding the definition of what a 
+	   granpos meant fixed as a design constraint.
+&lt;xiphmont&gt; derf: well, it had been.  This is actually a new innovation within 
+	   the machinery.
+&lt;derf&gt;     But I agree this is a reasonably simple special case.
+&lt;Arc&gt;      so discontinuous streams, granulepos is the start time of the packet
+&lt;xiphmont&gt; what complication do you see?
+&lt;xiphmont&gt; Arc: start time of the first packet beginning in the page
+&lt;xiphmont&gt; [not a continued packet]
+&lt;xiphmont&gt; Oh, continued packets.
+&lt;xiphmont&gt; No continued packets in discont streams.
+&lt;xiphmont&gt; You think that's reasonable?
+&lt;Arc&gt;      not really, because a discontinuous packet could be quite large 
+	   and you'd want it split across page borders
+&lt;derf&gt;     xiphmont: It gives a hard limit on packet size, doesn't it?
+&lt;xiphmont&gt; yeah, you're right.
+&lt;derf&gt;     xiphmont: It's an "if"... I'm not worried about it either.
+&lt;xiphmont&gt; OK, a restriction:
+&lt;xiphmont&gt; Continued packets must be continued in an immediately following 
+	   page.
+&lt;xiphmont&gt; derf: it is an if.
+&lt;Arc&gt;      that sounds healthy
+&lt;xiphmont&gt; OK
+&lt;xiphmont&gt; See the nice part about *all* of this is...
+&lt;xiphmont&gt; If a third-party impl screws up, it doesn't break the code, it 
+	   just munges playback slightly.
+&lt;xiphmont&gt; We can extend the spec to include them...
+&lt;xiphmont&gt; the stream format need not rev.
+&lt;xiphmont&gt; we already know existing code isn't up to discontinuous anyway.
+&lt;xiphmont&gt; OggFile is intended to do this for the app.  I do not expect most 
+	   apps to implement this.  It is purely a mux-layer operation.
+</pre>

@@ -9,6 +9,9 @@ m4data_DATA = ogg.m4
 
 EXTRA_DIST = README AUTHORS CHANGES COPYING libogg.spec ogg.m4 macosx
 
+dist-hook:
+	rm -rf `find $(distdir)/macosx -name CVS`
+
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"
 

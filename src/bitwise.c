@@ -172,7 +172,7 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
 
     memmove(b->ptr,source,bytes);
     b->ptr+=bytes;
-    b->buffer+=bytes;
+    b->endbyte+=bytes;
     *b->ptr=0;
 
   }

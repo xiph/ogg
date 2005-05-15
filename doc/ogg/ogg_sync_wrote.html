@@ -19,12 +19,20 @@
 
 <p>This function is used to tell the <a href="ogg_sync_state.html">ogg_sync_state</a> struct how many bytes we wrote into the buffer. 
 
-<br><br>
+<p>
+The general proceedure is to request a pointer into an internal 
+<a href="ogg_sync_state.html">ogg_sync_state</a> buffer by calling 
+<a href="ogg_sync_buffer.html">ogg_sync_buffer()</a>. The buffer
+is then filled up to the requested size with new input, and 
+ogg_sync_wrote() is called to advance the fill pointer by however
+much data was actually available.</p>
+
+<br>
 <table border=0 color=black cellspacing=0 cellpadding=7>
 <tr bgcolor=#cccccc>
 	<td>
 <pre><b>
-int ogg_sync_destroy(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy);
+int ogg_sync_wrote(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy, long bytes);
 </b></pre>
 	</td>
 </tr>
@@ -34,6 +42,8 @@ int ogg_sync_destroy(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy);
 <dl>
 <dt><i>oy</i></dt>
 <dd>Pointer to a previously declared <a href="ogg_sync_state.html">ogg_sync_state</a> struct.</dd>
+<dt><i>bytes</i></dt>
+<dd>Number of bytes of new data written.</dd>
 </dl>
 
 
@@ -43,7 +53,7 @@ int ogg_sync_destroy(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy);
 <li>
 0 in all other cases.</li>
 </blockquote>
-<p>
+
 
 <br><br>
 <hr noshade>

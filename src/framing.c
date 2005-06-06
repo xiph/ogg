@@ -474,8 +474,7 @@ int ogg_stream_eos(ogg_stream_state *os){
    ogg_stream_pagein() along with the appropriate
    ogg_stream_state* (ie, matching serialno).  We then get raw
    packets out calling ogg_stream_packetout() with a
-   ogg_stream_state.  See the 'frame-prog.txt' docs for details and
-   example code. */
+   ogg_stream_state. */
 
 /* initialize the struct to a known state */
 int ogg_sync_init(ogg_sync_state *oy){

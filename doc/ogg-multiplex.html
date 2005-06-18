@@ -27,7 +27,7 @@ specific low-level design decisions.
 The Ogg bitstream is intended to encapsulate chronological,
 time-linear mixed media into a single delivery stream or file.  The
 design is such that an application can always encode and/or decode a
-full-featured bitstream in one pass with no seeking an minimal
+full-featured bitstream in one pass with no seeking and minimal
 buffering.  Seeking to provide optimized encoding (such as two-pass
 encoding) or interactive decoding (such as scrubbing or instant
 replay) is not disallowed or discouraged, however no bitstream feature
@@ -68,7 +68,7 @@ functionality for both stream types.</i><p>
 Seek operations are by absolute time; a direct bisection search must
 find the exact time position requested.  Information in the Ogg
 bitstream is arranged such that all information to be presented for
-playback fromt he desired seek point will occur at or after the
+playback from the desired seek point will occur at or after the
 desired seek point.  Seek operations are neither 'fuzzy' nor
 heuristic.<p>
 

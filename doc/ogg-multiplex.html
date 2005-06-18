@@ -12,7 +12,7 @@ Page Multiplexing and Ordering in a Physical Ogg Stream
 The low-level mechanisms of an Ogg stream (as described in the Ogg
 Bitstream Overview) provide means for mixing multiple logical streams
 and media types into a single linear-chronological stream.  This
-document specifices the high-level arrangement and use of page
+document specifies the high-level arrangement and use of page
 structure to multiplex multiple streams of mixed media type within a
 physical Ogg stream.
 
@@ -56,7 +56,7 @@ Streams'.<p>
 
 Ogg is designed to use a bisection search to implement exact
 positional seeking rather than building an index; an index requires
-two-pass encoding and as such is not acceptible given the requirement
+two-pass encoding and as such is not acceptable given the requirement
 for full-featured linear encoding.<p>
 
 <i>Even making an index optional then requires an
@@ -72,14 +72,14 @@ playback from the desired seek point will occur at or after the
 desired seek point.  Seek operations are neither 'fuzzy' nor
 heuristic.<p>
 
-<i>Although keyframe handling in video appears to be an exception to
+<i>Although key frame handling in video appears to be an exception to
 "all needed playback information lies ahead of a given seek",
-keyframes can still be handled directly within this indexless
-framework. Seeking to a keyframe in video (as well as seeking in other
-media types with analagous restraints) is handled as two seeks; first
+key frames can still be handled directly within this indexless
+framework. Seeking to a key frame in video (as well as seeking in other
+media types with analogous restraints) is handled as two seeks; first
 a seek to the desired time which extracts state information that
-decodes to the time of the last keyframe, followed by a second seek
-directly to the keyframe.  The location of the previous keyframe is
+decodes to the time of the last key frame, followed by a second seek
+directly to the key frame.  The location of the previous key frame is
 embedded as state information in the granulepos; this mechanism is
 described in more detail later.</i>
 
@@ -104,7 +104,7 @@ unconnected data often located far apart. One possible example of a
 discontinuous stream types would be captioning.  Although it's
 possible to design captions as a continuous stream type, it's most
 natural to think of captions as widely spaced pieces of text with
-little happing between.<p>
+little happening between.<p>
 
 The fundamental design distinction between continuous and
 discontinuous streams concerns buffering.<p>
@@ -117,12 +117,12 @@ stream to starve for data during decode; buffering proceeds ahead
 until all continuous streams in a physical stream have data ready to
 decode on demand.  <p>
 
-Discontinuous stream data may occur on a farily regular basis, but the
+Discontinuous stream data may occur on a fairly regular basis, but the
 timing of, for example, a specific caption is impossible to predict
 with certainty in most captioning systems. Thus the buffering system
 should take discontinuous data 'as it comes' rather than working ahead
 (for a potentially unbounded period) to look for future discontinuous
-data.  As such, discontinuous streams are ingored when managing
+data.  As such, discontinuous streams are ignored when managing
 buffering; their pages simply 'fall out' of the stream when continuous
 streams are handled properly.<p>
 
@@ -144,21 +144,21 @@ later.<p>
 
 Ogg is designed so that the simplest navigation operations treat the
 physical Ogg stream as a whole summary of its streams, rather than
-navigating each interleaved stream as a seperate entity.  <p>
+navigating each interleaved stream as a separate entity.  <p>
 
 First Example: seeking to a desired time position in a multiplexed (or
 unmultiplexed) Ogg stream can be accomplished through a bisection
 search on time position of all pages in the stream (as encoded in the
-granule position). More powerful searches (such as a keyframe-aware
+granule position). More powerful searches (such as a key frame-aware
 seek within video) are also possible with additional search
-complexity, but similar computational compelxity.<p>
+complexity, but similar computational complexity.<p>
 
 Second Example: A bitstream section may consist of three multiplexed
 streams of differing lengths.  The result of multiplexing these
 streams should be thought of as a single mixed stream with a length
 equal to the longest of the three component streams.  Although it is
 also possible to think of the multiplexed results as three concurrent
-streams of different lenghts and it is possible to recover the three
+streams of different lengths and it is possible to recover the three
 original streams, it will also become obvious that once multiplexed,
 it isn't possible to find the internal lengths of the component
 streams without a linear search of the whole bitstream section.
@@ -205,7 +205,7 @@ absolute time value into a unique granule position value.<br>
 <li>Codecs shall choose a granule position definition that allows that
 codec means to seek as directly as possible to an immediately
 decodable point, such as the bit-divided granule position encoding of
-Theora allows the codec to seek efficiently to keyframes without using
+Theora allows the codec to seek efficiently to key frame without using
 an index.  That is, additional information other than absolute time
 may be encoded into a granule position value so long as the granule
 position obeys the above points.
@@ -231,8 +231,8 @@ audio encodings where exact single-sample resolution is generally a
 requirement.  A millisecond is both too large a granule and often does
 not represent an integer number of samples.<p>
 
-In the event that a audio frames always encode the same number of
-samples, the granule position could simple be a linear count of frames
+In the event that audio frames are always encoded as the same number of
+samples, the granule position could simply be a linear count of frames
 since beginning of stream. This has the advantages of being exact and
 efficient.  Position in time would simply be <tt>[granule_position] *
 [samples_per_frame] / [samples_per_second]</tt>.
@@ -255,14 +255,14 @@ least the following complications:<p>
 
 <li>video frames are relatively far apart compared to audio samples;
 for this reason, the point at which a video frame changes to the next
-frame is usually a strictly defined offset within the frme 'period'.
+frame is usually a strictly defined offset within the frame 'period'.
 That is, video at 50fps could just as easily define frame transitions
 <.015, .035, .055...> as at <.00, .02, .04...>.
 
 <li>frame rates often include drop-frames, leap-frames or other
 rational-but-non-integer timings.
 
-<li>Decode must begin at a 'keyframe' or 'I frame'.  Keyframes usually
+<li>Decode must begin at a 'key frame' or 'I frame'.  Keyframes usually
 occur relatively seldom.
 </ul>
 
@@ -274,21 +274,21 @@ codec's initial header, and the rest is just arithmetic.<p>
 The third point appears trickier at first glance, but it too can be
 handled through the granule position mapping mechanism.  Here we
 arrange the granule position in such a way that granule positions of
-keyframes are easy to find.  Divide the granule position into two
+key frames are easy to find.  Divide the granule position into two
 fields; the most-significant bits are an absolute frame counter, but
-it's only updated at each keyframe.  The least significant bits encode
-the number of frames since the last keyframe.  In this way, each
+it's only updated at each key frame.  The least significant bits encode
+the number of frames since the last key frame.  In this way, each
 granule position both encodes the absolute time of the current frame
-as well as the absolute time of the last keyframe.<p>
+as well as the absolute time of the last key frame.<p>
 
-Seeking to a most recent preceeding keyframe is then accomplished by
+Seeking to a most recent preceding key frame is then accomplished by
 first seeking to the original desired point, inspecting the granulepos
 of the resulting video page, extracting from that granulepos the
-absolute time of the desired keyframe, and then seeking directly to
-that keyframe's page.  Of course, it's still possible for an
-application to ignore keyframes and use a simpler seeking algorithm
+absolute time of the desired key frame, and then seeking directly to
+that key frame's page.  Of course, it's still possible for an
+application to ignore key frames and use a simpler seeking algorithm
 (decode would be unable to present decoded video until the next
-keyframe).  Surprisingly many player applications do choose the
+key frame).  Surprisingly many player applications do choose the
 simpler approach.<p>
 
 <h3>granule position, packets and pages</h3>
@@ -328,12 +328,12 @@ Vorbis) or discontinuous (such as Writ).<p>
 
 Start- and end-time encoding do not affect multiplexing sort-order;
 pages are still sorted by the absolute time a given granulepos maps to
-regardless of whether that granulepos prepresents start- or
+regardless of whether that granulepos represents start- or
 end-time.<p>
 
 <h2>Multiplex/Demultiplex Division of Labor</h2>
 
-The Ogg multiplex/deultiplex layer provides mechanisms for encoding
+The Ogg multiplex/demultiplex layer provides mechanisms for encoding
 raw packets into Ogg pages, decoding Ogg pages back into the original
 codec packets, determining the logical structure of an Ogg stream, and
 navigating through and synchronizing with an Ogg stream at a desired
@@ -342,27 +342,27 @@ in the Ogg domain and require no intervention from codecs.<p>
 
 Implementation of more complex operations does require codec
 knowledge, however.  Unlike other framing systems, Ogg maintains
-strict seperation between framing and the framed bistream data; Ogg
+strict separation between framing and the framed bitstream data; Ogg
 does not replicate codec-specific information in the page/framing
 data, nor does Ogg blur the line between framing and stream
 data/metadata.  Because Ogg is fully data-agnostic toward the data it
 frames, operations which require specifics of bitstream data (such as
-'seek to keyframe') also require interaction with the codec layer
+'seek to key frame') also require interaction with the codec layer
 (because, in this example, the Ogg layer is not aware of the concept
-of keyframes).  This is different from systems that blur the
-seperation between framing and stream data in order to simplify the
-seperation of code.  The Ogg system purposely keeps the distinction in
+of key frames).  This is different from systems that blur the
+separation between framing and stream data in order to simplify the
+separation of code.  The Ogg system purposely keeps the distinction in
 data simple so that later codec innovations are not constrained by
 framing design.<p>
 
 For this reason, however, complex seeking operations require
 interaction with the codecs in order to decode the granule position of
 a given stream type back to absolute time or in order to find
-'decodable points' such as keyframes in video.
+'decodable points' such as key frames in video.
 
 <h2>Unsorted Discussion Points</h2>
 
-flushes around keyframes?  RFC suggestion: repaginating or building a
+flushes around key frames?  RFC suggestion: repaginating or building a
 stream this way is nice but not required
 
 

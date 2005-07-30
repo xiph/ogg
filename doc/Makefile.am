@@ -1,6 +1,6 @@
 ## Process this with automake to create Makefile.in
 
-SUBDIRS = ogg
+SUBDIRS = libogg
 
 docdir = $(datadir)/doc/$(PACKAGE)-$(VERSION)
 

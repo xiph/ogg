@@ -112,10 +112,5 @@ autoheader || exit 1
 echo "  autoconf"
 autoconf || exit 1
 
-# this search and replace hack is specifically for MacOSX where automake
-# picks up changelog in debian/ because of filesystem
-# case-not-quite-sensitivity breaking make distcheck
-perl -i -p -e 's/DIST_COMMON = ChangeLog/DIST_COMMON =/g' debian/Makefile.in
-
 cd $olddir
 $srcdir/configure --enable-maintainer-mode "$@" && echo

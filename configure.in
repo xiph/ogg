@@ -23,7 +23,6 @@ AM_CONFIG_HEADER(config.h)
 dnl Set some options based on environment
 
 cflags_save="$CFLAGS"
-ldflags_save="$LDFLAGS"
 if test -z "$GCC"; then
         case $host in 
         *-*-irix*)
@@ -69,7 +68,6 @@ fi
 CFLAGS="$CFLAGS $cflags_save"
 DEBUG="$DEBUG $cflags_save"
 PROFILE="$PROFILE $cflags_save"
-LDFLAGS="$LDFLAGS $ldflags_save"
 
 dnl Checks for programs.
 

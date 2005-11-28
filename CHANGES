@@ -1,7 +1,9 @@
 Version 1.1.3 (unreleased)
 
  * Correct a bug in the granulepos field of pages where no packet ends
-
+ * New VS2003 and XCode builds, minor fixes to other builds
+ * documentation fixes and cleanup
+ 
 Version 1.1.2 (2004 September 23)
 
  * fix a bug with multipage packet assembly after seek

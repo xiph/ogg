@@ -45,9 +45,9 @@ The Ogg homepage is located at 'http://www.xiph.org/ogg/'.
 Up to date technical documents, contact information, source code and
 pre-built utilities may be found there.
 
-BUILDING FROM CVS:
+BUILDING FROM REPOSITORY SOURCE:
 
-A standard cvs build should consist of nothing more than:
+A standard svn build should consist of nothing more than:
 
 ./autogen.sh
 make 
@@ -100,4 +100,4 @@ and #include "ogg/ogg.h" wherever you need to acces Ogg functionality.
 (Build instructions for Ogg codecs such as vorbis are similar and may
 be found in those source modules' README files)
 
-$Id: README,v 1.10 2002/07/11 09:09:06 xiphmont Exp $
+$Id$

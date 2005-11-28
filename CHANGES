@@ -1,4 +1,4 @@
-Version 1.1.3 (unreleased)
+Version 1.1.3 (2005 November 27)
 
  * Correct a bug in the granulepos field of pages where no packet ends
  * New VS2003 and XCode builds, minor fixes to other builds

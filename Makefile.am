@@ -22,8 +22,8 @@ EXTRA_DIST = README AUTHORS CHANGES COPYING \
 dist-hook:
 	rm -rf `find $(distdir)/debian -name .svn`
 	rm -rf `find $(distdir)/debian -name "Makefile*"`
-	rm -rf `find $(distdir)/macos -name CVS`
-	rm -rf `find $(distdir)/macosx -name CVS`
+	rm -rf `find $(distdir)/macos -name .svn`
+	rm -rf `find $(distdir)/macosx -name .svn`
 
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"

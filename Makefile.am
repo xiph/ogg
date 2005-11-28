@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign 1.6 dist-zip
 
-SUBDIRS = src include doc win32
+SUBDIRS = src include doc
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = ogg.m4
@@ -17,13 +17,14 @@ pkgconfig_DATA = ogg.pc
 EXTRA_DIST = README AUTHORS CHANGES COPYING \
 	libogg.spec libogg.spec.in \
 	ogg.m4 ogg.pc.in ogg-uninstalled.pc.in \
-	macos macosx debian
+	debian macos macosx win32
 
 dist-hook:
 	rm -rf `find $(distdir)/debian -name .svn`
 	rm -rf `find $(distdir)/debian -name "Makefile*"`
 	rm -rf `find $(distdir)/macos -name .svn`
 	rm -rf `find $(distdir)/macosx -name .svn`
+	rm -rf `find $(distdir)/win32 -name .svn`
 
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"

@@ -23,13 +23,16 @@ Directory:
 
 ./include       Library API headers and codebooks
 
-./debian        Rules/spec files for building Debian .deb packages
-
 ./doc           Ogg specification documents
 
 ./win32		Win32 projects and build automation
 
-./mac		MacOS 9 projects and build automation
+./macosx	MacOS X project and build files
+
+./macos		Classic MacOS 9 projects and build automation
+
+./debian        Rules/spec files for building Debian .deb packages
+		(may not be present, depending on your distribution)
 
 WHAT IS OGG?:
 

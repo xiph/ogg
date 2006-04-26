@@ -2,7 +2,7 @@
 # Run this to set up the build system: configure, makefiles, etc.
 # (based on the version in enlightenment's cvs)
 
-package="libogg"
+package="vorbisdec"
 
 olddir=`pwd`
 srcdir=`dirname $0`
@@ -25,16 +25,20 @@ VERSIONMKINT="sed -e s/[^0-9]//"
                                                                                 
 # do we need automake?
 if test -r Makefile.am; then
-  AM_NEEDED=`fgrep AUTOMAKE_OPTIONS Makefile.am | $VERSIONGREP`
+  AM_OPTIONS=`fgrep AUTOMAKE_OPTIONS Makefile.am`
+  AM_NEEDED=`echo $AM_OPTIONS | $VERSIONGREP`
+  if test x"$AM_NEEDED" = "x$AM_OPTIONS"; then
+    AM_NEEDED=""
+  fi
   if test -z $AM_NEEDED; then
     echo -n "checking for automake... "
     AUTOMAKE=automake
     ACLOCAL=aclocal
     if ($AUTOMAKE --version < /dev/null > /dev/null 2>&1); then
+      echo "yes"
+    else
       echo "no"
       AUTOMAKE=
-    else
-      echo "yes"
     fi
   else
     echo -n "checking for automake $AM_NEEDED or later... "

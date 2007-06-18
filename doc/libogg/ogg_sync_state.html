@@ -19,7 +19,7 @@
 
 <p>
 The ogg_sync_state struct tracks the synchronization of the current page.
-<p>It is used during decoding to track the status of data as it is read in and 
+<p>It is used during decoding to track the status of data as it is read in, synchronized, verified, and parsed into pages belonging to the various logical bistreams in the current physical bitstream link. 
 <p>
 
 <table border=0 width=100% color=black cellspacing=0 cellpadding=7>
@@ -44,9 +44,19 @@ typedef struct {
 <h3>Relevant Struct Members</h3>
 <dl>
 <dt><i>data</i></dt>
-<dd>Pointer to data from packet bodies.</dd>
+<dd>Pointer to buffered stream data.</dd>
 <dt><i>storage</i></dt>
-<dd>Pointer to data from packet bodies.</dd>
+<dd>Current allocated size of the stream buffer held in <tt>*data</tt>.</dd>
+<dt><i>fill</i></dt>
+<dd>The number of valid bytes currently held in <tt>*data</tt>; functions as the buffer head pointer.</dd>
+<dt><i>returned</i></dt>
+<dd>The number of bytes at the head of <tt>*data</tt> that have already been returned as pages; functions as the buffer tail pointer.</dd>
+<dt><i>unsynced</i></dt>
+<dd>Synchronization state flag; nonzero if sync has not yet been attained or has been lost.</dd>
+<dt><i>headerbytes</i></dt>
+<dd>If synced, the number of bytes used by the synced page's header.</dd>
+<dt><i>bodybytes</i></dt>
+<dd>If synced, the number of bytes used by the synced page's body.</dd>
 </dl>
 
 

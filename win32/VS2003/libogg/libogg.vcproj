@@ -12,7 +12,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="..\debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="2"
 			CharacterSet="2">
@@ -64,7 +64,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
+			OutputDirectory="..\release"
 			IntermediateDirectory="Release"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -96,7 +96,7 @@
 				OutputFile="$(OutDir)/libogg.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\ogg.def"
-				GenerateDebugInformation="TRUE"
+				GenerateDebugInformation="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -126,7 +126,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release_SSE|Win32"
-			OutputDirectory="$(ConfigurationName)"
+			OutputDirectory="..\release"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -160,7 +160,7 @@
 				OutputFile="$(OutDir)/libogg.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\ogg.def"
-				GenerateDebugInformation="TRUE"
+				GenerateDebugInformation="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -190,7 +190,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release_SSE2|Win32"
-			OutputDirectory="$(ConfigurationName)"
+			OutputDirectory="..\release"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -223,7 +223,7 @@
 				OutputFile="$(OutDir)/libogg.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\ogg.def"
-				GenerateDebugInformation="TRUE"
+				GenerateDebugInformation="FALSE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

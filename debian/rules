@@ -84,7 +84,7 @@ clean:
 		$(MAKE) distclean; \
 	fi
 
-	#if test -d CVS; then \
+	if test -d CVS; then \
 		$(MAKE) cvs-clean ;\
 	fi
 

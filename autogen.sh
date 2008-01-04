@@ -43,10 +43,11 @@ if test -r Makefile.am; then
   else
     echo -n "checking for automake $AM_NEEDED or later... "
     for am in automake-$AM_NEEDED automake$AM_NEEDED \
-	automake automake-1.7 automake-1.8 automake-1.9; do
+	automake automake-1.10 automake-1.7 automake-1.8 automake-1.9; do
       ($am --version < /dev/null > /dev/null 2>&1) || continue
       ver=`$am --version < /dev/null | head -n 1 | $VERSIONGREP | $VERSIONMKINT`
       verneeded=`echo $AM_NEEDED | $VERSIONMKINT`
+	echo "checking needed $verneeded against version $ver"
       if test $ver -ge $verneeded; then
         AUTOMAKE=$am
         echo $AUTOMAKE

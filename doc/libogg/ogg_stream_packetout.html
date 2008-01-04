@@ -17,8 +17,21 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function assembles a raw data packet for output to the codec decoding engine. The data is already in the stream and broken into packet segments. Each successive call returns the next complete packet built from those segments.</p>
-<p>In a typical decoding situation, this should be used after calling <a href="ogg_stream_pagein.html">ogg_stream_pagein()</a> to submit a page of data to the bitstream. If the function returns 0, more data is needed and another page should be submitted. A non-zero return value indicates successful return of a packet.</p>
+<p>This function assembles a data packet for output to the codec 
+decoding engine. The data has already been submitted to the
+<a href="ogg_stream_state.html">ogg_stream_state</a> and broken
+into segments. Each successive call returns the next complete packet 
+built from those segments.</p>
+
+<p>In a typical decoding situation, this should be used after calling 
+<a href="ogg_stream_pagein.html">ogg_stream_pagein()</a> to submit a 
+page of data to the bitstream. If the function returns 0, more data is 
+needed and another page should be submitted. A non-zero return value 
+indicates successful return of a packet.</p>
+
+<p>The <i>op</i> is filled in with pointers to memory managed by
+the stream state and is only valid until the next call. The client
+must copy the packet data if a longer lifetime is required.</p>
 
 <br><br>
 <table border=0 color=black cellspacing=0 cellpadding=7>
@@ -39,7 +52,8 @@ href="ogg_stream_state.html">ogg_stream_state</a> struct.  Before this function 
 <dt><i>op</i></dt>
 <dd>Pointer to the packet to be filled in with pointers to the new data. 
 This will typically be submitted to a codec for decode after this 
-function is called.</dd>
+function is called. The pointers are only valid until the next call
+on this stream state.</dd>
 </dl>
 
 

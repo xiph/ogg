@@ -355,6 +355,9 @@ long oggpackB_read(oggpack_buffer *b,int bits){
     /* not the main path */
     ret=-1L;
     if(b->endbyte*8+bits>b->storage*8)goto overflow;
+    /* special case to avoid reading b->ptr[0], which might be past the end of
+        the buffer; also skips some useless accounting */
+    else if(!bits)return(0L);
   }
   
   ret=b->ptr[0]<<(24+b->endbit);

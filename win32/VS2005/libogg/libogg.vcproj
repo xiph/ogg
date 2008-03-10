@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="libogg"
 	ProjectGUID="{15CBFEFF-7965-41F5-B4E2-21E8795C9159}"
 	RootNamespace="libogg"
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="Debug"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			>
@@ -62,10 +62,17 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				AdditionalOptions="/DEF:..\..\ogg.def"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				GenerateDebugInformation="true"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -77,6 +84,12 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -84,7 +97,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="Release"
-			ConfigurationType="4"
+			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -133,10 +146,16 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				AdditionalOptions="/DEF:..\..\ogg.def"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -146,6 +165,12 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -206,15 +231,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libogg.dll"
+				AdditionalOptions="/DEF:..\..\ogg.def"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\ogg.def"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="$(OutDir)/libogg.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -297,15 +323,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libogg.dll"
+				AdditionalOptions="/DEF:..\..\ogg.def"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\..\ogg.def"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="$(OutDir)/libogg.lib"
+				ImportLibrary="$(OutDir)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool

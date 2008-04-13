@@ -17,7 +17,9 @@ test_bitwise_CFLAGS = -D_V_SELFTEST
 test_framing_SOURCES = framing.c
 test_framing_CFLAGS = -D_V_SELFTEST
 
-TESTS = test_framing test_bitwise
+check: $(noinst_PROGRAMS)
+	./test_bitwise$(EXEEXT)
+	./test_framing$(EXEEXT)
 
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"

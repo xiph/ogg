@@ -35,6 +35,7 @@
      typedef int64_t ogg_int64_t;
      typedef uint64_t ogg_uint64_t;
 #  elif defined(__MINGW32__)
+#    include <sys/types.h>
      typedef short ogg_int16_t;
      typedef unsigned short ogg_uint16_t;
      typedef int ogg_int32_t;

@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="libogg"
 	ProjectGUID="{15CBFEFF-7965-41F5-B4E2-21E8795C9159}"
+	RootNamespace="libogg"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,8 +13,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
@@ -64,8 +65,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\release"
-			IntermediateDirectory="Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="TRUE">
@@ -126,7 +127,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release_SSE|Win32"
-			OutputDirectory="..\release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
@@ -190,7 +191,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release_SSE2|Win32"
-			OutputDirectory="..\release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"

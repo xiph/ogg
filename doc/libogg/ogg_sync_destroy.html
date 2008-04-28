@@ -17,7 +17,13 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function is used to destroy an <a href="ogg_sync_state.html">ogg_sync_state</a> struct and free all memory used.
+<p>This function is used to destroy an <a href="ogg_sync_state.html">ogg_sync_state</a> struct and free all memory used.</p>
+
+<p>Note this calls free() on its argument so you should only use this 
+function if you've allocated the ogg_sync_state on the heap. If it is 
+allocated on the stack, or it will otherwise be freed by your 
+own code, use <a href="ogg_sync_clear.html">ogg_sync_clear</a> instead
+to release just the internal memory.</p>
 
 <br><br>
 <table border=0 color=black cellspacing=0 cellpadding=7>

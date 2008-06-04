@@ -84,7 +84,7 @@ dnl Check for types
 AC_MSG_CHECKING(for int16_t)
 AC_CACHE_VAL(has_int16_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>
@@ -100,7 +100,7 @@ AC_MSG_RESULT($has_int16_t)
 AC_MSG_CHECKING(for int32_t)
 AC_CACHE_VAL(has_int32_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>
@@ -116,7 +116,7 @@ AC_MSG_RESULT($has_int32_t)
 AC_MSG_CHECKING(for uint32_t)
 AC_CACHE_VAL(has_uint32_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>
@@ -132,7 +132,7 @@ AC_MSG_RESULT($has_uint32_t)
 AC_MSG_CHECKING(for uint16_t)
 AC_CACHE_VAL(has_uint16_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>
@@ -148,7 +148,7 @@ AC_MSG_RESULT($has_uint16_t)
 AC_MSG_CHECKING(for u_int32_t)
 AC_CACHE_VAL(has_u_int32_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>
@@ -164,7 +164,7 @@ AC_MSG_RESULT($has_u_int32_t)
 AC_MSG_CHECKING(for u_int16_t)
 AC_CACHE_VAL(has_u_int16_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>
@@ -180,7 +180,7 @@ AC_MSG_RESULT($has_u_int16_t)
 AC_MSG_CHECKING(for int64_t)
 AC_CACHE_VAL(has_int64_t,
 [AC_TRY_RUN([
-#ifdef __BEOS__
+#if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
 #endif
 #include <sys/types.h>

@@ -24,7 +24,7 @@ extern "C" {
 #include <ogg/os_types.h>
 
 typedef struct {
-  void *iov_base; 
+  void *iov_base;
   size_t iov_len;
 } ogg_iovec_t;
 
@@ -93,7 +93,7 @@ typedef struct {
   long  e_o_s;
 
   ogg_int64_t  granulepos;
-  
+
   ogg_int64_t  packetno;     /* sequence number for decode; the framing
 				knows where there's a hole in the data,
 				but we need coupling so that the codec
@@ -201,9 +201,3 @@ extern void     ogg_packet_clear(ogg_packet *op);
 #endif
 
 #endif  /* _OGG_H */
-
-
-
-
-
-

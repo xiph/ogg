@@ -125,8 +125,8 @@ on Ogg physical bitstreams in general, mostly to introduce
 design rationale. Each 'media' format defines its own (generally more
 restrictive) mapping. An 'Ogg Vorbis Audio Bitstream', for example, has a
 specific physical bitstream structure.
-An 'Ogg A/V' bitstream (not currently specified) will also mandate a
-specific, restricted physical bitstream format.</p>
+Any other codec or combination of codecs will generally also mandate a
+corresponding restricted physical bitstream format.</p>
 
 <h3>additional end-to-end structure</h3>
 
@@ -176,8 +176,8 @@ Whole pages from multiple logical bitstreams are mixed together.</p>
 
 <p>The initial pages of each logical bitstream must appear first; the
 media mapping specifies the order of the initial pages. For example,
-Ogg A/V will eventually specify an Ogg video bitstream with
-audio. The mapping may specify that the physical bitstream must begin
+Ogg Theora describes video bitstream with audio.
+The mapping specifies that the physical bitstream must begin
 with the initial page of a logical video bitstream, followed by the
 initial page of an audio stream. Unlike initial pages, terminal pages
 for the logical bitstreams need not all occur contiguously (although a

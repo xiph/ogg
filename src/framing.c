@@ -189,11 +189,16 @@ int ogg_stream_init(ogg_stream_state *os,int serialno){
   if(os){
     memset(os,0,sizeof(*os));
     os->body_storage=16*1024;
-    os->body_data=_ogg_malloc(os->body_storage*sizeof(*os->body_data));
-
     os->lacing_storage=1024;
+
+    os->body_data=_ogg_malloc(os->body_storage*sizeof(*os->body_data));
     os->lacing_vals=_ogg_malloc(os->lacing_storage*sizeof(*os->lacing_vals));
     os->granule_vals=_ogg_malloc(os->lacing_storage*sizeof(*os->granule_vals));
+
+    if(!os->body_data || !os->lacing_vals || !os->granule_vals){
+      ogg_stream_clear(os);
+      return -1;
+    }
 
     os->serialno=serialno;
 
@@ -225,19 +230,32 @@ int ogg_stream_destroy(ogg_stream_state *os){
 /* Helpers for ogg_stream_encode; this keeps the structure and
    what's happening fairly clear */
 
-static void _os_body_expand(ogg_stream_state *os,int needed){
+static int _os_body_expand(ogg_stream_state *os,int needed){
   if(os->body_storage<=os->body_fill+needed){
+    void *ret;
+    ret=_ogg_realloc(os->body_data,(os->body_storage+needed+1024)*
+		     sizeof(*os->body_data));
+    if(!ret) return -1;
     os->body_storage+=(needed+1024);
-    os->body_data=_ogg_realloc(os->body_data,os->body_storage*sizeof(*os->body_data));
+    os->body_data=ret;
   }
+  return 0;
 }
 
-static void _os_lacing_expand(ogg_stream_state *os,int needed){
+static int _os_lacing_expand(ogg_stream_state *os,int needed){
   if(os->lacing_storage<=os->lacing_fill+needed){
+    void *ret;
+    ret=_ogg_realloc(os->lacing_vals,(os->lacing_storage+needed+32)*
+		     sizeof(*os->lacing_vals));
+    if(!ret)return -1;
+    os->lacing_vals=ret;
+    ret=_ogg_realloc(os->granule_vals,(os->lacing_storage+needed+32)*
+		     sizeof(*os->granule_vals));
+    if(!ret)return -1;
+    os->granule_vals=ret;
     os->lacing_storage+=(needed+32);
-    os->lacing_vals=_ogg_realloc(os->lacing_vals,os->lacing_storage*sizeof(*os->lacing_vals));
-    os->granule_vals=_ogg_realloc(os->granule_vals,os->lacing_storage*sizeof(*os->granule_vals));
   }
+  return 0;
 }
 
 /* checksum the page */
@@ -288,8 +306,8 @@ int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count,
   }
  
   /* make sure we have the buffer storage */
-  _os_body_expand(os,bytes);
-  _os_lacing_expand(os,lacing_vals);
+  if(_os_body_expand(os,bytes))return -1;
+  if(_os_lacing_expand(os,lacing_vals))return -1;
 
   /* Copy in the submitted packet.  Yes, the copy is a waste; this is
      the liability of overly clean abstraction for the time being.  It
@@ -528,11 +546,14 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
   if(size>oy->storage-oy->fill){
     /* We need to extend the internal buffer */
     long newsize=size+oy->fill+4096; /* an extra page to be nice */
+    void *ret;
 
     if(oy->data)
-      oy->data=_ogg_realloc(oy->data,newsize);
+      ret=_ogg_realloc(oy->data,newsize);
     else
-      oy->data=_ogg_malloc(newsize);
+      ret=_ogg_malloc(newsize);
+    if(!ret)return NULL;
+    oy->data=ret;
     oy->storage=newsize;
   }
 
@@ -729,7 +750,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   if(serialno!=os->serialno)return(-1);
   if(version>0)return(-1);
 
-  _os_lacing_expand(os,segments+1);
+  if(_os_lacing_expand(os,segments+1))return -1;
 
   /* are we in sequence? */
   if(pageno!=os->pageno){
@@ -766,7 +787,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   }
   
   if(bodysize){
-    _os_body_expand(os,bodysize);
+    if(_os_body_expand(os,bodysize))return -1;
     memcpy(os->body_data+os->body_fill,body,bodysize);
     os->body_fill+=bodysize;
   }

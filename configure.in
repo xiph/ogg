@@ -83,7 +83,7 @@ AC_C_CONST
 dnl Check for types
 
 AC_MSG_CHECKING(for int16_t)
-AC_CACHE_VAL(has_int16_t,
+AC_CACHE_VAL(has_cv_int16_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -92,14 +92,14 @@ AC_CACHE_VAL(has_int16_t,
 int16_t foo;
 int main() {return 0;}
 ],
-has_int16_t=yes,
-has_int16_t=no,
-has_int16_t=no
+has_cv_int16_t=yes,
+has_cv_int16_t=no,
+has_cv_int16_t=no
 )])
-AC_MSG_RESULT($has_int16_t)
+AC_MSG_RESULT($has_cv_int16_t)
 
 AC_MSG_CHECKING(for int32_t)
-AC_CACHE_VAL(has_int32_t,
+AC_CACHE_VAL(has_cv_int32_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -108,14 +108,14 @@ AC_CACHE_VAL(has_int32_t,
 int32_t foo;
 int main() {return 0;}
 ],
-has_int32_t=yes,
-has_int32_t=no,
-has_int32_t=no
+has_cv_int32_t=yes,
+has_cv_int32_t=no,
+has_cv_int32_t=no
 )])
-AC_MSG_RESULT($has_int32_t)
+AC_MSG_RESULT($has_cv_int32_t)
 
 AC_MSG_CHECKING(for uint32_t)
-AC_CACHE_VAL(has_uint32_t,
+AC_CACHE_VAL(has_cv_uint32_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -124,14 +124,14 @@ AC_CACHE_VAL(has_uint32_t,
 uint32_t foo;
 int main() {return 0;}
 ],
-has_uint32_t=yes,
-has_uint32_t=no,
-has_uint32_t=no
+has_cv_uint32_t=yes,
+has_cv_uint32_t=no,
+has_cv_uint32_t=no
 )])
-AC_MSG_RESULT($has_uint32_t)
+AC_MSG_RESULT($has_cv_uint32_t)
 
 AC_MSG_CHECKING(for uint16_t)
-AC_CACHE_VAL(has_uint16_t,
+AC_CACHE_VAL(has_cv_uint16_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -140,14 +140,14 @@ AC_CACHE_VAL(has_uint16_t,
 uint16_t foo;
 int main() {return 0;}
 ],
-has_uint16_t=yes,
-has_uint16_t=no,
-has_uint16_t=no
+has_cv_uint16_t=yes,
+has_cv_uint16_t=no,
+has_cv_uint16_t=no
 )])
-AC_MSG_RESULT($has_uint16_t)
+AC_MSG_RESULT($has_cv_uint16_t)
 
 AC_MSG_CHECKING(for u_int32_t)
-AC_CACHE_VAL(has_u_int32_t,
+AC_CACHE_VAL(has_cv_u_int32_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -156,14 +156,14 @@ AC_CACHE_VAL(has_u_int32_t,
 u_int32_t foo;
 int main() {return 0;}
 ],
-has_u_int32_t=yes,
-has_u_int32_t=no,
-has_u_int32_t=no
+has_cv_u_int32_t=yes,
+has_cv_u_int32_t=no,
+has_cv_u_int32_t=no
 )])
-AC_MSG_RESULT($has_u_int32_t)
+AC_MSG_RESULT($has_cv_u_int32_t)
 
 AC_MSG_CHECKING(for u_int16_t)
-AC_CACHE_VAL(has_u_int16_t,
+AC_CACHE_VAL(has_cv_u_int16_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -172,14 +172,14 @@ AC_CACHE_VAL(has_u_int16_t,
 u_int16_t foo;
 int main() {return 0;}
 ],
-has_u_int16_t=yes,
-has_u_int16_t=no,
-has_u_int16_t=no
+has_cv_u_int16_t=yes,
+has_cv_u_int16_t=no,
+has_cv_u_int16_t=no
 )])
-AC_MSG_RESULT($has_u_int16_t)
+AC_MSG_RESULT($has_cv_u_int16_t)
 
 AC_MSG_CHECKING(for int64_t)
-AC_CACHE_VAL(has_int64_t,
+AC_CACHE_VAL(has_cv_int64_t,
 [AC_TRY_RUN([
 #if defined __BEOS__ && !defined __HAIKU__
 #include <inttypes.h>
@@ -188,11 +188,11 @@ AC_CACHE_VAL(has_int64_t,
 int64_t foo;
 int main() {return 0;}
 ],
-has_int64_t=yes,
-has_int64_t=no,
-has_int64_t=no
+has_cv_int64_t=yes,
+has_cv_int64_t=no,
+has_cv_int64_t=no
 )])
-AC_MSG_RESULT($has_int64_t)
+AC_MSG_RESULT($has_cv_int64_t)
 
 AC_CHECK_SIZEOF(short,2)
 AC_CHECK_SIZEOF(int,4)
@@ -200,7 +200,7 @@ AC_CHECK_SIZEOF(long,4)
 AC_CHECK_SIZEOF(long long,8)
 
 
-if test x$has_int16_t = "xyes" ; then
+if test x$has_cv_int16_t = "xyes" ; then
         SIZE16="int16_t"
 else
         case 2 in
@@ -209,7 +209,7 @@ else
         esac
 fi
 
-if test x$has_int32_t = "xyes" ; then
+if test x$has_cv_int32_t = "xyes" ; then
         SIZE32="int32_t"
 else
         case 4 in
@@ -219,10 +219,10 @@ else
         esac
 fi
 
-if test x$has_uint32_t = "xyes" ; then
+if test x$has_cv_uint32_t = "xyes" ; then
         USIZE32="uint32_t"
 else
-        if test x$has_u_int32_t = "xyes" ; then
+        if test x$has_cv_u_int32_t = "xyes" ; then
                 USIZE32="u_int32_t"
         else
                 case 4 in
@@ -233,10 +233,10 @@ else
         fi
 fi
 
-if test x$has_uint16_t = "xyes" ; then
+if test x$has_cv_uint16_t = "xyes" ; then
         USIZE16="uint16_t"
 else
-        if test x$has_u_int16_t = "xyes" ; then
+        if test x$has_cv_u_int16_t = "xyes" ; then
                 USIZE16="u_int16_t"
         else
                 case 2 in
@@ -247,7 +247,7 @@ else
         fi
 fi
 
-if test x$has_int64_t = "xyes" ; then
+if test x$has_cv_int64_t = "xyes" ; then
         SIZE64="int64_t"
 else
 case 8 in

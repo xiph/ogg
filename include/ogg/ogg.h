@@ -116,6 +116,7 @@ typedef struct {
 /* Ogg BITSTREAM PRIMITIVES: bitstream ************************/
 
 extern void  oggpack_writeinit(oggpack_buffer *b);
+extern int   oggpack_writecheck(oggpack_buffer *b);
 extern void  oggpack_writetrunc(oggpack_buffer *b,long bits);
 extern void  oggpack_writealign(oggpack_buffer *b);
 extern void  oggpack_writecopy(oggpack_buffer *b,void *source,long bits);
@@ -134,6 +135,7 @@ extern long  oggpack_bits(oggpack_buffer *b);
 extern unsigned char *oggpack_get_buffer(oggpack_buffer *b);
 
 extern void  oggpackB_writeinit(oggpack_buffer *b);
+extern int   oggpackB_writecheck(oggpack_buffer *b);
 extern void  oggpackB_writetrunc(oggpack_buffer *b,long bits);
 extern void  oggpackB_writealign(oggpack_buffer *b);
 extern void  oggpackB_writecopy(oggpack_buffer *b,void *source,long bits);

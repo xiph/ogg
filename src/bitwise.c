@@ -47,28 +47,48 @@ void oggpackB_writeinit(oggpack_buffer *b){
   oggpack_writeinit(b);
 }
 
+int oggpack_writecheck(oggpack_buffer *b){
+  if(!b->ptr || !b->storage)return -1;
+  return 0;
+}
+
+int oggpackB_writecheck(oggpack_buffer *b){
+  return oggpackB_writecheck(b);
+}
+
 void oggpack_writetrunc(oggpack_buffer *b,long bits){
   long bytes=bits>>3;
-  bits-=bytes*8;
-  b->ptr=b->buffer+bytes;
-  b->endbit=bits;
-  b->endbyte=bytes;
-  *b->ptr&=mask[bits];
+  if(b->ptr){
+    bits-=bytes*8;
+    b->ptr=b->buffer+bytes;
+    b->endbit=bits;
+    b->endbyte=bytes;
+    *b->ptr&=mask[bits];
+  }
 }
 
 void oggpackB_writetrunc(oggpack_buffer *b,long bits){
   long bytes=bits>>3;
-  bits-=bytes*8;
-  b->ptr=b->buffer+bytes;
-  b->endbit=bits;
-  b->endbyte=bytes;
-  *b->ptr&=mask8B[bits];
+  if(b->ptr){
+    bits-=bytes*8;
+    b->ptr=b->buffer+bytes;
+    b->endbit=bits;
+    b->endbyte=bytes;
+    *b->ptr&=mask8B[bits];
+  }
 }
 
 /* Takes only up to 32 bits. */
 void oggpack_write(oggpack_buffer *b,unsigned long value,int bits){
   if(b->endbyte+4>=b->storage){
-    b->buffer=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
+    void *ret;
+    if(!b->ptr)return;
+    ret=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
+    if(!ret){
+      oggpack_writeclear(b);
+      return;
+    }
+    b->buffer=ret;
     b->storage+=BUFFER_INCREMENT;
     b->ptr=b->buffer+b->endbyte;
   }
@@ -102,7 +122,14 @@ void oggpack_write(oggpack_buffer *b,unsigned long value,int bits){
 /* Takes only up to 32 bits. */
 void oggpackB_write(oggpack_buffer *b,unsigned long value,int bits){
   if(b->endbyte+4>=b->storage){
-    b->buffer=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
+    void *ret;
+    if(!b->ptr)return;
+    ret=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
+    if(!ret){
+      oggpack_writeclear(b);
+      return;
+    }
+    b->buffer=ret;
     b->storage+=BUFFER_INCREMENT;
     b->ptr=b->buffer+b->endbyte;
   }
@@ -165,8 +192,15 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
   }else{
     /* aligned block copy */
     if(b->endbyte+bytes+1>=b->storage){
+      void *ret;
+      if(!b->ptr)return;
       b->storage=b->endbyte+bytes+BUFFER_INCREMENT;
-      b->buffer=_ogg_realloc(b->buffer,b->storage);
+      ret=_ogg_realloc(b->buffer,b->storage);
+      if(!ret){
+	oggpack_writeclear(b);
+	return;
+      }
+      b->buffer=ret;
       b->ptr=b->buffer+b->endbyte;
     }
 
@@ -193,6 +227,7 @@ void oggpackB_writecopy(oggpack_buffer *b,void *source,long bits){
 }
 
 void oggpack_reset(oggpack_buffer *b){
+  if(!b->ptr)return;
   b->ptr=b->buffer;
   b->buffer[0]=0;
   b->endbit=b->endbyte=0;
@@ -203,7 +238,7 @@ void oggpackB_reset(oggpack_buffer *b){
 }
 
 void oggpack_writeclear(oggpack_buffer *b){
-  _ogg_free(b->buffer);
+  if(b->buffer)_ogg_free(b->buffer);
   memset(b,0,sizeof(*b));
 }
 

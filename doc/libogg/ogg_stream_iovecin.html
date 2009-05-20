@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title>libogg - function - ogg_stream_packetin</title>
+<title>libogg - function - ogg_stream_iovecin</title>
 <link rel=stylesheet href="style.css" type="text/css">
 </head>
 
@@ -13,13 +13,15 @@
 </tr>
 </table>
 
-<h1>ogg_stream_packetin</h1>
+<h1>ogg_stream_iovecin</h1>
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function submits a packet to the bitstream for page 
-encapsulation. After this is called, more packets can be submitted,
-or pages can be written out.</p>
+<p>This function submits packet data (in the form of
+an array of <a href="ogg_iovec_t.html">ogg_iovec_t</a>, rather than using
+an <a href="ogg_packet.html">ogg_packet</a> structure) to the
+bitstream for page encapsulation. After this is called, more packets
+can be submitted, or pages can be written out.</p>
 
 <p>In a typical encoding situation, this should be used after filling a 
 packet with data.
@@ -32,7 +34,7 @@ is free to alter the contents of <i>os</i> after this call has returned.
 <tr bgcolor=#cccccc>
 	<td>
 <pre><b>
-int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op);
+int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count, long e_o_s, ogg_int64_t granulepos);
 </b></pre>
 	</td>
 </tr>
@@ -42,8 +44,14 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op);
 <dl>
 <dt><i>os</i></dt>
 <dd>Pointer to a previously declared <a href="ogg_stream_state.html">ogg_stream_state</a> struct.</dd>
-<dt><i>op</i></dt>
-<dd>Pointer to the packet we are putting into the bitstream.
+<dt><i>iov</i></dt>
+<dd>Length-encoded buffers held in an array of <a href="ogg_iovec_t.html">ogg_iovec_t</a>.
+<dt><i>count</i></dt>
+<dd>Length of the iov array.
+<dt><i>e_o_s</i></dt>
+<dd>End of stream flag, analagous to the e_o_s field in an <a href="ogg_packet.html">ogg_packet</a>.
+<dt><i>granulepos</i></dt>
+<dd>Granule position value, analagous to the granpos field in an <a href="ogg_packet.html">ogg_packet</a>.
 </dl>
 
 

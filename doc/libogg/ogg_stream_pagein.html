@@ -43,7 +43,7 @@ int ogg_stream_pagein(<a href="ogg_stream_state.html">ogg_stream_state</a> *os, 
 
 <h3>Return Values</h3>
 <blockquote>
-<li>-1 indicates failure.  This means that the serial number of the page did not match the serial number of the bitstream, or that the page version was incorrect.</li>
+<li>-1 indicates failure.  This means that the serial number of the page did not match the serial number of the bitstream, the page version was incorrect, or a memory allocation failed.</li>
 <li>
 0 means that the page was successfully submitted to the bitstream.</li>
 </blockquote>

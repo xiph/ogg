@@ -53,7 +53,7 @@ int oggpack_writecheck(oggpack_buffer *b){
 }
 
 int oggpackB_writecheck(oggpack_buffer *b){
-  return oggpackB_writecheck(b);
+  return oggpack_writecheck(b);
 }
 
 void oggpack_writetrunc(oggpack_buffer *b,long bits){

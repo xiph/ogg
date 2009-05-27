@@ -60,8 +60,8 @@ on this stream state.</dd>
 <h3>Return Values</h3>
 <blockquote>
 <ul>
-<li>-1 if we are out of sync and there is a gap in the data. Usually this will not be a fatal error and subsequent calls to ogg_stream_packetout are likely to succeed. <i>op</i> has not been updated.</li>
-<li>0 if there is insufficient data available to complete a packet. <i>op</i> has not been updated.
+<li>-1 if we are out of sync and there is a gap in the data. This is usually a recoverable error and subsequent calls to ogg_stream_packetout are likely to succeed. <i>op</i> has not been updated.</li>
+<li>0 if there is insufficient data available to complete a packet, or on unrecoverable internal error occurred. <i>op</i> has not been updated.
 <li>1 if a packet was assembled normally. <i>op</i> contains the next packet from the stream.</li>
 </ul>
 </blockquote>

@@ -44,11 +44,9 @@ int ogg_sync_pageout(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy, <a hr
 
 <h3>Return Values</h3>
 <blockquote>
-<li>-1 if we were not properly synced and had to skip some bytes.</li>
-<li>
-0 if we need more data to verify a page.</li>
-<li>
-1 if we have a page.</li>
+<li>-1 returned if stream has not yet captured sync (bytes were skipped).</li>
+<li>0 returned if more data needed or an internal error occurred.</li>
+<li>1 indicated a page was synced and returned.</li>
 </blockquote>
 <p>
 

@@ -58,8 +58,8 @@ packet?" check.</dd>
 <h3>Return Values</h3>
 <blockquote>
 <ul>
-<li>-1 if there's no packet available due to lost sync or a hole
-in the data.</li>
+<li>-1 if there's no packet available due to lost sync or a hole in the data.</li>
+<li>0 if there is insufficient data available to complete a packet, or on unrecoverable internal error occurred.</li>
 <li>1 if a packet is available.</li>
 </ul>
 </blockquote>

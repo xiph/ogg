@@ -22,7 +22,6 @@ doc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
 	oggpack_read1.html oggpack_readinit.html oggpack_reset.html\
 	oggpack_write.html oggpack_writealign.html oggpack_writeclear.html\
 	oggpack_writecopy.html oggpack_writeinit.html oggpack_writetrunc.html\
-	overview.html reference.html style.css vorbis_comment.html\
-	vorbis_info.html
+	overview.html reference.html style.css
 
 EXTRA_DIST = $(doc_DATA)

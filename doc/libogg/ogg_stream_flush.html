@@ -43,7 +43,7 @@ int ogg_stream_flush(<a href="ogg_stream_state.html">ogg_stream_state</a> *os, <
 
 <h3>Return Values</h3>
 <blockquote>
-<li>0 means that all packet data has already been flushed into pages, and there are no packets to put into the page.</li>
+<li>0 means that all packet data has already been flushed into pages, and there are no packets to put into the page.  0 is also returned in the case of an <a href="ogg_stream_state.html">ogg_stream_state</a> that has been cleared explicitly or implicitly due to an internal error.</li>
 <li>
 Nonzero means that remaining packets have successfully been flushed into the page.</li>
 </blockquote>

@@ -44,7 +44,7 @@ int ogg_sync_pageseek(<a href="ogg_sync_state.html">ogg_sync_state</a> *oy, <a h
 <blockquote>
 <li>-n means that we skipped n bytes within the bitstream.</li>
 <li>
-0 means that the page isn't ready and we need more data.  No bytes have been skipped.</li>
+0 means that the page isn't ready and we need more data, or than an internal error occurred.  No bytes have been skipped.</li>
 <li>
 n means that the page was synced at the current location, with a page length of n bytes.
 </blockquote>

@@ -103,13 +103,13 @@ void oggpack_write(oggpack_buffer *b,unsigned long value,int bits){
     if(bits>=16){
       b->ptr[2]=(unsigned char)(value>>(16-b->endbit));
       if(bits>=24){
-	b->ptr[3]=(unsigned char)(value>>(24-b->endbit));
-	if(bits>=32){
-	  if(b->endbit)
-	    b->ptr[4]=(unsigned char)(value>>(32-b->endbit));
-	  else
-	    b->ptr[4]=0;
-	}
+        b->ptr[3]=(unsigned char)(value>>(24-b->endbit));
+        if(bits>=32){
+          if(b->endbit)
+            b->ptr[4]=(unsigned char)(value>>(32-b->endbit));
+          else
+            b->ptr[4]=0;
+        }
       }
     }
   }
@@ -144,13 +144,13 @@ void oggpackB_write(oggpack_buffer *b,unsigned long value,int bits){
     if(bits>=16){
       b->ptr[2]=(unsigned char)(value>>(8+b->endbit));
       if(bits>=24){
-	b->ptr[3]=(unsigned char)(value>>(b->endbit));
-	if(bits>=32){
-	  if(b->endbit)
-	    b->ptr[4]=(unsigned char)(value<<(8-b->endbit));
-	  else
-	    b->ptr[4]=0;
-	}
+        b->ptr[3]=(unsigned char)(value>>(b->endbit));
+        if(bits>=32){
+          if(b->endbit)
+            b->ptr[4]=(unsigned char)(value<<(8-b->endbit));
+          else
+            b->ptr[4]=0;
+        }
       }
     }
   }
@@ -173,12 +173,12 @@ void oggpackB_writealign(oggpack_buffer *b){
 }
 
 static void oggpack_writecopy_helper(oggpack_buffer *b,
-				     void *source,
-				     long bits,
-				     void (*w)(oggpack_buffer *,
-					       unsigned long,
-					       int),
-				     int msb){
+                                     void *source,
+                                     long bits,
+                                     void (*w)(oggpack_buffer *,
+                                               unsigned long,
+                                               int),
+                                     int msb){
   unsigned char *ptr=(unsigned char *)source;
 
   long bytes=bits/8;
@@ -197,8 +197,8 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
       b->storage=b->endbyte+bytes+BUFFER_INCREMENT;
       ret=_ogg_realloc(b->buffer,b->storage);
       if(!ret){
-	oggpack_writeclear(b);
-	return;
+        oggpack_writeclear(b);
+        return;
       }
       b->buffer=ret;
       b->ptr=b->buffer+b->endbyte;
@@ -274,9 +274,9 @@ long oggpack_look(oggpack_buffer *b,int bits){
     if(bits>16){
       ret|=b->ptr[2]<<(16-b->endbit);  
       if(bits>24){
-	ret|=b->ptr[3]<<(24-b->endbit);  
-	if(bits>32 && b->endbit)
-	  ret|=b->ptr[4]<<(32-b->endbit);
+        ret|=b->ptr[3]<<(24-b->endbit);  
+        if(bits>32 && b->endbit)
+          ret|=b->ptr[4]<<(32-b->endbit);
       }
     }
   }
@@ -301,9 +301,9 @@ long oggpackB_look(oggpack_buffer *b,int bits){
     if(bits>16){
       ret|=b->ptr[2]<<(8+b->endbit);  
       if(bits>24){
-	ret|=b->ptr[3]<<(b->endbit);  
-	if(bits>32 && b->endbit)
-	  ret|=b->ptr[4]>>(8-b->endbit);
+        ret|=b->ptr[3]<<(b->endbit);  
+        if(bits>32 && b->endbit)
+          ret|=b->ptr[4]>>(8-b->endbit);
       }
     }
   }
@@ -362,10 +362,10 @@ long oggpack_read(oggpack_buffer *b,int bits){
     if(bits>16){
       ret|=b->ptr[2]<<(16-b->endbit);  
       if(bits>24){
-	ret|=b->ptr[3]<<(24-b->endbit);  
-	if(bits>32 && b->endbit){
-	  ret|=b->ptr[4]<<(32-b->endbit);
-	}
+        ret|=b->ptr[3]<<(24-b->endbit);  
+        if(bits>32 && b->endbit){
+          ret|=b->ptr[4]<<(32-b->endbit);
+        }
       }
     }
   }
@@ -401,9 +401,9 @@ long oggpackB_read(oggpack_buffer *b,int bits){
     if(bits>16){
       ret|=b->ptr[2]<<(8+b->endbit);  
       if(bits>24){
-	ret|=b->ptr[3]<<(b->endbit);  
-	if(bits>32 && b->endbit)
-	  ret|=b->ptr[4]>>(8-b->endbit);
+        ret|=b->ptr[3]<<(b->endbit);  
+        if(bits>32 && b->endbit)
+          ret|=b->ptr[4]>>(8-b->endbit);
       }
     }
   }
@@ -531,10 +531,10 @@ void cliptest(unsigned long *b,int vals,int bits,int *comp,int compsize){
       report("looked at incorrect value!\n");
     if(tbit==1)
       if(oggpack_look1(&r)!=(b[i]&mask[tbit]))
-	report("looked at single bit incorrect value!\n");
+        report("looked at single bit incorrect value!\n");
     if(tbit==1){
       if(oggpack_read1(&r)!=(b[i]&mask[tbit]))
-	report("read incorrect single bit value!\n");
+        report("read incorrect single bit value!\n");
     }else{
     if(oggpack_read(&r,tbit)!=(b[i]&mask[tbit]))
       report("read incorrect value!\n");
@@ -566,10 +566,10 @@ void cliptestB(unsigned long *b,int vals,int bits,int *comp,int compsize){
       report("looked at incorrect value!\n");
     if(tbit==1)
       if(oggpackB_look1(&r)!=(b[i]&mask[tbit]))
-	report("looked at single bit incorrect value!\n");
+        report("looked at single bit incorrect value!\n");
     if(tbit==1){
       if(oggpackB_read1(&r)!=(b[i]&mask[tbit]))
-	report("read incorrect single bit value!\n");
+        report("read incorrect single bit value!\n");
     }else{
     if(oggpackB_read(&r,tbit)!=(b[i]&mask[tbit]))
       report("read incorrect value!\n");
@@ -607,8 +607,8 @@ int main(void){
                     34,242,223,136,35,222,211,86,171,50,225,135,214,75,172,
                     223,4};
   static int oneB[33]={150,101,131,33,203,15,204,216,105,193,156,65,84,85,222,
-		       8,139,145,227,126,34,55,244,171,85,100,39,195,173,18,
-		       245,251,128};
+                       8,139,145,227,126,34,55,244,171,85,100,39,195,173,18,
+                       245,251,128};
 
   int twosize=6;
   static int two[6]={61,255,255,251,231,29};
@@ -620,25 +620,25 @@ int main(void){
                       58,135,196,61,55,129,183,54,101,100,170,37,127,126,10,
                       100,52,4,14,18,86,77,1};
   static int threeB[54]={206,128,42,153,57,8,183,251,13,89,36,30,32,144,183,
-			 130,59,240,121,59,85,223,19,228,180,134,33,107,74,98,
-			 233,253,196,135,63,2,110,114,50,155,90,127,37,170,104,
-			 200,20,254,4,58,106,176,144,0};
+                         130,59,240,121,59,85,223,19,228,180,134,33,107,74,98,
+                         233,253,196,135,63,2,110,114,50,155,90,127,37,170,104,
+                         200,20,254,4,58,106,176,144,0};
 
   int foursize=38;
   static int four[38]={18,6,163,252,97,194,104,131,32,1,7,82,137,42,129,11,72,
                      132,60,220,112,8,196,109,64,179,86,9,137,195,208,122,169,
                      28,2,133,0,1};
   static int fourB[38]={36,48,102,83,243,24,52,7,4,35,132,10,145,21,2,93,2,41,
-			1,219,184,16,33,184,54,149,170,132,18,30,29,98,229,67,
-			129,10,4,32};
+                        1,219,184,16,33,184,54,149,170,132,18,30,29,98,229,67,
+                        129,10,4,32};
 
   int fivesize=45;
   static int five[45]={169,2,126,139,144,172,30,4,80,72,240,59,130,218,73,62,
                      241,24,210,44,4,20,0,248,116,49,135,100,110,130,181,169,
                      84,75,159,2,1,0,132,192,8,0,0,18,22};
   static int fiveB[45]={1,84,145,111,245,100,128,8,56,36,40,71,126,78,213,226,
-			124,105,12,0,133,128,0,162,233,242,67,152,77,205,77,
-			172,150,169,129,79,128,0,6,4,32,0,27,9,0};
+                        124,105,12,0,133,128,0,162,233,242,67,152,77,205,77,
+                        172,150,169,129,79,128,0,6,4,32,0,27,9,0};
 
   int sixsize=7;
   static int six[7]={17,177,170,242,169,19,148};
@@ -671,7 +671,7 @@ int main(void){
     if(oggpack_look(&r,32)==-1)report("out of data. failed!");
     if(oggpack_look(&r,32)!=large[i]){
       fprintf(stderr,"%ld != %ld (%lx!=%lx):",oggpack_look(&r,32),large[i],
-	      oggpack_look(&r,32),large[i]);
+              oggpack_look(&r,32),large[i]);
       report("read incorrect value!\n");
     }
     oggpack_adv(&r,32);
@@ -757,7 +757,7 @@ int main(void){
     if(oggpackB_look(&r,32)==-1)report("out of data. failed!");
     if(oggpackB_look(&r,32)!=large[i]){
       fprintf(stderr,"%ld != %ld (%lx!=%lx):",oggpackB_look(&r,32),large[i],
-	      oggpackB_look(&r,32),large[i]);
+              oggpackB_look(&r,32),large[i]);
       report("read incorrect value!\n");
     }
     oggpackB_adv(&r,32);

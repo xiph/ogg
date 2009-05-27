@@ -59,8 +59,8 @@ typedef struct {
 
   int     *lacing_vals;      /* The values that will go to the segment table */
   ogg_int64_t *granule_vals; /* granulepos values for headers. Not compact
-				this way, but it is simple coupled to the
-				lacing fifo */
+                                this way, but it is simple coupled to the
+                                lacing fifo */
   long    lacing_storage;
   long    lacing_fill;
   long    lacing_packet;
@@ -75,7 +75,7 @@ typedef struct {
                              of a logical bitstream */
   long    serialno;
   long    pageno;
-  ogg_int64_t  packetno;      /* sequence number for decode; the framing
+  ogg_int64_t  packetno;  /* sequence number for decode; the framing
                              knows where there's a hole in the data,
                              but we need coupling so that the codec
                              (which is in a seperate abstraction
@@ -96,10 +96,10 @@ typedef struct {
   ogg_int64_t  granulepos;
 
   ogg_int64_t  packetno;     /* sequence number for decode; the framing
-				knows where there's a hole in the data,
-				but we need coupling so that the codec
-				(which is in a seperate abstraction
-				layer) also knows about the gap */
+                                knows where there's a hole in the data,
+                                but we need coupling so that the codec
+                                (which is in a seperate abstraction
+                                layer) also knows about the gap */
 } ogg_packet;
 
 typedef struct {
@@ -157,7 +157,7 @@ extern unsigned char *oggpackB_get_buffer(oggpack_buffer *b);
 
 extern int      ogg_stream_packetin(ogg_stream_state *os, ogg_packet *op);
 extern int      ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov,
-				   int count, long e_o_s, ogg_int64_t granulepos);
+                                   int count, long e_o_s, ogg_int64_t granulepos);
 extern int      ogg_stream_pageout(ogg_stream_state *os, ogg_page *og);
 extern int      ogg_stream_flush(ogg_stream_state *os, ogg_page *og);
 
@@ -166,8 +166,8 @@ extern int      ogg_stream_flush(ogg_stream_state *os, ogg_page *og);
 extern int      ogg_sync_init(ogg_sync_state *oy);
 extern int      ogg_sync_clear(ogg_sync_state *oy);
 extern int      ogg_sync_reset(ogg_sync_state *oy);
-extern int	ogg_sync_destroy(ogg_sync_state *oy);
-extern int	ogg_sync_check(ogg_sync_state *oy);
+extern int      ogg_sync_destroy(ogg_sync_state *oy);
+extern int      ogg_sync_check(ogg_sync_state *oy);
 
 extern char    *ogg_sync_buffer(ogg_sync_state *oy, long size);
 extern int      ogg_sync_wrote(ogg_sync_state *oy, long bytes);

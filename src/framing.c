@@ -5,12 +5,12 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2007             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2009             *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
- function: code raw [Vorbis] packets into framed OggSquish stream and
+ function: code raw packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
  last mod: $Id$
 
@@ -207,6 +207,12 @@ int ogg_stream_init(ogg_stream_state *os,int serialno){
   return(-1);
 } 
 
+/* async/delayed error detection for the ogg_stream_state */
+int ogg_stream_check(ogg_stream_state *os){
+  if(!os || !os->body_data) return -1;
+  return 0;
+}
+
 /* _clear does not free os, only the non-flat storage within */
 int ogg_stream_clear(ogg_stream_state *os){
   if(os){
@@ -235,7 +241,10 @@ static int _os_body_expand(ogg_stream_state *os,int needed){
     void *ret;
     ret=_ogg_realloc(os->body_data,(os->body_storage+needed+1024)*
 		     sizeof(*os->body_data));
-    if(!ret) return -1;
+    if(!ret){
+      ogg_stream_clear(os);
+      return -1;
+    }
     os->body_storage+=(needed+1024);
     os->body_data=ret;
   }
@@ -247,11 +256,17 @@ static int _os_lacing_expand(ogg_stream_state *os,int needed){
     void *ret;
     ret=_ogg_realloc(os->lacing_vals,(os->lacing_storage+needed+32)*
 		     sizeof(*os->lacing_vals));
-    if(!ret)return -1;
+    if(!ret){
+      ogg_stream_clear(os);
+      return -1;
+    }
     os->lacing_vals=ret;
     ret=_ogg_realloc(os->granule_vals,(os->lacing_storage+needed+32)*
 		     sizeof(*os->granule_vals));
-    if(!ret)return -1;
+    if(!ret){
+      ogg_stream_clear(os);
+      return -1;
+    }
     os->granule_vals=ret;
     os->lacing_storage+=(needed+32);
   }
@@ -290,6 +305,10 @@ int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count,
                        long e_o_s, ogg_int64_t granulepos){
 
   int bytes = 0, lacing_vals, i;
+
+  if(ogg_stream_check(os)) return -1;
+  if(!iov) return 0;
+ 
   for (i = 0; i < count; ++i) bytes += (int)iov[i].iov_len;
   lacing_vals=bytes/255+1;
 
@@ -306,8 +325,8 @@ int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count,
   }
  
   /* make sure we have the buffer storage */
-  if(_os_body_expand(os,bytes))return -1;
-  if(_os_lacing_expand(os,lacing_vals))return -1;
+  if(_os_body_expand(os,bytes) || _os_lacing_expand(os,lacing_vals))
+    return -1;
 
   /* Copy in the submitted packet.  Yes, the copy is a waste; this is
      the liability of overly clean abstraction for the time being.  It
@@ -369,7 +388,8 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   long acc=0;
   ogg_int64_t granule_pos=-1;
 
-  if(maxvals==0)return(0);
+  if(ogg_stream_check(os)) return 0;
+  if(maxvals==0)return 0;
   
   /* construct a page */
   /* decide how many segments to include */
@@ -476,6 +496,7 @@ returned are to static buffers; do not free. The returned buffers are
 good only until the next call (using the same ogg_stream_state) */
 
 int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
+  if(ogg_stream_check(os)) return 0;
 
   if((os->e_o_s&&os->lacing_fill) ||          /* 'were done, now flush' case */
      os->body_fill-os->body_returned > 4096 ||/* 'page nominal size' case */
@@ -486,10 +507,11 @@ int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
   }
   
   /* not enough data to construct a page and not end of stream */
-  return(0);
+  return 0;
 }
 
 int ogg_stream_eos(ogg_stream_state *os){
+  if(ogg_stream_check(os)) return 1;
   return os->e_o_s;
 }
 
@@ -511,6 +533,7 @@ int ogg_stream_eos(ogg_stream_state *os){
 /* initialize the struct to a known state */
 int ogg_sync_init(ogg_sync_state *oy){
   if(oy){
+    oy->storage = -1; /* used as a readiness flag */
     memset(oy,0,sizeof(*oy));
   }
   return(0);
@@ -520,7 +543,7 @@ int ogg_sync_init(ogg_sync_state *oy){
 int ogg_sync_clear(ogg_sync_state *oy){
   if(oy){
     if(oy->data)_ogg_free(oy->data);
-    ogg_sync_init(oy);
+    memset(oy,0,sizeof(*oy));
   }
   return(0);
 }
@@ -533,7 +556,13 @@ int ogg_sync_destroy(ogg_sync_state *oy){
   return(0);
 }
 
+int ogg_sync_check(ogg_sync_state *oy){
+  if(oy->storage<0) return -1;
+  return 0;
+}
+
 char *ogg_sync_buffer(ogg_sync_state *oy, long size){
+  if(ogg_sync_check(oy)) return NULL;
 
   /* first, clear out any space that has been previously returned */
   if(oy->returned){
@@ -552,7 +581,10 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
       ret=_ogg_realloc(oy->data,newsize);
     else
       ret=_ogg_malloc(newsize);
-    if(!ret)return NULL;
+    if(!ret){
+      ogg_sync_clear(oy);
+      return NULL;
+    }
     oy->data=ret;
     oy->storage=newsize;
   }
@@ -562,7 +594,8 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
 }
 
 int ogg_sync_wrote(ogg_sync_state *oy, long bytes){
-  if(oy->fill+bytes>oy->storage)return(-1);
+  if(ogg_sync_check(oy))return -1;
+  if(oy->fill+bytes>oy->storage)return -1;
   oy->fill+=bytes;
   return(0);
 }
@@ -581,6 +614,8 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
   unsigned char *page=oy->data+oy->returned;
   unsigned char *next;
   long bytes=oy->fill-oy->returned;
+
+  if(ogg_sync_check(oy))return 0;
   
   if(oy->headerbytes==0){
     int headerbytes,i;
@@ -675,6 +710,8 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
 
 int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
 
+  if(ogg_sync_check(oy))return 0;
+
   /* all we need to do is verify a page at the head of the stream
      buffer.  If it doesn't verify, we look for the next potential
      frame */
@@ -719,6 +756,8 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   long pageno=ogg_page_pageno(og);
   int segments=header[26];
   
+  if(ogg_stream_check(os)) return -1;
+
   /* clean up 'returned data' */
   {
     long lr=os->lacing_returned;
@@ -750,7 +789,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   if(serialno!=os->serialno)return(-1);
   if(version>0)return(-1);
 
-  if(_os_lacing_expand(os,segments+1))return -1;
+  if(_os_lacing_expand(os,segments+1)) return -1;
 
   /* are we in sequence? */
   if(pageno!=os->pageno){
@@ -787,7 +826,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   }
   
   if(bodysize){
-    if(_os_body_expand(os,bodysize))return -1;
+    if(_os_body_expand(os,bodysize)) return -1;
     memcpy(os->body_data+os->body_fill,body,bodysize);
     os->body_fill+=bodysize;
   }
@@ -832,6 +871,8 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
 
 /* clear things to an initial state.  Good to call, eg, before seeking */
 int ogg_sync_reset(ogg_sync_state *oy){
+  if(ogg_sync_check(oy))return -1;
+
   oy->fill=0;
   oy->returned=0;
   oy->unsynced=0;
@@ -841,6 +882,8 @@ int ogg_sync_reset(ogg_sync_state *oy){
 }
 
 int ogg_stream_reset(ogg_stream_state *os){
+  if(ogg_stream_check(os)) return -1;
+
   os->body_fill=0;
   os->body_returned=0;
 
@@ -860,6 +903,7 @@ int ogg_stream_reset(ogg_stream_state *os){
 }
 
 int ogg_stream_reset_serialno(ogg_stream_state *os,int serialno){
+  if(ogg_stream_check(os)) return -1;
   ogg_stream_reset(os);
   os->serialno=serialno;
   return(0);
@@ -920,10 +964,12 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 }
 
 int ogg_stream_packetout(ogg_stream_state *os,ogg_packet *op){
+  if(ogg_stream_check(os)) return 0;
   return _packetout(os,op,1);
 }
 
 int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
+  if(ogg_stream_check(os)) return 0;
   return _packetout(os,op,0);
 }
 

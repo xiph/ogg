@@ -23,7 +23,8 @@
 href="ogg_stream_packetin.html">ogg_stream_packetin()</a> to submit 
 data packets to the bitstream. Internally, this function assembles 
 the accumulated packet bodies into an Ogg page suitable for writing 
-to a stream.</p>
+to a stream. The function is typically called in a loop until there
+are no more pages ready for output.</p>
 
 <p>This function will only return a page when a "reasonable" amount of 
 packet data is available. Normally this is appropriate since it 

@@ -168,7 +168,7 @@ simply using two bytes at the head of every packet and having a max
 packet size of 32k. Small packets (&lt;255, the typical case) are
 penalized with twice the segmentation overhead). Using the lacing
 values as suggested, small packets see the minimum possible
-byte-aligned overheade (1 byte) and large packets, over 512 bytes or
+byte-aligned overhead (1 byte) and large packets, over 512 bytes or
 so, see a fairly constant ~.5% overhead on encoding space.</p>
 
 <p>Note that a lacing value of 255 implies that a second lacing value

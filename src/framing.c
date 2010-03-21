@@ -1,11 +1,11 @@
 /********************************************************************
  *                                                                  *
- * THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.   *
+ * THIS FILE IS PART OF THE Ogg CONTAINER SOURCE CODE.              *
  * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2009             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2010             *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
@@ -366,21 +366,10 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
   return ogg_stream_iovecin(os, &iov, 1, op->e_o_s, op->granulepos);
 }
 
-/* This will flush remaining packets into a page (returning nonzero),
-   even if there is not enough data to trigger a flush normally
-   (undersized page). If there are no packets or partial packets to
-   flush, ogg_stream_flush returns 0.  Note that ogg_stream_flush will
-   try to flush a normal sized page like ogg_stream_pageout; a call to
-   ogg_stream_flush does not guarantee that all packets have flushed.
-   Only a return value of 0 from ogg_stream_flush indicates all packet
-   data is flushed into pages.
-
-   since ogg_stream_flush will flush the last page in a stream even if
-   it's undersized, you almost certainly want to use ogg_stream_pageout
-   (and *not* ogg_stream_flush) unless you specifically need to flush 
-   an page regardless of size in the middle of a stream. */
-
-int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
+/* Conditionally flush a page; force==0 will only flush nominal-size
+   pages, force==1 forces us to flush a page regardless of page size
+   so long as there's any data available at all. */
+static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force){
   int i;
   int vals=0;
   int maxvals=(os->lacing_fill>255?255:os->lacing_fill);
@@ -388,12 +377,12 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   long acc=0;
   ogg_int64_t granule_pos=-1;
 
-  if(ogg_stream_check(os)) return 0;
-  if(maxvals==0)return 0;
-  
+  if(ogg_stream_check(os)) return(0);
+  if(maxvals==0) return(0);
+
   /* construct a page */
   /* decide how many segments to include */
-  
+
   /* If this is the initial header case, the first page must only include
      the initial header packet */
   if(os->b_o_s==0){  /* 'initial header page' case */
@@ -405,20 +394,41 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
       }
     }
   }else{
+
+    /* The extra packets_done, packet_just_done logic here attempts to do two things:
+       1) Don't unneccessarily span pages.
+       2) Unless necessary, don't flush pages if there are less than four packets on
+          them; this expands page size to reduce unneccessary overhead if incoming packets
+          are large.
+       These are not necessary behaviors, just 'always better than naive flushing'
+       without requiring an application to explicitly request a specific optimized
+       behavior. We'll want an explicit behavior setup pathway eventually as well. */
+
+    int packets_done=0;
+    int packet_just_done=0;
     for(vals=0;vals<maxvals;vals++){
-      if(acc>4096)break;
+      if(acc>4096 && packet_just_done>=4){
+        force=1;
+        break;
+      }
       acc+=os->lacing_vals[vals]&0x0ff;
-      if((os->lacing_vals[vals]&0xff)<255)
+      if((os->lacing_vals[vals]&0xff)<255){
         granule_pos=os->granule_vals[vals];
+        packet_just_done=++packets_done;
+      }else
+        packet_just_done=0;
     }
+    if(vals==255)force=1;
   }
-  
+
+  if(!force) return(0);
+
   /* construct the header in temp storage */
   memcpy(os->header,"OggS",4);
-  
+
   /* stream structure version */
   os->header[4]=0x00;
-  
+
   /* continued packet flag? */
   os->header[5]=0x00;
   if((os->lacing_vals[0]&0x100)==0)os->header[5]|=0x01;
@@ -490,24 +500,37 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   return(1);
 }
 
+/* This will flush remaining packets into a page (returning nonzero),
+   even if there is not enough data to trigger a flush normally
+   (undersized page). If there are no packets or partial packets to
+   flush, ogg_stream_flush returns 0.  Note that ogg_stream_flush will
+   try to flush a normal sized page like ogg_stream_pageout; a call to
+   ogg_stream_flush does not guarantee that all packets have flushed.
+   Only a return value of 0 from ogg_stream_flush indicates all packet
+   data is flushed into pages.
+
+   since ogg_stream_flush will flush the last page in a stream even if
+   it's undersized, you almost certainly want to use ogg_stream_pageout
+   (and *not* ogg_stream_flush) unless you specifically need to flush
+   an page regardless of size in the middle of a stream. */
+
+int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
+  return ogg_stream_flush_i(os,og,1);
+}
 
 /* This constructs pages from buffered packet segments.  The pointers
 returned are to static buffers; do not free. The returned buffers are
 good only until the next call (using the same ogg_stream_state) */
 
 int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
+  int force=0;
   if(ogg_stream_check(os)) return 0;
 
   if((os->e_o_s&&os->lacing_fill) ||          /* 'were done, now flush' case */
-     os->body_fill-os->body_returned > 4096 ||/* 'page nominal size' case */
-     os->lacing_fill>=255 ||                  /* 'segment table full' case */
-     (os->lacing_fill&&!os->b_o_s)){          /* 'initial header page' case */
-        
-    return(ogg_stream_flush(os,og));
-  }
-  
-  /* not enough data to construct a page and not end of stream */
-  return 0;
+     (os->lacing_fill&&!os->b_o_s))           /* 'initial header page' case */
+    force=1;
+
+  return(ogg_stream_flush_i(os,og,force));
 }
 
 int ogg_stream_eos(ogg_stream_state *os){

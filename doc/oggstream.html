@@ -462,7 +462,7 @@ preceding segment have terminated. </p>
 
 <em>[More to come shortly; this section is currently being revised and expanded]</em>
 
-<p>Below, we present an example of a grouped and chained bitstream:</p>
+<p>Below, we present an example of a multiplexed and chained bitstream:</p>
 
 <p><img src="stream.png" alt="stream"/></p>
 
@@ -471,18 +471,15 @@ multiplexed into a physical bitstream. Note the following
 characteristics:</p>
 
 <ol>
-<li>Grouped bitstreams begin together; all of the initial pages
-must appear before any data pages. When concurrently multiplexed
-groups are chained, the new group does not begin until all the
-bitstreams in the previous group have terminated.</li>
+<li>Multiplexed bitstreams in a given link begin together; all of the
+initial pages must appear before any data pages. When concurrently
+multiplexed groups are chained, the new group does not begin until all
+the bitstreams in the previous group have terminated.</li>
 
-<li>The pages of concurrently multiplexed bitstreams need not conform
-to a regular order; the only requirement is that page <tt>n</tt> of a
-logical bitstream follow page <tt>n-1</tt> in the physical bitstream.
-There are no restrictions on intervening pages belonging to other
-logical bitstreams. (Tying page appearance to bitrate demands is one
-logical strategy, ie, the page appears at the chronological point
-where decode requires more information).</li>
+<li>The ordering of pages of concurrently multiplexed bitstreams is
+goverened by timestamp (not shown here); there is no regular
+interleaving order.  Pages within a logical bitstream appear in
+sequence order.</li>
 </ol>
 
 <div id="copyright">

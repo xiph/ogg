@@ -1007,13 +1007,13 @@ void ogg_packet_clear(ogg_packet *op) {
 ogg_stream_state os_en, os_de;
 ogg_sync_state oy;
 
-void checkpacket(ogg_packet *op,int len, int no, int pos){
+void checkpacket(ogg_packet *op,long len, int no, long pos){
   long j;
   static int sequence=0;
   static int lastno=0;
 
   if(op->bytes!=len){
-    fprintf(stderr,"incorrect packet length (%d != %d)!\n",op->bytes,len);
+    fprintf(stderr,"incorrect packet length (%ld != %ld)!\n",op->bytes,len);
     exit(1);
   }
   if(op->granulepos!=pos){
@@ -1544,7 +1544,7 @@ void test_pack(const int *pl, const int **headers, int byteskip,
             if(ret<0)continue;
             /* got a page.  Happy happy.  Verify that it's good. */
             
-            fprintf(stderr,"(%ld), ",pageout);
+            fprintf(stderr,"(%d), ",pageout);
 
             check_page(data+deptr,headers[pageout],&og_de);
             deptr+=og_de.body_len;

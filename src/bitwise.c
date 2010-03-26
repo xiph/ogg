@@ -692,7 +692,7 @@ int main(void){
   fprintf(stderr,"ok.");
 
   fprintf(stderr,"\nTesting read past end (LSb): ");
-  oggpack_readinit(&r,"\0\0\0\0\0\0\0\0",8);
+  oggpack_readinit(&r,(unsigned char *)"\0\0\0\0\0\0\0\0",8);
   for(i=0;i<64;i++){
     if(oggpack_read(&r,1)!=0){
       fprintf(stderr,"failed; got -1 prematurely.\n");
@@ -704,7 +704,7 @@ int main(void){
       fprintf(stderr,"failed; read past end without -1.\n");
       exit(1);
   }
-  oggpack_readinit(&r,"\0\0\0\0\0\0\0\0",8);
+  oggpack_readinit(&r,(unsigned char *)"\0\0\0\0\0\0\0\0",8);
   if(oggpack_read(&r,30)!=0 || oggpack_read(&r,16)!=0){
       fprintf(stderr,"failed 2; got -1 prematurely.\n");
       exit(1);
@@ -778,7 +778,7 @@ int main(void){
   fprintf(stderr,"ok.");
 
   fprintf(stderr,"\nTesting read past end (MSb): ");
-  oggpackB_readinit(&r,"\0\0\0\0\0\0\0\0",8);
+  oggpackB_readinit(&r,(unsigned char *)"\0\0\0\0\0\0\0\0",8);
   for(i=0;i<64;i++){
     if(oggpackB_read(&r,1)!=0){
       fprintf(stderr,"failed; got -1 prematurely.\n");
@@ -790,7 +790,7 @@ int main(void){
       fprintf(stderr,"failed; read past end without -1.\n");
       exit(1);
   }
-  oggpackB_readinit(&r,"\0\0\0\0\0\0\0\0",8);
+  oggpackB_readinit(&r,(unsigned char *)"\0\0\0\0\0\0\0\0",8);
   if(oggpackB_read(&r,30)!=0 || oggpackB_read(&r,16)!=0){
       fprintf(stderr,"failed 2; got -1 prematurely.\n");
       exit(1);

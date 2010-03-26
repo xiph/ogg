@@ -1013,11 +1013,11 @@ void checkpacket(ogg_packet *op,int len, int no, int pos){
   static int lastno=0;
 
   if(op->bytes!=len){
-    fprintf(stderr,"incorrect packet length!\n");
+    fprintf(stderr,"incorrect packet length (%d != %d)!\n",op->bytes,len);
     exit(1);
   }
   if(op->granulepos!=pos){
-    fprintf(stderr,"incorrect packet position!\n");
+    fprintf(stderr,"incorrect packet granpos (%ld != %ld)!\n",(long)op->granulepos,pos);
     exit(1);
   }
 
@@ -1184,18 +1184,72 @@ const int head1_4[] = {0x4f,0x67,0x67,0x53,0,0x02,
 const int head2_4[] = {0x4f,0x67,0x67,0x53,0,0x00,
                        0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
                        0x01,0x02,0x03,0x04,1,0,0,0,
-                       0x54,0x05,0x51,0xc8,
-                       17,
+                       0xf8,0x3c,0x19,0x79,
+                       255,
                        255,255,255,255,255,255,255,255,
-                       255,255,255,255,255,255,255,255,255};
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255};
 
 const int head3_4[] = {0x4f,0x67,0x67,0x53,0,0x05,
                        0x07,0x0c,0x00,0x00,0x00,0x00,0x00,0x00,
                        0x01,0x02,0x03,0x04,2,0,0,0,
-                       0xc8,0xc3,0xcb,0xed,
-                       5,
-                       10,255,4,255,0};
+                       0x38,0xe6,0xb6,0x28,
+                       6,
+                       255,220,255,4,255,0};
 
+
+/* spill expansion test */
+const int head1_4b[] = {0x4f,0x67,0x67,0x53,0,0x02,
+                        0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                        0x01,0x02,0x03,0x04,0,0,0,0,
+                        0xff,0x7b,0x23,0x17,
+                        1,
+                        0};
+
+const int head2_4b[] = {0x4f,0x67,0x67,0x53,0,0x00,
+                        0x07,0x10,0x00,0x00,0x00,0x00,0x00,0x00,
+                        0x01,0x02,0x03,0x04,1,0,0,0,
+                        0xce,0x8f,0x17,0x1a,
+                        23,
+                        255,255,255,255,255,255,255,255,
+                        255,255,255,255,255,255,255,255,255,10,255,4,255,0,0};
+
+
+const int head3_4b[] = {0x4f,0x67,0x67,0x53,0,0x04,
+                        0x07,0x14,0x00,0x00,0x00,0x00,0x00,0x00,
+                        0x01,0x02,0x03,0x04,2,0,0,0,
+                        0x9b,0xb2,0x50,0xa1,
+                        1,
+                        0};
 
 /* page with the 255 segment limit */
 const int head1_5[] = {0x4f,0x67,0x67,0x53,0,0x02,
@@ -1262,25 +1316,86 @@ const int head1_6[] = {0x4f,0x67,0x67,0x53,0,0x02,
 const int head2_6[] = {0x4f,0x67,0x67,0x53,0,0x00,
                        0x07,0x04,0x00,0x00,0x00,0x00,0x00,0x00,
                        0x01,0x02,0x03,0x04,1,0,0,0,
-                       0x3c,0xd9,0x4d,0x3f,
-                       17,
-                       100,255,255,255,255,255,255,255,255,
-                       255,255,255,255,255,255,255,255};
+                       0x68,0x22,0x7c,0x3d,
+                       255,
+                       100,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255};
 
 const int head3_6[] = {0x4f,0x67,0x67,0x53,0,0x01,
                        0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
                        0x01,0x02,0x03,0x04,2,0,0,0,
-                       0x01,0xd2,0xe5,0xe5,
-                       17,
+                       0xf4,0x87,0xba,0xf3,
+                       255,
                        255,255,255,255,255,255,255,255,
-                       255,255,255,255,255,255,255,255,255};
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255};
 
 const int head4_6[] = {0x4f,0x67,0x67,0x53,0,0x05,
                        0x07,0x10,0x00,0x00,0x00,0x00,0x00,0x00,
                        0x01,0x02,0x03,0x04,3,0,0,0,
-                       0xef,0xdd,0x88,0xde,
-                       7,
-                       255,255,75,255,4,255,0};
+                       0xf7,0x2f,0x6c,0x60,
+                       5,
+                       254,255,4,255,0};
 
 /* packet that overspans over an entire page */
 const int head1_7[] = {0x4f,0x67,0x67,0x53,0,0x02,
@@ -1293,18 +1408,50 @@ const int head1_7[] = {0x4f,0x67,0x67,0x53,0,0x02,
 const int head2_7[] = {0x4f,0x67,0x67,0x53,0,0x00,
                        0x07,0x04,0x00,0x00,0x00,0x00,0x00,0x00,
                        0x01,0x02,0x03,0x04,1,0,0,0,
-                       0x3c,0xd9,0x4d,0x3f,
-                       17,
-                       100,255,255,255,255,255,255,255,255,
-                       255,255,255,255,255,255,255,255};
+                       0x68,0x22,0x7c,0x3d,
+                       255,
+                       100,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255,255,255,
+                       255,255,255,255,255,255};
 
 const int head3_7[] = {0x4f,0x67,0x67,0x53,0,0x05,
                        0x07,0x08,0x00,0x00,0x00,0x00,0x00,0x00,
                        0x01,0x02,0x03,0x04,2,0,0,0,
                        0xd4,0xe0,0x60,0xe5,
-                       1,0};
+                       1,
+                       0};
 
-void test_pack(const int *pl, const int **headers, int byteskip, 
+void test_pack(const int *pl, const int **headers, int byteskip,
                int pageskip, int packetskip){
   unsigned char *data=_ogg_malloc(1024*1024); /* for scripted test cases only */
   long inptr=0;
@@ -1496,7 +1643,7 @@ int main(void){
     /* 17 only */
     const int packets[]={17, -1};
     const int *headret[]={head1_0,NULL};
-    
+
     fprintf(stderr,"testing single page encoding... ");
     test_pack(packets,headret,0,0,0);
   }
@@ -1505,7 +1652,7 @@ int main(void){
     /* 17, 254, 255, 256, 500, 510, 600 byte, pad */
     const int packets[]={17, 254, 255, 256, 500, 510, 600, -1};
     const int *headret[]={head1_1,head2_1,NULL};
-    
+
     fprintf(stderr,"testing basic page encoding... ");
     test_pack(packets,headret,0,0,0);
   }
@@ -1514,7 +1661,7 @@ int main(void){
     /* nil packets; beginning,middle,end */
     const int packets[]={0,17, 254, 255, 0, 256, 0, 500, 510, 600, 0, -1};
     const int *headret[]={head1_2,head2_2,NULL};
-    
+
     fprintf(stderr,"testing basic nil packets... ");
     test_pack(packets,headret,0,0,0);
   }
@@ -1523,17 +1670,27 @@ int main(void){
     /* large initial packet */
     const int packets[]={4345,259,255,-1};
     const int *headret[]={head1_3,head2_3,NULL};
-    
+
     fprintf(stderr,"testing initial-packet lacing > 4k... ");
     test_pack(packets,headret,0,0,0);
   }
 
   {
-    /* continuing packet test */
-    const int packets[]={0,4345,259,255,-1};
+    /* continuing packet test; with page spill expansion, we have to
+       overflow the lacing table. */
+    const int packets[]={0,65500,259,255,-1};
     const int *headret[]={head1_4,head2_4,head3_4,NULL};
-    
+
     fprintf(stderr,"testing single packet page span... ");
+    test_pack(packets,headret,0,0,0);
+  }
+
+  {
+    /* spill expand packet test */
+    const int packets[]={0,4345,259,255,0,0,-1};
+    const int *headret[]={head1_4b,head2_4b,head3_4b,NULL};
+
+    fprintf(stderr,"testing page spill expansion... ");
     test_pack(packets,headret,0,0,0);
   }
 
@@ -1580,7 +1737,7 @@ int main(void){
 
   {
     /* packet that overspans over an entire page */
-    const int packets[]={0,100,9000,259,255,-1};
+    const int packets[]={0,100,130049,259,255,-1};
     const int *headret[]={head1_6,head2_6,head3_6,head4_6,NULL};
     
     fprintf(stderr,"testing very large packets... ");
@@ -1590,7 +1747,7 @@ int main(void){
   {
     /* test for the libogg 1.1.1 resync in large continuation bug
        found by Josh Coalson)  */
-    const int packets[]={0,100,9000,259,255,-1};
+    const int packets[]={0,100,130049,259,255,-1};
     const int *headret[]={head1_6,head2_6,head3_6,head4_6,NULL};
     
     fprintf(stderr,"testing continuation resync in very large packets... ");
@@ -1599,7 +1756,7 @@ int main(void){
 
   {
     /* term only page.  why not? */
-    const int packets[]={0,100,4080,-1};
+    const int packets[]={0,100,64770,-1};
     const int *headret[]={head1_7,head2_7,head3_7,NULL};
     
     fprintf(stderr,"testing zero data page (1 nil packet)... ");
@@ -1611,7 +1768,7 @@ int main(void){
   {
     /* build a bunch of pages for testing */
     unsigned char *data=_ogg_malloc(1024*1024);
-    int pl[]={0,100,4079,2956,2057,76,34,912,0,234,1000,1000,1000,300,-1};
+    int pl[]={0, 1,1,98,4079, 1,1,2954,2057, 76,34,912,0,234,1000,1000, 1000,300,-1};
     int inptr=0,i,j;
     ogg_page og[5];
     
@@ -1672,17 +1829,21 @@ int main(void){
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
       checkpacket(&test,0,0,0);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,100,1,-1);
+      checkpacket(&test,1,1,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,4079,2,3000);
+      checkpacket(&test,1,2,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,98,3,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,4079,4,5000);
       if(ogg_stream_packetout(&os_de,&test)!=-1){
         fprintf(stderr,"Error: loss of page did not return error\n");
         exit(1);
       }
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,76,5,-1);
+      checkpacket(&test,76,9,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,34,6,-1);
+      checkpacket(&test,34,10,-1);
       fprintf(stderr,"ok.\n");
     }
 
@@ -1715,24 +1876,34 @@ int main(void){
       ogg_stream_pagein(&os_de,&temp);
 
       /* do we get the expected results/packets? */
-      
+
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
       checkpacket(&test,0,0,0);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,100,1,-1);
+      checkpacket(&test,1,1,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,4079,2,3000);
+      checkpacket(&test,1,2,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,2956,3,4000);
+      checkpacket(&test,98,3,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,4079,4,5000);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,1,5,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,1,6,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,2954,7,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,2057,8,9000);
       if(ogg_stream_packetout(&os_de,&test)!=-1){
         fprintf(stderr,"Error: loss of page did not return error\n");
         exit(1);
       }
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,300,13,14000);
+      checkpacket(&test,300,17,18000);
       fprintf(stderr,"ok.\n");
     }
-    
+
     /* the rest only test sync */
     {
       ogg_page og_de;
@@ -1743,35 +1914,35 @@ int main(void){
              3);
       ogg_sync_wrote(&oy,3);
       if(ogg_sync_pageout(&oy,&og_de)>0)error();
-      
+
       /* Test fractional page inputs: incomplete fixed header */
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header+3,
              20);
       ogg_sync_wrote(&oy,20);
       if(ogg_sync_pageout(&oy,&og_de)>0)error();
-      
+
       /* Test fractional page inputs: incomplete header */
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header+23,
              5);
       ogg_sync_wrote(&oy,5);
       if(ogg_sync_pageout(&oy,&og_de)>0)error();
-      
+
       /* Test fractional page inputs: incomplete body */
-      
+
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header+28,
              og[1].header_len-28);
       ogg_sync_wrote(&oy,og[1].header_len-28);
       if(ogg_sync_pageout(&oy,&og_de)>0)error();
-      
+
       memcpy(ogg_sync_buffer(&oy,og[1].body_len),og[1].body,1000);
       ogg_sync_wrote(&oy,1000);
       if(ogg_sync_pageout(&oy,&og_de)>0)error();
-      
+
       memcpy(ogg_sync_buffer(&oy,og[1].body_len),og[1].body+1000,
              og[1].body_len-1000);
       ogg_sync_wrote(&oy,og[1].body_len-1000);
       if(ogg_sync_pageout(&oy,&og_de)<=0)error();
-      
+
       fprintf(stderr,"ok.\n");
     }
 
@@ -1779,7 +1950,7 @@ int main(void){
     {
       ogg_page og_de;
       fprintf(stderr,"Testing sync on 1+partial inputs... ");
-      ogg_sync_reset(&oy); 
+      ogg_sync_reset(&oy);
 
       memcpy(ogg_sync_buffer(&oy,og[1].header_len),og[1].header,
              og[1].header_len);

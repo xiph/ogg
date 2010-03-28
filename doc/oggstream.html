@@ -60,11 +60,44 @@ li {
   color: #888888;
   clear: both;
 }
+
+.caption {
+  color: #000000;
+  background-color: #aabbff;
+  margin: 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+  padding: 1em;
+  padding-bottom: 0em;
+  overflow: hidden;
+}
+
+.caption p {
+  clear: none;
+}
+
+.caption img {
+  display: block;
+  margin: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1.5em;
+  background-color: #ffffff;
+  padding: 10px;
+}
+   
+#thepage {
+  margin-left: auto;
+  margin-right: auto;
+  width: 840px;
+}
+
 </style>
 
 </head>
 
 <body>
+<div id="thepage">
 
 <div id="xiphlogo">
   <a href="http://www.xiph.org/"><img src="fish_xiph_org.png" alt="Fish Logo and Xiph.org"/></a>
@@ -332,6 +365,20 @@ boundary information; strung together, the unframed packets form a
 <em>logical bitstream</em> of apparently random bytes with no internal
 landmarks.
 
+<div class="caption">
+  <img src="packets.png"> 
+
+  <p> Packets of raw codec data are not typically internally framed.
+  When they are strung together into a stream without any container to
+  provide framing, they lose their individual boundaries. Seek and
+  capture are not possible within an unframed stream, and for many
+  codecs with variable length payloads and/or early-packet termination
+  (such as Vorbis), it may become impossible to recover the original
+  frame boundaries even if the stream is scanned linearly from
+  beginning to end.
+
+</div>
+
 <p>Logical bitstream packets are grouped and framed into Ogg pages
 along with a unique stream <em>serial number</em> to produce a
 <em>physical bitstream</em>.  An <em>elementary stream</em> is a
@@ -340,6 +387,23 @@ bitstream. Each page is a self contained entity, although a packet may
 be split and encoded across one or more pages. The page decode
 mechanism is designed to recognize, verify and handle single pages at
 a time from the overall bitstream.
+
+<div class="caption">
+  <img src="pages.png"> 
+
+  <p> The primary purpose of a container is to provide framing for raw
+  packets, marking the packet boundaries so the exact packets can be
+  retrieved for decode later.  The container also provides secondary
+  functions such as capture, timestamping, sequencing, stream
+  identification and so on.  Not all of these functions are represented in the diagram.
+
+  <p>In the Ogg container, pages do not necessarily contain
+  integer numbers of packets. Packets may span across page boundaries
+  or even multiple pages.  This is necessary as pages have a maximum
+  possible size in order to provide capture guarantees, but packet
+  size is unbounded.
+</div>
+
 
 <p><a href="framing.html">Ogg Bitstream Framing</a> specifies
 the page format of an Ogg bitstream, the packet coding process
@@ -455,8 +519,8 @@ scope of the physical bitstream.</p>
 consecutively. Such a physical bitstream obeys all the rules of both
 chained and multiplexed streams.  Each link, when unchained, must
 stand on its own as a valid physical bitstream.  Chained streams do
-not mix; a new segment may not begin until all streams in the
-preceding segment have terminated. </p>
+not mix or interleave; a new segment may not begin until all streams
+in the preceding segment have terminated. </p>
 
 <h2>Examples</h2>
 
@@ -489,5 +553,6 @@ sequence order.</li>
   These pages &copy; 1994 - 2010 Xiph.Org. All rights reserved.
 </div>
 
+</div>
 </body>
 </html>

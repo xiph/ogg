@@ -369,7 +369,7 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
 /* Conditionally flush a page; force==0 will only flush nominal-size
    pages, force==1 forces us to flush a page regardless of page size
    so long as there's any data available at all. */
-static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force){
+static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force, int nfill){
   int i;
   int vals=0;
   int maxvals=(os->lacing_fill>255?255:os->lacing_fill);
@@ -407,7 +407,7 @@ static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force){
     int packets_done=0;
     int packet_just_done=0;
     for(vals=0;vals<maxvals;vals++){
-      if(acc>4096 && packet_just_done>=4){
+      if(acc>nfill && packet_just_done>=8){
         force=1;
         break;
       }
@@ -515,7 +515,7 @@ static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force){
    an page regardless of size in the middle of a stream. */
 
 int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
-  return ogg_stream_flush_i(os,og,1);
+  return ogg_stream_flush_i(os,og,1,4096);
 }
 
 /* This constructs pages from buffered packet segments.  The pointers
@@ -530,7 +530,22 @@ int ogg_stream_pageout(ogg_stream_state *os, ogg_page *og){
      (os->lacing_fill&&!os->b_o_s))           /* 'initial header page' case */
     force=1;
 
-  return(ogg_stream_flush_i(os,og,force));
+  return(ogg_stream_flush_i(os,og,force,4096));
+}
+
+/* Like the above, but an argument is provided to adjust the nominal 
+page size for applications which are smart enough to provide their
+own delay based flushing */
+   
+int ogg_stream_pageout_fill(ogg_stream_state *os, ogg_page *og, int nfill){
+  int force=0;
+  if(ogg_stream_check(os)) return 0;
+
+  if((os->e_o_s&&os->lacing_fill) ||          /* 'were done, now flush' case */
+     (os->lacing_fill&&!os->b_o_s))           /* 'initial header page' case */
+    force=1;
+
+  return(ogg_stream_flush_i(os,og,force,nfill));
 }
 
 int ogg_stream_eos(ogg_stream_state *os){

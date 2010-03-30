@@ -192,10 +192,7 @@ consists of nothing more than a lacing value of zero in the header.</p>
 <p>Packets are not restricted to beginning and ending within a page,
 although individual segments are, by definition, required to do so.
 Packets are not restricted to a maximum size, although excessively
-large packets in the data stream are discouraged; the Ogg
-bitstream specification strongly recommends nominal page size of
-approximately 4-8kB (large packets are foreseen as being useful for
-initialization data at the beginning of a logical bitstream).</p>
+large packets in the data stream are discouraged.</p>
 
 <p>After segmenting a packet, the encoder may decide not to place all the
 resulting segments into the current page; to do so, the encoder places

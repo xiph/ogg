@@ -24,8 +24,9 @@ Ogg pages are the fundamental unit of framing and interleave in an ogg bitstream
 They are made up of packet segments of 255 bytes each. There can be as many as
 255 packet segments per page, for a maximum page size of a little under 64 kB.
 This is not a practical limitation as the segments can be joined across
-page boundaries allowing packets of arbitrary size. In practice pages are
-usually around 4 kB.
+page boundaries allowing packets of arbitrary size. In practice many
+applications will not completely fill all pages because they flush the
+accumulated packets periodically order to bound latency more tightly. 
 <p>
 <p>For a complete description of ogg pages and headers, please refer to the <a href="../framing.html">framing document</a>.
 

@@ -105,7 +105,7 @@ li {
 
 <h1>Ogg bitstream overview</h1>
 
-This document serves as starting point for understanding the design
+<p>This document serves as starting point for understanding the design
 and implementation of the Ogg container format.  If you're new to Ogg
 or merely want a high-level technical overview, start reading here.
 Other documents linked from the <a href="index.html">index page</a>
@@ -136,7 +136,8 @@ the Ogg container itself.  Metadata is thus compartmentalized and
 layered rather than part of a monolithic design, an especially good
 idea as no two groups seem able to agree on what a complete or
 complete-enough metadata set should be. In this way, the container and
-container implementation are isolated from unnecessary design flux.
+container implementation are isolated from unnecessary metadata design
+flux.
 
 <h3>Streaming</h3> 
 
@@ -296,21 +297,21 @@ buffer-ahead hinting.
 in an attempt to make the mux and codec layer implementations 'fully
 separable'.  Things like specific timebase, keyframing strategy, frame
 duration, etc, do not appear in the Ogg container.  The mux layer is,
-instead, expected to query a codec through a standardized interface,
+instead, expected to query a codec through a centralized interface,
 left to the implementation, for this data when it is needed.
 
 <p>Though modern design wisdom usually prefers to predict all possible
 needs of current and future codecs then embed these dependencies and
 the required metadata into the container itself, this strategy
 increases container specification complexity, fragility, and rigidity.
-The mux and codec implementations become more independent, but the
-specifications become less independent. A codec can't do what a
-container hasn't already provided for.  New codecs are harder to
-support, and you can do fewer useful things with the ones you've
+The mux and codec code becomes more independent, but the
+specifications become logically less independent. A codec can't do
+what a container hasn't already provided for.  Novel codecs are harder
+to support, and you can do fewer useful things with the ones you've
 already got (eg, try to make a good splitter without using any codecs.
-You're stuck splitting at keyframes only, or building yet another new
-mechanism into the container layer to mark what frames to skip
-displaying).
+Such a splitter is limited to splitting at keyframes only, or building
+yet another new mechanism into the container layer to mark what frames
+to skip displaying).
 
 <p>Ogg's design goes the opposite direction, where the specification
 is to be as simple, easy to understand, and 'proofed' against novel
@@ -326,8 +327,8 @@ declaring the structure and interrelations between multiple media
 types in a muxed stream.  That is, the Ogg container itself does not
 specify data like 'which steam is the subtitle stream?' or 'which
 video stream is the primary angle?'.  This metadata still exists, but
-is stored in the Ogg container rather than being built into the Ogg
-container.  Xiph specifies the 'Skeleton' metadata format for Ogg
+is stored by the Ogg container rather than being built into the Ogg
+container itself.  Xiph specifies the 'Skeleton' metadata format for Ogg
 streams, but this decoupling of container and stream structure
 metadata means it is possible to use Ogg with any metadata
 specification without altering the container itself, or without stream
@@ -357,13 +358,12 @@ position.
 
 <h3>Packets, pages, and bitstreams</h3>
 
-<p>Ogg codecs use <em>packets</em>.  Packets are octet payloads of
-raw, compressed data, containing the data needed for a single
+<p>Ogg codecs place raw compressed data into <em>packets</em>.
+Packets are octet payloads containing the data needed for a single
 decompressed unit, eg, one video frame. Packets have no maximum size
-and may be zero length. They do not have any high-level structure or
-boundary information; strung together, the unframed packets form a
-<em>logical bitstream</em> of apparently random bytes with no internal
-landmarks.
+and may be zero length. They do not generally have any framing
+information; strung together, the unframed packets form a <em>logical
+bitstream</em> of codec data with no internal landmarks.
 
 <div class="caption">
   <img src="packets.png"> 
@@ -382,11 +382,11 @@ landmarks.
 <p>Logical bitstream packets are grouped and framed into Ogg pages
 along with a unique stream <em>serial number</em> to produce a
 <em>physical bitstream</em>.  An <em>elementary stream</em> is a
-physical bitstream containing only the pages framing a single logical
-bitstream. Each page is a self contained entity, although a packet may
-be split and encoded across one or more pages. The page decode
-mechanism is designed to recognize, verify and handle single pages at
-a time from the overall bitstream.
+physical bitstream containing only a single logical bitstream. Each
+page is a self contained entity, although a packet may be split and
+encoded across one or more pages. The page decode mechanism is
+designed to recognize, verify and handle single pages at a time from
+the overall bitstream.
 
 <div class="caption">
   <img src="pages.png"> 

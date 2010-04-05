@@ -1251,18 +1251,19 @@ const int head1_4b[] = {0x4f,0x67,0x67,0x53,0,0x02,
                         0};
 
 const int head2_4b[] = {0x4f,0x67,0x67,0x53,0,0x00,
-                        0x07,0x10,0x00,0x00,0x00,0x00,0x00,0x00,
+                        0x07,0x20,0x00,0x00,0x00,0x00,0x00,0x00,
                         0x01,0x02,0x03,0x04,1,0,0,0,
-                        0xce,0x8f,0x17,0x1a,
-                        23,
+                        0xe6,0x54,0xfe,0x7d,
+                        27,
                         255,255,255,255,255,255,255,255,
-                        255,255,255,255,255,255,255,255,255,10,255,4,255,0,0};
+                        255,255,255,255,255,255,255,255,
+                        255,10,255,4,255,0,0,0,0,0,0};
 
 
 const int head3_4b[] = {0x4f,0x67,0x67,0x53,0,0x04,
-                        0x07,0x14,0x00,0x00,0x00,0x00,0x00,0x00,
+                        0x07,0x24,0x00,0x00,0x00,0x00,0x00,0x00,
                         0x01,0x02,0x03,0x04,2,0,0,0,
-                        0x9b,0xb2,0x50,0xa1,
+                        0x77,0x62,0xe0,0x12,
                         1,
                         0};
 
@@ -1702,7 +1703,7 @@ int main(void){
 
   {
     /* spill expand packet test */
-    const int packets[]={0,4345,259,255,0,0,-1};
+    const int packets[]={0,4345,259,255,0,0,0,0,0,0,-1};
     const int *headret[]={head1_4b,head2_4b,head3_4b,NULL};
 
     fprintf(stderr,"testing page spill expansion... ");
@@ -1783,7 +1784,7 @@ int main(void){
   {
     /* build a bunch of pages for testing */
     unsigned char *data=_ogg_malloc(1024*1024);
-    int pl[]={0, 1,1,98,4079, 1,1,2954,2057, 76,34,912,0,234,1000,1000, 1000,300,-1};
+    int pl[]={0, 0,0,0,0,1,1,98,4079, 0,0,0,0,1,1,2954,2057, 0,0,0,0,76,34,912,0,234,1000,1000, 1000,300,-1};
     int inptr=0,i,j;
     ogg_page og[5];
     
@@ -1844,21 +1845,37 @@ int main(void){
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
       checkpacket(&test,0,0,0);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,1,1,-1);
+      checkpacket(&test,0,1,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,1,2,-1);
+      checkpacket(&test,0,2,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,98,3,-1);
+      checkpacket(&test,0,3,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,4079,4,5000);
+      checkpacket(&test,0,4,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,1,5,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,1,6,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,98,7,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,4079,8,9000);
       if(ogg_stream_packetout(&os_de,&test)!=-1){
         fprintf(stderr,"Error: loss of page did not return error\n");
         exit(1);
       }
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,76,9,-1);
+      checkpacket(&test,0,17,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,34,10,-1);
+      checkpacket(&test,0,18,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,0,19,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,0,20,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,76,21,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,34,22,-1);
       fprintf(stderr,"ok.\n");
     }
 
@@ -1895,27 +1912,43 @@ int main(void){
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
       checkpacket(&test,0,0,0);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,1,1,-1);
+      checkpacket(&test,0,1,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,1,2,-1);
+      checkpacket(&test,0,2,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,98,3,-1);
+      checkpacket(&test,0,3,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,4079,4,5000);
+      checkpacket(&test,0,4,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
       checkpacket(&test,1,5,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
       checkpacket(&test,1,6,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,2954,7,-1);
+      checkpacket(&test,98,7,-1);
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,2057,8,9000);
+      checkpacket(&test,4079,8,9000);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,0,9,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,0,10,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,0,11,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,0,12,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,1,13,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,1,14,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,2954,15,-1);
+      if(ogg_stream_packetout(&os_de,&test)!=1)error();
+      checkpacket(&test,2057,16,17000);
       if(ogg_stream_packetout(&os_de,&test)!=-1){
         fprintf(stderr,"Error: loss of page did not return error\n");
         exit(1);
       }
       if(ogg_stream_packetout(&os_de,&test)!=1)error();
-      checkpacket(&test,300,17,18000);
+      checkpacket(&test,300,29,30000);
       fprintf(stderr,"ok.\n");
     }
 

@@ -424,6 +424,14 @@ physical bitstream by taking the pages in order from the physical
 bitstream and redirecting them into the appropriate logical decoding
 entity.
 
+<div class="caption">
+  <img src="multiplex1.png"> 
+
+<p>Multiple media types are mutliplexed into a single Ogg stream by
+interleaving the pages from each elementary physical stream.  
+
+</div>
+
 <p><a href="ogg-multiplex.html">Ogg Bitstream Multiplexing</a> specifies
 proper multiplexing of an Ogg bitstream in detail.
 
@@ -452,38 +460,9 @@ interleaved in order of the time stamp regardless of stream type.
 Both continuous and discontinuous logical streams are used to seek
 within a physical stream, however only continuous streams are used to
 determine buffering depth; because discontinuous streams are stamped
-by start time, they will always 'fall out' in time when buffering
-tracks only the continuous streams.  See 'Examples' for an
-illustration of the buffering mechanism.
-
-<h2>Mapping Requirements</h2>
-
-<p>Each codec is allowed some freedom in deciding how its logical
-bitstream is encapsulated into an Ogg bitstream (even if it is a
-trivial mapping, eg, 'plop the packets in and go'). This is the
-codec's <em>mapping</em>. Ogg imposes a few mapping requirements
-on any codec.
-
-<p>The <a href="framing.html">framing specification</a> defines
-'beginning of stream' and 'end of stream' page markers via a header
-flag (it is possible for a stream to consist of a single page). A
-correct stream always consists of an integer number of pages, an easy
-requirement given the variable size nature of pages.</p>
-
-<p>The first page of an elementary Ogg bitstream consists of a single,
-small 'initial header' packet that must include sufficient information
-to identify the exact CODEC type. From this initial header, the codec
-must also be able to determine its timebase and whether or not it is a
-continuous- or discontinuous-time stream.  The initial header must fit
-on a single page. If a codec makes use of auxiliary headers (for
-example, Vorbis uses two auxiliary headers), these headers must follow
-the initial header immediately.  The last header finishes its page;
-data begins on a fresh page.
-
-<p>As an example, Ogg Vorbis places the name and revision of the
-Vorbis CODEC, the audio rate and the audio quality into this initial
-header.  Comments and detailed codec setup appears in the larger
-auxiliary headers.</p>
+by start time, they will always 'fall out' at the proper time when
+buffering the continuous streams.  See 'Examples' for an illustration
+of the buffering mechanism.
 
 <h2>Multiplexing Requirements</h2>
 
@@ -493,24 +472,24 @@ of multiple elementary streams:
 
 <ol>
 
-<li> The initial header for each stream appears in sequence, each
+<li><p> The initial header for each stream appears in sequence, each
 header on a single page.  All initial headers must appear with no
 intervening data (no auxiliary header pages or packets, no data pages
 or packets).  Order of the initial headers is unspecified. The
 'beginning of stream' flag is set on each initial header.
 
-<li> All auxiliary headers for all streams must follow.  Order
+<li><p> All auxiliary headers for all streams must follow.  Order
 is unspecified.  The final auxiliary header of each stream must flush
 its page.
 
-<li>Data pages for each stream follow, interleaved in time order. 
+<li><p>Data pages for each stream follow, interleaved in time order. 
 
-<li>The final page of each stream sets the 'end of stream' flag.
+<li><p>The final page of each stream sets the 'end of stream' flag.
 Unlike initial pages, terminal pages for the logical bitstreams need
 not occur contiguously; indeed it may not be possible for them to do so.
 </oL>
 
-<p>Each grouped bitstream must have a unique serial number within the
+<p><p>Each grouped bitstream must have a unique serial number within the
 scope of the physical bitstream.</p>
 
 <h3>chaining and multiplexing</h3>
@@ -521,6 +500,57 @@ chained and multiplexed streams.  Each link, when unchained, must
 stand on its own as a valid physical bitstream.  Chained streams do
 not mix or interleave; a new segment may not begin until all streams
 in the preceding segment have terminated. </p>
+
+<h2>Codec Mapping Requirements</h2>
+
+<p>Each codec is allowed some freedom in deciding how its logical
+bitstream is encapsulated into an Ogg bitstream (even if it is a
+trivial mapping, eg, 'plop the packets in and go'). This is the
+codec's <em>mapping</em>. Ogg imposes a few mapping requirements
+on any codec.
+
+<ol>
+
+<li><p>The <a href="framing.html">framing specification</a> defines
+'beginning of stream' and 'end of stream' page markers via a header
+flag (it is possible for a stream to consist of a single page). A
+correct stream always consists of an integer number of pages, an easy
+requirement given the variable size nature of pages.</p>
+
+<li><p>The first page of an elementary Ogg bitstream consists of a single,
+small 'initial header' packet that must include sufficient information
+to identify the exact CODEC type. From this initial header, the codec
+must also be able to determine its timebase and whether or not it is a
+continuous- or discontinuous-time stream.  The initial header must fit
+on a single page. If a codec makes use of auxiliary headers (for
+example, Vorbis uses two auxiliary headers), these headers must follow
+the initial header immediately.  The last header finishes its page;
+data begins on a fresh page.
+
+<p><p>As an example, Ogg Vorbis places the name and revision of the
+Vorbis CODEC, the audio rate and the audio quality into this initial
+header.  Vorbis comments and detailed codec setup appears in the larger
+auxiliary headers.</p>
+
+<li><p>Granule positions must be translatable to an exact absolute
+time value.  As described above, the mux layer is permitted to query a
+codec or codec stub plugin to perform this mapping. It is not
+necessary for an absolute time to be mappable into a single unique
+granule position value.
+
+<li><p>Codecs are not required to use a fixed duration-per-packet (for
+example, Vorbis does not).  the mux layer is permitted to query a
+codec or codec stub plugin for the time duration of a packet.
+
+<li><p>Although an absolute time need not be translatable to a unique
+granule position, a codec must be able to determine the unique granule
+position of the current packet using the granule position of a
+preceeding packet.
+
+<li><p>Packets and pages must be arranged in ascending
+granule-position and time order.
+
+</ol>
 
 <h2>Examples</h2>
 

@@ -206,14 +206,9 @@ is tolerant of gross corruption.  Seek operations are neither 'fuzzy' nor
 heuristic.
 
 <p>Seeking without use of an index is a major point of the Ogg
-design. There are several reasons why Ogg forgoes an index:
+design. There two primary reasons why Ogg transport forgoes an index:
 			  
-<ul>
-
-<li>It must be possible to create an Ogg stream in a single pass, and
-an index requires either two passes to create, or the index must be
-tacked onto the end of a live stream after the stream is finished.
-Both methods run afoul of other design constraints.
+<ol>
 
 <li>An index is only marginally useful in Ogg for the complexity
 added; it adds no new functionality and seldom improves performance
@@ -227,7 +222,18 @@ only by building an internal index after reading the entire file
 beginning to end.  This has been the fate of other containers that
 specify optional indexing.
 
-</ul>
+</ol>
+
+<p>In addition, it must be possible to create an Ogg stream in a
+single pass. Although an optional index can simply be tacked on the
+end of the created stream, some software groups object to
+end-positioned indexes and claim to be unwilling to support indexes
+not located at the stream beginning.
+
+<p><i>All this said, it's become clear that an optional index is a
+demanded feature.  For this reason, the <a
+href="http://wiki.xiph.org/Ogg_Index">OggSkeleton now defines a
+proposed index.</a></i>
 
 <h3>Simple multiplexing</h3>
 

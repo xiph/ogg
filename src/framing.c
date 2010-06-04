@@ -972,7 +972,7 @@ static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
   /* Gather the whole packet. We'll have no holes or a partial packet */
   {
     int size=os->lacing_vals[ptr]&0xff;
-    int bytes=size;
+    long bytes=size;
     int eos=os->lacing_vals[ptr]&0x200; /* last packet of the stream? */
     int bos=os->lacing_vals[ptr]&0x100; /* first packet of the stream? */
 

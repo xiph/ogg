@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <ogg/ogg.h>
 
 #define BUFFER_INCREMENT 256
@@ -84,7 +85,7 @@ void oggpack_write(oggpack_buffer *b,unsigned long value,int bits){
   if(b->endbyte>=b->storage-4){
     void *ret;
     if(!b->ptr)return;
-    if(b->storage>TYPE_MAX(b->storage)-BUFFER_INCREMENT) goto err;
+    if(b->storage>LONG_MAX-BUFFER_INCREMENT) goto err;
     ret=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
     if(!ret) goto err;
     b->buffer=ret;
@@ -127,7 +128,7 @@ void oggpackB_write(oggpack_buffer *b,unsigned long value,int bits){
   if(b->endbyte>=b->storage-4){
     void *ret;
     if(!b->ptr)return;
-    if(b->storage>TYPE_MAX(b->storage)-BUFFER_INCREMENT) goto err;
+    if(b->storage>LONG_MAX-BUFFER_INCREMENT) goto err;
     ret=_ogg_realloc(b->buffer,b->storage+BUFFER_INCREMENT);
     if(!ret) goto err;
     b->buffer=ret;

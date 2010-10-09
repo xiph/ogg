@@ -17,8 +17,10 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function clears the memory used by the <a href="ogg_packet.html">ogg_packet</a> struct, and frees the internal allocated memory, but does not free
-the structure itself.
+<p>This function clears the memory used by the <a href="ogg_packet.html">ogg_packet</a> struct,
+but does not free the structure itself.
+It unconditionally frees the <i>packet</i> data buffer,
+then it zeros all structure members.
 <br><br>
 <table border=0 color=black cellspacing=0 cellpadding=7>
 <tr bgcolor=#cccccc>

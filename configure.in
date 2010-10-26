@@ -85,186 +85,64 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
+INCLUDE_INTTYPES_H=0
+INCLUDE_STDINT_H=0
+INCLUDE_SYS_TYPES_H=0
+AC_CHECK_HEADER(inttypes.h,INCLUDE_INTTYPES_H=1)
+AC_CHECK_HEADER(stdint.h,INCLUDE_STDINT_H=1)
+AC_CHECK_HEADER(sys/types.h,INCLUDE_SYS_TYPES_H=1)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 dnl Check for types
 
-AC_MSG_CHECKING(for int16_t)
-AC_CACHE_VAL(has_cv_int16_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-int16_t foo;
-int main() {return 0;}
-],
-has_cv_int16_t=yes,
-has_cv_int16_t=no,
-has_cv_int16_t=no
-)])
-AC_MSG_RESULT($has_cv_int16_t)
+AC_CHECK_SIZEOF(int16_t)
+AC_CHECK_SIZEOF(uint16_t)
+AC_CHECK_SIZEOF(u_int16_t)
+AC_CHECK_SIZEOF(int32_t)
+AC_CHECK_SIZEOF(uint32_t)
+AC_CHECK_SIZEOF(u_int32_t)
+AC_CHECK_SIZEOF(int64_t)
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
 
-AC_MSG_CHECKING(for int32_t)
-AC_CACHE_VAL(has_cv_int32_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-int32_t foo;
-int main() {return 0;}
-],
-has_cv_int32_t=yes,
-has_cv_int32_t=no,
-has_cv_int32_t=no
-)])
-AC_MSG_RESULT($has_cv_int32_t)
-
-AC_MSG_CHECKING(for uint32_t)
-AC_CACHE_VAL(has_cv_uint32_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-uint32_t foo;
-int main() {return 0;}
-],
-has_cv_uint32_t=yes,
-has_cv_uint32_t=no,
-has_cv_uint32_t=no
-)])
-AC_MSG_RESULT($has_cv_uint32_t)
-
-AC_MSG_CHECKING(for uint16_t)
-AC_CACHE_VAL(has_cv_uint16_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-uint16_t foo;
-int main() {return 0;}
-],
-has_cv_uint16_t=yes,
-has_cv_uint16_t=no,
-has_cv_uint16_t=no
-)])
-AC_MSG_RESULT($has_cv_uint16_t)
-
-AC_MSG_CHECKING(for u_int32_t)
-AC_CACHE_VAL(has_cv_u_int32_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-u_int32_t foo;
-int main() {return 0;}
-],
-has_cv_u_int32_t=yes,
-has_cv_u_int32_t=no,
-has_cv_u_int32_t=no
-)])
-AC_MSG_RESULT($has_cv_u_int32_t)
-
-AC_MSG_CHECKING(for u_int16_t)
-AC_CACHE_VAL(has_cv_u_int16_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-u_int16_t foo;
-int main() {return 0;}
-],
-has_cv_u_int16_t=yes,
-has_cv_u_int16_t=no,
-has_cv_u_int16_t=no
-)])
-AC_MSG_RESULT($has_cv_u_int16_t)
-
-AC_MSG_CHECKING(for int64_t)
-AC_CACHE_VAL(has_cv_int64_t,
-[AC_TRY_RUN([
-#if defined __BEOS__ && !defined __HAIKU__
-#include <inttypes.h>
-#endif
-#include <sys/types.h>
-int64_t foo;
-int main() {return 0;}
-],
-has_cv_int64_t=yes,
-has_cv_int64_t=no,
-has_cv_int64_t=no
-)])
-AC_MSG_RESULT($has_cv_int64_t)
-
-AC_CHECK_SIZEOF(short,2)
-AC_CHECK_SIZEOF(int,4)
-AC_CHECK_SIZEOF(long,4)
-AC_CHECK_SIZEOF(long long,8)
-
-
-if test x$has_cv_int16_t = "xyes" ; then
-        SIZE16="int16_t"
-else
-        case 2 in
-                $ac_cv_sizeof_short) SIZE16="short";;
-                $ac_cv_sizeof_int) SIZE16="int";;
-        esac
-fi
-
-if test x$has_cv_int32_t = "xyes" ; then
-        SIZE32="int32_t"
-else
-        case 4 in
-                $ac_cv_sizeof_short) SIZE32="short";;
-                $ac_cv_sizeof_int) SIZE32="int";;
-                $ac_cv_sizeof_long) SIZE32="long";;
-        esac
-fi
-
-if test x$has_cv_uint32_t = "xyes" ; then
-        USIZE32="uint32_t"
-else
-        if test x$has_cv_u_int32_t = "xyes" ; then
-                USIZE32="u_int32_t"
-        else
-                case 4 in
-                        $ac_cv_sizeof_short) USIZE32="unsigned short";;
-                        $ac_cv_sizeof_int) USIZE32="unsigned int";;
-                        $ac_cv_sizeof_long) USIZE32="unsigned long";;
-                esac
-        fi
-fi
-
-if test x$has_cv_uint16_t = "xyes" ; then
-        USIZE16="uint16_t"
-else
-        if test x$has_cv_u_int16_t = "xyes" ; then
-                USIZE16="u_int16_t"
-        else
-                case 2 in
-                        $ac_cv_sizeof_short) USIZE16="unsigned short";;
-                        $ac_cv_sizeof_int) USIZE16="unsigned int";;
-                        $ac_cv_sizeof_long) USIZE16="unsigned long";;
-                esac
-        fi
-fi
-
-if test x$has_cv_int64_t = "xyes" ; then
-        SIZE64="int64_t"
-else
-case 8 in
-        $ac_cv_sizeof_int) SIZE64="int";;
-        $ac_cv_sizeof_long) SIZE64="long";;
-        $ac_cv_sizeof_long_long) SIZE64="long long";;
+case 2 in
+     $ac_cv_sizeof_short) SIZE16="short";;
+     $ac_cv_sizeof_int) SIZE16="int";;
+     $ac_cv_sizeof_int16_t) SIZE16="int16_t";;
 esac
-fi
+
+case 2 in
+     $ac_cv_sizeof_short) USIZE16="unsigned short";;
+     $ac_cv_sizeof_int) USIZE16="unsigned int";;
+     $ac_cv_sizeof_u_int16_t) USIZE16="u_int16_t";;
+     $ac_cv_sizeof_uint16_t) USIZE16="uint16_t";;
+esac
+
+case 4 in
+     $ac_cv_sizeof_short) SIZE32="short";;
+     $ac_cv_sizeof_int) SIZE32="int";;
+     $ac_cv_sizeof_long) SIZE32="long";;
+     $ac_cv_sizeof_int32_t) SIZE32="int32_t";;
+esac
+
+case 4 in
+     $ac_cv_sizeof_short) USIZE32="unsigned short";;
+     $ac_cv_sizeof_int) USIZE32="unsigned int";;
+     $ac_cv_sizeof_long) USIZE32="unsigned long";;
+     $ac_cv_sizeof_u_int32_t) USIZE32="u_int32_t";;
+     $ac_cv_sizeof_uint32_t) USIZE32="uint32_t";;
+esac
+
+case 8 in
+     $ac_cv_sizeof_int) SIZE64="int";;
+     $ac_cv_sizeof_long) SIZE64="long";;
+     $ac_cv_sizeof_long_long) SIZE64="long long";;
+     $ac_cv_sizeof_int64_t) SIZE64="int64_t";;
+esac
 
 if test -z "$SIZE16"; then
         AC_MSG_ERROR(No 16 bit type found on this platform!)
@@ -288,6 +166,9 @@ AC_FUNC_MEMCMP
 dnl Make substitutions
 
 AC_SUBST(LIBTOOL_DEPS)
+AC_SUBST(INCLUDE_INTTYPES_H)
+AC_SUBST(INCLUDE_STDINT_H)
+AC_SUBST(INCLUDE_SYS_TYPES_H)
 AC_SUBST(SIZE16)
 AC_SUBST(USIZE16)
 AC_SUBST(SIZE32)

@@ -68,7 +68,7 @@
 
 #elif (defined(__APPLE__) && defined(__MACH__)) /* MacOS X Framework build */
 
-#  include <sys/types.h>
+#  include <inttypes.h>
    typedef int16_t ogg_int16_t;
    typedef u_int16_t ogg_uint16_t;
    typedef int32_t ogg_int32_t;
@@ -140,7 +140,6 @@
 
 #else
 
-#  include <sys/types.h>
 #  include <ogg/config_types.h>
 
 #endif

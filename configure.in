@@ -50,18 +50,9 @@ else
                 PROFILE="-Wall -W -pg -g -O20 -ffast-math -fsigned-char"
 		;;
         sparc-sun-*)
-                sparc_cpu=""
-                AC_MSG_CHECKING([if gcc supports -mv8])
-                old_cflags="$CFLAGS"
-                CFLAGS="$CFLAGS -mv8"
-                AC_TRY_COMPILE(, [return 0;], [
-                        AC_MSG_RESULT([yes])
-                        sparc_cpu="-mv8"
-                ])
-                CFLAGS="$old_cflags"
-                DEBUG="-g -Wall -fsigned-char $sparc_cpu"
-                CFLAGS="-O20 -ffast-math -fsigned-char $sparc_cpu"
-                PROFILE="-pg -g -O20 -fsigned-char $sparc_cpu" 
+                DEBUG="-g -Wall -fsigned-char"
+                CFLAGS="-O20 -ffast-math -fsigned-char"
+                PROFILE="-pg -g -O20 -fsigned-char" 
 		;;
 	*-*-darwin*)
 		DEBUG="-fno-common -g -Wall -fsigned-char"

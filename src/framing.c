@@ -275,7 +275,7 @@ static int _os_lacing_expand(ogg_stream_state *os,int needed){
 
 /* checksum the page */
 /* Direct table CRC; note that this will be faster in the future if we
-   perform the checksum silmultaneously with other copies */
+   perform the checksum simultaneously with other copies */
 
 void ogg_page_checksum_set(ogg_page *og){
   if(og){
@@ -736,7 +736,7 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
 }
 
 /* sync the stream and get a page.  Keep trying until we find a page.
-   Supress 'sync errors' after reporting the first.
+   Suppress 'sync errors' after reporting the first.
 
    return values:
    -1) recapture (hole in data)

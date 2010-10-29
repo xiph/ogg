@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title>libogg - function - ogg_stream_pageout</title>
+<title>libogg - function - ogg_stream_pageout_fill</title>
 <link rel=stylesheet href="style.css" type="text/css">
 </head>
 
@@ -13,11 +13,14 @@
 </tr>
 </table>
 
-<h1>ogg_stream_pageout</h1>
+<h1>ogg_stream_pageout_fill</h1>
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function forms packets into pages.</p>
+<p>This function forms packets into pages, similar
+to <a href="ogg_stream_pageout.html">ogg_stream_pageout()</a>, but
+allows applications to explicitly request a specific page spill
+size.</p>
 
 <p>In a typical encoding situation, this would be called after using <a 
 href="ogg_stream_packetin.html">ogg_stream_packetin()</a> to submit 
@@ -26,21 +29,20 @@ the accumulated packet bodies into an Ogg page suitable for writing
 to a stream. The function is typically called in a loop until there
 are no more pages ready for output.</p>
 
-<p>This function will only return a page when a "reasonable" amount of 
-packet data is available. Normally this is appropriate since it 
-limits the overhead of the Ogg page headers in the bitstream, and so
-calling ogg_stream_pageout() after ogg_stream_packetin() should be the 
-common case. Call <a href="ogg_stream_flush.html">ogg_stream_flush()</a> 
-if immediate page generation is desired. This may be occasionally 
-necessary, for example, to limit the temporal latency of a variable 
-bitrate stream.</p>
+<p>This function will return a page when at least four packets have
+been accumulated and accumulated packet data meets or exceeds the
+specified number of bytes, <b>and/or</b> when the accumulated packet
+data meets/exceeds the maximum page size regardless of accumulated
+packet
+count. Call <a href="ogg_stream_flush.html">ogg_stream_flush()</a> if
+immediate page generation is desired regardless of accumulated data.</p>
 
 <br><br>
 <table border=0 color=black cellspacing=0 cellpadding=7>
 <tr bgcolor=#cccccc>
 	<td>
 <pre><b>
-int ogg_stream_pageout(<a href="ogg_stream_state.html">ogg_stream_state</a> *os, <a href="ogg_page.html">ogg_page</a> *og);
+int ogg_stream_pageout(<a href="ogg_stream_state.html">ogg_stream_state</a> *os, <a href="ogg_page.html">ogg_page</a> *og, int fillbytes);
 </b></pre>
 	</td>
 </tr>
@@ -55,6 +57,8 @@ int ogg_stream_pageout(<a href="ogg_stream_state.html">ogg_stream_state</a> *os,
 in. Data pointed to is owned by libogg. The structure is valid until the 
 next call to ogg_stream_pageout(), ogg_stream_packetin(), or 
 ogg_stream_flush().</dd>
+<dt><i>fillbytes</i></dt>
+<dd>Packet data watermark in bytes.</dd>
 </dl>
 
 

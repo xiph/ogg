@@ -407,7 +407,7 @@ static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force, int 
     int packets_done=0;
     int packet_just_done=0;
     for(vals=0;vals<maxvals;vals++){
-      if(acc>nfill && packet_just_done>=8){
+      if(acc>nfill && packet_just_done>=4){
         force=1;
         break;
       }

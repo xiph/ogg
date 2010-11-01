@@ -1,3 +1,18 @@
+Version 1.2.1 (2010 November 01)
+
+* Various build updates (see SVN)
+* Add ogg_stream_pageout_fill() to API to allow applications
+  greater explicit flexibility in page sizing.
+* Documentation updates including multiplexing description,
+  terminology and API (incl. ogg_packet_clear(), 
+  ogg_stream_pageout_fill())
+* Correct possible buffer overwrite in stream encoding on 32 bit 
+  when a single packet exceed 250MB.
+* Correct read-buffer overrun [without side effects] under 
+  similar circumstances.
+* Update unit testing to work properly with new page spill
+  heuristic.
+
 Version 1.2.0 (2010 March 25)
 
 * Alter default flushing behavior to span less often and use larger page 

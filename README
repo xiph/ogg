@@ -27,7 +27,7 @@ Directory:
 
 ./win32		Win32 projects and build automation
 
-./macosx	MacOS X project and build files
+./macosx	Mac OS X project and build files
 
 ./macos		Classic MacOS 9 projects and build automation
 

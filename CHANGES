@@ -1,3 +1,9 @@
+Version 1.2.2 (2010 December 07)
+
+* Build fix (types correction) for Mac OS X
+* Update win32 project files to Visual Studio 2008
+* ogg_stream_pageout_fill documentation fix
+
 Version 1.2.1 (2010 November 01)
 
 * Various build updates (see SVN)

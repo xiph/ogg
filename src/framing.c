@@ -518,6 +518,14 @@ int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   return ogg_stream_flush_i(os,og,1,4096);
 }
 
+/* Like the above, but an argument is provided to adjust the nominal 
+page size for applications which are smart enough to provide their
+own delay based flushing */
+
+int ogg_stream_flush_fill(ogg_stream_state *os,ogg_page *og, int nfill){
+  return ogg_stream_flush_i(os,og,1,nfill);
+}
+
 /* This constructs pages from buffered packet segments.  The pointers
 returned are to static buffers; do not free. The returned buffers are
 good only until the next call (using the same ogg_stream_state) */

@@ -33,8 +33,9 @@ are no more pages ready for output.</p>
 been accumulated and accumulated packet data meets or exceeds the
 specified number of bytes, <b>and/or</b> when the accumulated packet
 data meets/exceeds the maximum page size regardless of accumulated
-packet
-count. Call <a href="ogg_stream_flush.html">ogg_stream_flush()</a> if
+packet count.
+Call <a href="ogg_stream_flush.html">ogg_stream_flush()</a> or
+<a href="ogg_stream_flush_fill.html">ogg_stream_flush_fill()</a> if
 immediate page generation is desired regardless of accumulated data.</p>
 
 <br><br>

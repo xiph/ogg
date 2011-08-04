@@ -512,7 +512,7 @@ static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force, int 
    since ogg_stream_flush will flush the last page in a stream even if
    it's undersized, you almost certainly want to use ogg_stream_pageout
    (and *not* ogg_stream_flush) unless you specifically need to flush
-   an page regardless of size in the middle of a stream. */
+   a page regardless of size in the middle of a stream. */
 
 int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   return ogg_stream_flush_i(os,og,1,4096);

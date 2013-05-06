@@ -26,7 +26,7 @@ its internal state and release any in-use memory, flagging itself as
 'not ready'.  Subsequent attempts to write using the buffer will
 silently fail. This error state may be detected at any later time by
 using oggpack_writecheck().  It is safe but not necessary to
-call <a href="oggpack_clear.html">oggpack_clear()</a> on a buffer that
+call <a href="oggpack_writeclear.html">oggpack_writeclear()</a> on a buffer that
 has flagged an error and released its resources. 
 
 <p><em>Important note to developers: Although libogg checks the

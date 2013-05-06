@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-docdir = $(datadir)/doc/$(PACKAGE)-$(VERSION)/libogg
+apidocdir = $(htmldir)/libogg
 
-doc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
+dist_apidoc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
 	general.html index.html ogg_iovec_t.html ogg_packet.html ogg_packet_clear.html\
 	ogg_page.html ogg_page_bos.html ogg_page_checksum_set.html\
 	ogg_page_continued.html ogg_page_eos.html ogg_page_granulepos.html\
@@ -24,4 +24,3 @@ doc_DATA = bitpacking.html datastructures.html decoding.html encoding.html\
 	oggpack_writecopy.html oggpack_writeinit.html oggpack_writetrunc.html\
 	overview.html reference.html style.css
 
-EXTRA_DIST = $(doc_DATA)

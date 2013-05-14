@@ -100,38 +100,38 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
 
 case 2 in
+     $ac_cv_sizeof_int16_t) SIZE16="int16_t";;
      $ac_cv_sizeof_short) SIZE16="short";;
      $ac_cv_sizeof_int) SIZE16="int";;
-     $ac_cv_sizeof_int16_t) SIZE16="int16_t";;
 esac
 
 case 2 in
+     $ac_cv_sizeof_uint16_t) USIZE16="uint16_t";;
      $ac_cv_sizeof_short) USIZE16="unsigned short";;
      $ac_cv_sizeof_int) USIZE16="unsigned int";;
      $ac_cv_sizeof_u_int16_t) USIZE16="u_int16_t";;
-     $ac_cv_sizeof_uint16_t) USIZE16="uint16_t";;
 esac
 
 case 4 in
+     $ac_cv_sizeof_int32_t) SIZE32="int32_t";;
      $ac_cv_sizeof_short) SIZE32="short";;
      $ac_cv_sizeof_int) SIZE32="int";;
      $ac_cv_sizeof_long) SIZE32="long";;
-     $ac_cv_sizeof_int32_t) SIZE32="int32_t";;
 esac
 
 case 4 in
+     $ac_cv_sizeof_uint32_t) USIZE32="uint32_t";;
      $ac_cv_sizeof_short) USIZE32="unsigned short";;
      $ac_cv_sizeof_int) USIZE32="unsigned int";;
      $ac_cv_sizeof_long) USIZE32="unsigned long";;
      $ac_cv_sizeof_u_int32_t) USIZE32="u_int32_t";;
-     $ac_cv_sizeof_uint32_t) USIZE32="uint32_t";;
 esac
 
 case 8 in
+     $ac_cv_sizeof_int64_t) SIZE64="int64_t";;
      $ac_cv_sizeof_int) SIZE64="int";;
      $ac_cv_sizeof_long) SIZE64="long";;
      $ac_cv_sizeof_long_long) SIZE64="long long";;
-     $ac_cv_sizeof_int64_t) SIZE64="int64_t";;
 esac
 
 if test -z "$SIZE16"; then

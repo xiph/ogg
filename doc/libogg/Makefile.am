@@ -24,3 +24,16 @@ dist_apidoc_DATA = bitpacking.html datastructures.html decoding.html encoding.ht
 	oggpack_writecopy.html oggpack_writeinit.html oggpack_writetrunc.html\
 	overview.html reference.html style.css
 
+update-doc-version:
+	@YEAR=$$(date +%Y); DAY=$$(date +%Y%m%d);					\
+	for f in $(srcdir)/*.html; do							\
+		sed -e "s/2000-[0-9]\{4\} Xiph.Org/2000-$$YEAR Xiph.Org/g"		\
+		    -e "s/libogg release [0-9. -]\+/libogg release $(VERSION) - $$DAY/g"\
+			< $$f > $$f.tmp;						\
+		if diff -q $$f $$f.tmp > /dev/null; then				\
+			rm $$f.tmp;							\
+		else									\
+			mv $$f.tmp $$f;							\
+		fi;									\
+	done;
+

@@ -642,7 +642,7 @@ void copytest(int prefill, int copy){
   dest=oggpack_get_buffer(&dest_write);
   dest_bytes=oggpack_bytes(&dest_write);
   if(dest_bytes!=(prefill+7)/8){
-    fprintf(stderr,"wrong number of bytes after prefill! %d!=%d\n",dest_bytes,(prefill+7)/8);
+    fprintf(stderr,"wrong number of bytes after prefill! %ld!=%d\n",dest_bytes,(prefill+7)/8);
     exit(1);
   }
   oggpack_readinit(&source_read,source,source_bytes);
@@ -670,7 +670,7 @@ void copytest(int prefill, int copy){
   dest=oggpack_get_buffer(&dest_write);
   dest_bytes=oggpack_bytes(&dest_write);
   if(dest_bytes!=(copy+prefill+7)/8){
-    fprintf(stderr,"wrong number of bytes after prefill+copy! %d!=%d\n",dest_bytes,(copy+prefill+7)/8);
+    fprintf(stderr,"wrong number of bytes after prefill+copy! %ld!=%d\n",dest_bytes,(copy+prefill+7)/8);
     exit(1);
   }
   oggpack_readinit(&source_read,source,source_bytes);
@@ -733,7 +733,7 @@ void copytestB(int prefill, int copy){
   dest=oggpackB_get_buffer(&dest_write);
   dest_bytes=oggpackB_bytes(&dest_write);
   if(dest_bytes!=(prefill+7)/8){
-    fprintf(stderr,"wrong number of bytes after prefill! %d!=%d\n",dest_bytes,(prefill+7)/8);
+    fprintf(stderr,"wrong number of bytes after prefill! %ld!=%d\n",dest_bytes,(prefill+7)/8);
     exit(1);
   }
   oggpackB_readinit(&source_read,source,source_bytes);
@@ -761,7 +761,7 @@ void copytestB(int prefill, int copy){
   dest=oggpackB_get_buffer(&dest_write);
   dest_bytes=oggpackB_bytes(&dest_write);
   if(dest_bytes!=(copy+prefill+7)/8){
-    fprintf(stderr,"wrong number of bytes after prefill+copy! %d!=%d\n",dest_bytes,(copy+prefill+7)/8);
+    fprintf(stderr,"wrong number of bytes after prefill+copy! %ld!=%d\n",dest_bytes,(copy+prefill+7)/8);
     exit(1);
   }
   oggpackB_readinit(&source_read,source,source_bytes);

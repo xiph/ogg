@@ -1,3 +1,7 @@
+Version 1.3.2 (2014 May 27)
+
+ * Fix an bug in oggpack_writecopy().
+
 Version 1.3.1 (2013 May 12)
 
 * Guard against very large packets.

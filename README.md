@@ -1,5 +1,7 @@
 # Ogg
 
+[![Build Status](https://travis-ci.org/xiph/ogg.png?branch=master)](https://travis-ci.org/xiph/ogg)
+
 Ogg project codecs use the Ogg bitstream format to arrange the raw,
 compressed bitstream into a more robust, useful form. For example,
 the Ogg bitstream makes seeking, time stamping and error recovery
@@ -50,6 +52,7 @@ documentation into /usr/local/share/doc.
 A standard svn build should consist of nothing more than:
 
     ./autogen.sh
+    ./configure
     make
 
 and as root if desired :

@@ -1,0 +1,5 @@
+language: c
+script:
+  - ./autogen.sh
+  - ./configure
+  - make distcheck

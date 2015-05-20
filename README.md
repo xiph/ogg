@@ -1,7 +1,12 @@
 # Ogg
 
-## What's here ##
+Ogg project codecs use the Ogg bitstream format to arrange the raw,
+compressed bitstream into a more robust, useful form. For example,
+the Ogg bitstream makes seeking, time stamping and error recovery
+possible, as well as mixing several sepearate, concurrent media
+streams into a single physical bitstream.
 
+## What's here ##
 This source distribution includes libogg and nothing else. Other modules
 (eg, the modules libvorbis, vorbis-tools for the Vorbis music codec,
 libtheora for the Theora video codec) contain the codec libraries for
@@ -18,14 +23,6 @@ Directory:
 - `win32` Win32 projects and build automation
 
 - `macosx` Mac OS X project and build files
-
-## What is Ogg? ##
-
-Ogg project codecs use the Ogg bitstream format to arrange the raw,
-compressed bitstream into a more robust, useful form.  For example,
-the Ogg bitstream makes seeking, time stamping and error recovery
-possible, as well as mixing several sepearate, concurrent media
-streams into a single physical bitstream.
 
 ## Contact ##
 

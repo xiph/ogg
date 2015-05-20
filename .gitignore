@@ -5,6 +5,7 @@ compile
 config.guess
 config.h
 config.h.in
+config.h.in~
 config.log
 config.status
 config.sub
@@ -22,6 +23,10 @@ ogg.pc
 ogg-uninstalled.pc
 stamp-h1
 .project
+include/ogg/config_types.h
+src/*.o
+src/*.lo
+src/lib*.la
 src/.libs
 src/.deps
 src/test_*

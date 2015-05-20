@@ -1,14 +1,5 @@
 # Ogg
 
-```
- THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.
- USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS
- GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE
- IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.
- THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2015
- by the Xiph.Org Foundation http://www.xiph.org/
-```
-
 ## What's here ##
 
 This source distribution includes libogg and nothing else. Other modules
@@ -93,3 +84,13 @@ your system:
 
 (Build instructions for Ogg codecs such as vorbis are similar and may
 be found in those source modules' README files)
+
+## License ##
+
+THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.
+USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS
+GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE
+IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.
+
+THE OggVorbis SOURCE CODE IS COPYRIGHT (C) 1994-2015
+by the Xiph.Org Foundation https://www.xiph.org/

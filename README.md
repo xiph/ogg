@@ -15,7 +15,7 @@ Directory:
 
 - `doc` Ogg specification and libogg API documents
 
-- `win32`	Win32 projects and build automation
+- `win32` Win32 projects and build automation
 
 - `macosx` Mac OS X project and build files
 

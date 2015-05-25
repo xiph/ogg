@@ -12,7 +12,6 @@ config.sub
 configure
 depcomp
 install-sh
-libogg.spec
 libtool
 ltmain.sh
 Makefile

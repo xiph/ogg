@@ -176,7 +176,6 @@ Makefile
 src/Makefile
 doc/Makefile doc/libogg/Makefile
 include/Makefile include/ogg/Makefile include/ogg/config_types.h
-libogg.spec
 ogg.pc
 ogg-uninstalled.pc
 ])

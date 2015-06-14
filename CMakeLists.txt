@@ -19,14 +19,34 @@ set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
 set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
-# Extract so library version from configure.ac
-string(REGEX MATCH "LIB_AGE=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
-set(LIB_AGE ${CMAKE_MATCH_1})
-string(REGEX MATCH "LIB_REVISION=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
-set(LIB_REVISION ${CMAKE_MATCH_1})
+# Helper function to get version-info
+function(get_version_info result current_var_name age_var_name revision_var_name)
+    string(REGEX MATCH "${current_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
+    set(VERSION_INFO_CURRENT ${CMAKE_MATCH_1})
+    
+    string(REGEX MATCH "${age_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
+    set(VERSION_INFO_AGE ${CMAKE_MATCH_1})
+
+    string(REGEX MATCH "${revision_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
+    set(VERSION_INFO_REVISION ${CMAKE_MATCH_1})
+
+    math(EXPR VERSION_INFO_CURRENT_MINUS_AGE "${VERSION_INFO_CURRENT} - ${VERSION_INFO_AGE}")
+
+    set(${result} "${VERSION_INFO_CURRENT_MINUS_AGE}.${VERSION_INFO_AGE}.${VERSION_INFO_REVISION}" PARENT_SCOPE)
+endfunction()
+
+# Helper function to configure pkg-config files
+function(configure_pkg_config_file pkg_config_file_in)
+    set(prefix ${CMAKE_INSTALL_PREFIX})
+    set(exec_prefix ${CMAKE_INSTALL_FULL_BINDIR})
+    set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+    set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+    set(VERSION ${PROJECT_VERSION})
+    string(REPLACE ".in" "" pkg_config_file ${pkg_config_file_in})
+    configure_file(${pkg_config_file_in} ${pkg_config_file} @ONLY)
+endfunction()
 
 message(STATUS "Configuring ${PROJECT_NAME} ${PROJECT_VERSION}")
-message(STATUS "Shared library version 0.${LIB_AGE}.${LIB_REVISION}")
 
 # Configure config_type.h
 check_include_files(inttypes.h INCLUDE_INTTYPES_H)
@@ -61,7 +81,9 @@ endif()
 
 include_directories(include)
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
-set_target_properties(ogg PROPERTIES SOVERSION "0.${LIB_AGE}.${LIB_REVISION}")
+
+get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
+set_target_properties(ogg PROPERTIES SOVERSION ${OGG_VERSION_INFO})
 
 if(BUILD_FRAMEWORK)
     set_target_properties(ogg PROPERTIES
@@ -76,19 +98,8 @@ if(BUILD_FRAMEWORK)
     )
 endif()
 
-# Configure pkg-config files
-function(configure_pkg_config_file pkg_config_file_in)
-    set(prefix ${CMAKE_INSTALL_PREFIX})
-    set(exec_prefix ${CMAKE_INSTALL_FULL_BINDIR})
-    set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
-    set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
-    set(VERSION ${PROJECT_VERSION})
-    string(REPLACE ".in" "" pkg_config_file ${pkg_config_file_in})
-    configure_file(${pkg_config_file_in} ${pkg_config_file} @ONLY)
-endfunction()
-
 configure_pkg_config_file(ogg.pc.in)
 
-install(FILES include/ogg/ogg.h include/ogg/os_types.h include/ogg/config_types.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+install(FILES include/ogg/ogg.h include/ogg/os_types.h include/ogg/config_types.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/ogg)
 install(TARGETS ogg RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ogg.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

@@ -23,7 +23,7 @@ set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_
 function(get_version_info result current_var_name age_var_name revision_var_name)
     string(REGEX MATCH "${current_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
     set(VERSION_INFO_CURRENT ${CMAKE_MATCH_1})
-    
+
     string(REGEX MATCH "${age_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
     set(VERSION_INFO_AGE ${CMAKE_MATCH_1})
 

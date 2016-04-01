@@ -62,6 +62,7 @@ set(SIZE64 int64_t)
 configure_file(include/ogg/config_types.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ogg/config_types.h @ONLY)
 
 set(OGG_HEADERS
+    include/ogg/config_types.h
     include/ogg/ogg.h
     include/ogg/os_types.h
 )
@@ -83,7 +84,11 @@ include_directories(include)
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
 
 get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
-set_target_properties(ogg PROPERTIES SOVERSION ${OGG_VERSION_INFO})
+set_target_properties(
+    ogg PROPERTIES
+    SOVERSION ${OGG_VERSION_INFO}
+    PUBLIC_HEADER "${OGG_HEADERS}"
+)
 
 if(BUILD_FRAMEWORK)
     set_target_properties(ogg PROPERTIES
@@ -93,13 +98,17 @@ if(BUILD_FRAMEWORK)
         MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
         MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
         XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-        PUBLIC_HEADER "${OGG_HEADERS}"
         OUTPUT_NAME Ogg
     )
 endif()
 
 configure_pkg_config_file(ogg.pc.in)
 
-install(FILES include/ogg/ogg.h include/ogg/os_types.h include/ogg/config_types.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/ogg)
-install(TARGETS ogg RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS ogg
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
+)
 install(FILES ogg.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

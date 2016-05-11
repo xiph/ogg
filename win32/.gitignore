@@ -1,0 +1,20 @@
+# Visual Studio ignores
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+*.manifest
+*.lastbuildstate
+*.exe
+*.log
+*.idb
+*.ipdb
+*.ilk
+*.iobj
+*.obj
+*.pdb
+*.sdf
+*.suo
+*.tlog
+*.vcxproj.user
+*.vc.db

@@ -18,3 +18,4 @@
 *.tlog
 *.vcxproj.user
 *.vc.db
+*.vc.opendb

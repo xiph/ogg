@@ -1,7 +1,8 @@
 # Ogg
 
-[![Travis Build Status](https://travis-ci.org/xiph/ogg.png?branch=master)](https://travis-ci.org/xiph/ogg)
+[![Travis Build Status](https://travis-ci.org/xiph/ogg.svg?branch=master)](https://travis-ci.org/xiph/ogg)
 [![Jenkins Build Status](https://mf4.xiph.org/jenkins/job/libogg/badge/icon)](https://mf4.xiph.org/jenkins/job/libogg/)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rillian/ogg?branch=master&svg=true)](https://ci.appveyor.com/project/rillian/ogg)
 
 Ogg project codecs use the Ogg bitstream format to arrange the raw,
 compressed bitstream into a more robust, useful form. For example,

@@ -1,4 +1,5 @@
--script:
+language: c
+script:
 -  - ./bootstrap.sh
 -  - configure
 -  - make distcheck

@@ -1,7 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([libogg],[1.3.2],[ogg-dev@xiph.org])
-
+LT_INIT
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR(src/framing.c)
 
 AM_INIT_AUTOMAKE
@@ -17,7 +18,6 @@ AC_SUBST(LIB_REVISION)
 AC_SUBST(LIB_AGE)
 
 AC_PROG_CC
-AM_PROG_LIBTOOL
 AM_PROG_CC_C_O
 
 dnl Set some options based on environment

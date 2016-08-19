@@ -1,8 +1,11 @@
 language: c
-script: ./autogen.sh && ./configure && make distcheck
+script:
+- ./autogen.sh
+- ./configure
+- make distcheck
 os:
 - linux
-- macx
+- osx
 compiler:
 - gcc
 - clang

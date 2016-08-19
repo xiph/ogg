@@ -1,2 +1,8 @@
 language: c
 script: ./autogen.sh && ./configure && make distcheck
+os:
+- linux
+- macx
+compiler:
+- gcc
+- clang

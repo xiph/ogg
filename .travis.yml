@@ -1,5 +1,2 @@
 language: c
-script:
--  - ./bootstrap.sh
--  - configure
--  - make distcheck
+script: ./autogen.sh && configure && make distcheck

@@ -9,4 +9,5 @@ test -n "$srcdir" && cd "$srcdir"
 
 echo "Updating build configuration files for $package, please wait...."
 
+libtoolize
 autoreconf -if

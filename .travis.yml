@@ -1,5 +1,21 @@
 language: c
+
+env:
+  - BUILD_SYSTEM=AUTOTOOLS
+  - BUILD_SYSTEM=CMAKE
+
 script:
-  - ./autogen.sh
-  - ./configure
-  - make distcheck
+  - >
+    if [[ "$BUILD_SYSTEM" == "AUTOTOOLS" ]] ; then
+      ./autogen.sh
+      ./configure
+      make distcheck
+    fi
+  - >
+    if [[ "$BUILD_SYSTEM" == "CMAKE" ]] ; then
+      mkdir build
+      pushd build
+      cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+      cmake --build .
+      popd
+    fi

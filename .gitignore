@@ -31,3 +31,5 @@ src/.libs
 src/.deps
 src/test_*
 macosx/build/
+CMakeFiles/
+build-*/

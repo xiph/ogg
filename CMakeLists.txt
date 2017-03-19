@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 2.8.7)
-project(libogg)
+cmake_minimum_required(VERSION 2.8.12)
+project(ogg)
 
 # Required modules
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
+include(CMakePackageConfigHelpers)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
@@ -80,8 +81,11 @@ if(BUILD_FRAMEWORK)
     set(BUILD_SHARED_LIBS TRUE)
 endif()
 
-include_directories(include)
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
+target_include_directories(ogg PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
 set_target_properties(
@@ -104,7 +108,10 @@ endif()
 
 configure_pkg_config_file(ogg.pc.in)
 
+write_basic_package_version_file(OggConfigVersion.cmake COMPATIBILITY SameMajorVersion)
+
 install(TARGETS ogg
+    EXPORT OggTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -112,3 +119,16 @@ install(TARGETS ogg
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
 )
 install(FILES ogg.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+if (UNIX)
+    set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/ogg)
+elseif(WIN32)
+    set(CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_PREFIX}/cmake)
+endif()
+if (CMAKE_INSTALL_PACKAGEDIR)
+    install(EXPORT OggTargets DESTINATION ${CMAKE_INSTALL_PACKAGEDIR})
+    install(FILES
+        OggConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/OggConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
+    )
+endif ()

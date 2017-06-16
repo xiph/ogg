@@ -62,7 +62,7 @@ set(SIZE64 int64_t)
 configure_file(include/ogg/config_types.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/ogg/config_types.h @ONLY)
 
 set(OGG_HEADERS
-    include/ogg/config_types.h
+    ${CMAKE_CURRENT_BINARY_DIR}/include/ogg/config_types.h
     include/ogg/ogg.h
     include/ogg/os_types.h
 )
@@ -80,7 +80,7 @@ if(BUILD_FRAMEWORK)
     set(BUILD_SHARED_LIBS TRUE)
 endif()
 
-include_directories(include)
+include_directories(include ${CMAKE_CURRENT_BINARY_DIR}/include)
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
 
 get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
@@ -111,4 +111,6 @@ install(TARGETS ogg
     FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
 )
-install(FILES ogg.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ogg.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)

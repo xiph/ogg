@@ -1,5 +1,16 @@
 language: c
+
+env:
+  - BUILD=AUTOTOOLS
+  - BUILD=CMAKE
+
 script:
-  - ./autogen.sh
-  - ./configure
-  - make distcheck
+  - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then ./autogen.sh ; fi
+  - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then ./configure ; fi
+  - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then make distcheck ; fi
+  - if [[ "$BUILD" == "CMAKE" ]] ; then mkdir build ; fi
+  - if [[ "$BUILD" == "CMAKE" ]] ; then pushd build ; fi
+  - if [[ "$BUILD" == "CMAKE" ]] ; then cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/_inst .. ; fi
+  - if [[ "$BUILD" == "CMAKE" ]] ; then cmake --build . ; fi
+  - if [[ "$BUILD" == "CMAKE" ]] ; then cmake --build . --target install ; fi
+  - if [[ "$BUILD" == "CMAKE" ]] ; then popd ; fi

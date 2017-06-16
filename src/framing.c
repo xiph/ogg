@@ -875,6 +875,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
      some segments */
   if(continued){
     if(os->lacing_fill<1 ||
+       (os->lacing_vals[os->lacing_fill-1]&0xff)<255 ||
        os->lacing_vals[os->lacing_fill-1]==0x400){
       bos=0;
       for(;segptr<segments;segptr++){

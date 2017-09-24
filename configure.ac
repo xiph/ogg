@@ -150,6 +150,17 @@ if test -z "$SIZE64"; then
         AC_MSG_WARN(No 64 bit type found on this platform!)
 fi
 
+AC_ARG_ENABLE([crc],
+    [AS_HELP_STRING([--disable-crc],
+                    [Disable CRC in the demuxer)])],,
+    [enable_crc=yes])
+
+AM_CONDITIONAL([DISABLE_CRC], [test "$enable_crc" = "no"])
+
+AS_IF([test "$enable_crc" = "no"],[
+  AC_DEFINE([DISABLE_CRC], [1], [Do not build with CRC])
+])
+
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
 

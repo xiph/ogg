@@ -7,9 +7,6 @@ include(CheckIncludeFiles)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
-if(APPLE)
-    option(BUILD_FRAMEWORK "Build Framework bundle for OSX" OFF)
-endif()
 
 # Extract project version from configure.ac
 file(READ configure.ac CONFIGURE_AC_CONTENTS)
@@ -76,12 +73,13 @@ if(MSVC)
     list(APPEND OGG_SOURCES win32/ogg.def)
 endif()
 
-if(BUILD_FRAMEWORK)
-    set(BUILD_SHARED_LIBS TRUE)
-endif()
-
-include_directories(include ${CMAKE_CURRENT_BINARY_DIR}/include)
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
+
+set(ogg_inc_dir "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(ogg
+  PRIVATE
+  "$<BUILD_INTERFACE:${ogg_inc_dir}>"
+  )
 
 get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
 set_target_properties(
@@ -90,27 +88,49 @@ set_target_properties(
     PUBLIC_HEADER "${OGG_HEADERS}"
 )
 
-if(BUILD_FRAMEWORK)
-    set_target_properties(ogg PROPERTIES
-        FRAMEWORK TRUE
-        FRAMEWORK_VERSION ${PROJECT_VERSION}
-        MACOSX_FRAMEWORK_IDENTIFIER org.xiph.ogg
-        MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
-        MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
-        XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-        OUTPUT_NAME Ogg
-    )
-endif()
+### Install ###
 
-configure_pkg_config_file(ogg.pc.in)
+set(target_name ogg)
 
-install(TARGETS ogg
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
-)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ogg.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-)
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+set(config_install_dir "lib/cmake/${target_name}")
+set(include_install_dir "include")
+
+set(version_config "${generated_dir}/${target_name}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${target_name}Config.cmake")
+set(targets_export_name "${target_name}Targets")
+set(namespace "${target_name}::")
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${version_config}" COMPATIBILITY SameMajorVersion
+  )
+
+# Note: use 'targets_export_name'
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/cmake/Config.cmake.in"
+  "${project_config}"
+  INSTALL_DESTINATION "${config_install_dir}"
+  )
+
+install(
+  TARGETS "${target_name}"
+  EXPORT "${targets_export_name}"
+  LIBRARY DESTINATION "lib"
+  ARCHIVE DESTINATION "lib"
+  RUNTIME DESTINATION "bin"
+  INCLUDES DESTINATION "${include_install_dir}/ogg"
+  PUBLIC_HEADER DESTINATION "${include_install_dir}/ogg"
+  )
+
+install(
+  FILES "${project_config}" "${version_config}"
+  DESTINATION "${config_install_dir}"
+  )
+
+install(
+  EXPORT "${targets_export_name}"
+  NAMESPACE "${namespace}"
+  DESTINATION "${config_install_dir}"
+  )

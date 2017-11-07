@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([libogg],[1.3.2],[ogg-dev@xiph.org])
+AC_INIT([libogg],[1.3.3],[ogg-dev@xiph.org])
 
 AC_CONFIG_SRCDIR(src/framing.c)
 
@@ -10,7 +10,7 @@ AM_MAINTAINER_MODE([enable])
 dnl Library versioning
 
 LIB_CURRENT=8
-LIB_REVISION=2
+LIB_REVISION=3
 LIB_AGE=8
 AC_SUBST(LIB_CURRENT)
 AC_SUBST(LIB_REVISION)

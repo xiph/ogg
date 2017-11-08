@@ -1,6 +1,6 @@
-; $Id$
 ;
 ; ogg.def
+; List of exported functions for Windows builds.
 ;
 LIBRARY
 EXPORTS

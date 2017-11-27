@@ -1,9 +1,19 @@
 language: c
-dist: trusty
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
 
 env:
   - BUILD=AUTOTOOLS
   - BUILD=CMAKE
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew bundle; fi
 
 script:
   - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then ./autogen.sh ; fi

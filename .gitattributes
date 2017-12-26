@@ -1,0 +1,5 @@
+*.bat eol=crlf
+*.sln eol=crlf
+*.vcxproj eol=crlf
+*.vcxproj.filters eol=crlf
+common.props eol=crlf

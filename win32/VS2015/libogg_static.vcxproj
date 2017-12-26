@@ -27,7 +27,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -124,11 +123,11 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CallingConvention>Cdecl</CallingConvention>
+      <OmitDefaultLibName>true</OmitDefaultLibName>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -80,8 +80,8 @@ if(BUILD_FRAMEWORK)
     set(BUILD_SHARED_LIBS TRUE)
 endif()
 
-include_directories(include ${CMAKE_CURRENT_BINARY_DIR}/include)
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
+target_include_directories(ogg PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
 set_target_properties(

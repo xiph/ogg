@@ -82,7 +82,7 @@ Version 1.1 (2003 November 17)
 
  * big-endian bitpacker routines for Theora
  * various portability fixes
- * improved API documenation
+ * improved API documentation
  * RFC 3533 documentation of the format by Silvia Pfeiffer at CSIRO
  * RFC 3534 documentation of the application/ogg mime-type by Linus Walleij
 

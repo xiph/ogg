@@ -21,7 +21,7 @@ Source release:
 - Add a copy of the documentation to <https://xiph.org/ogg/docs/>
   and update the links.
 
-Releases are commited to https://svn.xiph.org/releases/ogg/
+Releases are committed to https://svn.xiph.org/releases/ogg/
 which propagates to downloads.xiph.org.
 
 Release packages should also be manually attached to the corresponding

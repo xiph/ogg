@@ -1,15 +1,22 @@
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.12)
 project(libogg)
 
 # Required modules
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
+include(CMakePackageConfigHelpers)
+include(CTest)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
 if(APPLE)
     option(BUILD_FRAMEWORK "Build Framework bundle for OSX" OFF)
 endif()
+
+# Install options
+option(INSTALL_DOCS "Install documentation" ON)
+option(INSTALL_PKG_CONFIG_MODULE "Install ogg.pc file" ON)
+option(INSTALL_CMAKE_PACKAGE_MODULE "Install CMake package configiguration module" ON)
 
 # Extract project version from configure.ac
 file(READ configure.ac CONFIGURE_AC_CONTENTS)
@@ -19,21 +26,19 @@ set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
 set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
-# Helper function to get version-info
-function(get_version_info result current_var_name age_var_name revision_var_name)
-    string(REGEX MATCH "${current_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
-    set(VERSION_INFO_CURRENT ${CMAKE_MATCH_1})
+# Extract library version from configure.ac
+string(REGEX MATCH "LIB_CURRENT=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
+set(LIB_CURRENT ${CMAKE_MATCH_1})
 
-    string(REGEX MATCH "${age_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
-    set(VERSION_INFO_AGE ${CMAKE_MATCH_1})
+string(REGEX MATCH "LIB_AGE=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
+set(LIB_AGE ${CMAKE_MATCH_1})
 
-    string(REGEX MATCH "${revision_var_name}=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
-    set(VERSION_INFO_REVISION ${CMAKE_MATCH_1})
+string(REGEX MATCH "LIB_REVISION=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
+set(LIB_REVISION ${CMAKE_MATCH_1})
 
-    math(EXPR VERSION_INFO_CURRENT_MINUS_AGE "${VERSION_INFO_CURRENT} - ${VERSION_INFO_AGE}")
+math(EXPR LIB_SOVERSION "${LIB_CURRENT} - ${LIB_AGE}")
+set(LIB_VERSION "${LIB_SOVERSION}.${LIB_AGE}.${LIB_REVISION}")
 
-    set(${result} "${VERSION_INFO_CURRENT_MINUS_AGE}.${VERSION_INFO_AGE}.${VERSION_INFO_REVISION}" PARENT_SCOPE)
-endfunction()
 
 # Helper function to configure pkg-config files
 function(configure_pkg_config_file pkg_config_file_in)
@@ -70,9 +75,10 @@ set(OGG_HEADERS
 set(OGG_SOURCES
     src/bitwise.c
     src/framing.c
+    src/crctable.h
 )
 
-if(MSVC)
+if(WIN32 AND BUILD_SHARED_LIBS)
     list(APPEND OGG_SOURCES win32/ogg.def)
 endif()
 
@@ -81,12 +87,16 @@ if(BUILD_FRAMEWORK)
 endif()
 
 add_library(ogg ${OGG_HEADERS} ${OGG_SOURCES})
-target_include_directories(ogg PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_include_directories(ogg PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
-get_version_info(OGG_VERSION_INFO "LIB_CURRENT" "LIB_AGE" "LIB_REVISION")
 set_target_properties(
     ogg PROPERTIES
-    SOVERSION ${OGG_VERSION_INFO}
+    SOVERSION ${LIB_SOVERSION}
+    VERSION ${LIB_VERSION}
     PUBLIC_HEADER "${OGG_HEADERS}"
 )
 
@@ -105,12 +115,77 @@ endif()
 configure_pkg_config_file(ogg.pc.in)
 
 install(TARGETS ogg
+    EXPORT ogg-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
 )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ogg.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+
+write_basic_package_version_file(ogg-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
 )
+
+if(INSTALL_CMAKE_PACKAGE_MODULE)
+    set(CMAKE_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/ogg)
+    install(EXPORT ogg-targets
+        DESTINATION ${CMAKE_INSTALL_CONFIGDIR}
+        NAMESPACE Ogg::
+        FILE ogg-config.cmake
+    )
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/ogg-config-version.cmake
+        DESTINATION ${CMAKE_INSTALL_CONFIGDIR}
+    )
+endif()
+
+if(INSTALL_PKG_CONFIG_MODULE)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ogg.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
+endif()
+
+if(INSTALL_DOCS)
+    set(OGG_DOCS
+        doc/framing.html
+        doc/index.html
+        doc/oggstream.html
+        doc/ogg-multiplex.html
+        doc/fish_xiph_org.png
+        doc/multiplex1.png
+        doc/packets.png
+        doc/pages.png
+        doc/stream.png
+        doc/vorbisword2.png
+        doc/white-ogg.png
+        doc/white-xifish.png
+        doc/rfc3533.txt
+        doc/rfc5334.txt
+        doc/skeleton.html
+    )
+    install(FILES ${OGG_DOCS} DESTINATION ${CMAKE_INSTALL_DOCDIR}/html)
+    install(DIRECTORY doc/libogg DESTINATION ${CMAKE_INSTALL_DOCDIR}/html)
+endif()
+
+if(BUILD_TESTING)
+    add_executable(test_bitwise src/bitwise.c ${OGG_HEADERS})
+    target_compile_definitions(test_bitwise PRIVATE _V_SELFTEST)
+    target_include_directories(test_bitwise PRIVATE
+        include
+        ${CMAKE_CURRENT_BINARY_DIR}/include
+    )
+    add_test(NAME test_bitwise COMMAND $<TARGET_FILE:test_bitwise>)
+
+    add_executable(test_framing src/framing.c ${OGG_HEADERS})
+    target_compile_definitions(test_framing PRIVATE _V_SELFTEST)
+    target_include_directories(test_framing PRIVATE
+        include
+        ${CMAKE_CURRENT_BINARY_DIR}/include
+    )
+    add_test(NAME test_framing COMMAND $<TARGET_FILE:test_framing>)
+endif()
+
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+include(CPack)

@@ -27,7 +27,7 @@ its internal state and release any in-use memory, flagging itself as
 silently fail. This error state may be detected at any later time by
 using oggpack_writecheck().  It is safe but not necessary to
 call <a href="oggpack_writeclear.html">oggpack_writeclear()</a> on a buffer that
-has flagged an error and released its resources. 
+has flagged an error and released its resources.
 
 <p><em>Important note to developers: Although libogg checks the
 results of memory allocations, these checks are only useful on a
@@ -37,7 +37,7 @@ routinely overallocated and all allocations succeed whether memory is
 available or not.  The only way to detect an out of memory condition
 on the vast majority of OSes is to watch for and capture segmentation
 faults.  This function is useful only to embedded developers.</em>
- 
+
 <br><br>
 <table border=0 color=black cellspacing=0 cellpadding=7>
 <tr bgcolor=#cccccc>

@@ -17,10 +17,10 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function returns the total number of bytes behind the current 
-access point in the <a href="oggpack_buffer.html">oggpack_buffer</a>. 
-For write-initialized buffers, this is the number of complete bytes 
-written so far. For read-initialized buffers, it is the number of 
+<p>This function returns the total number of bytes behind the current
+access point in the <a href="oggpack_buffer.html">oggpack_buffer</a>.
+For write-initialized buffers, this is the number of complete bytes
+written so far. For read-initialized buffers, it is the number of
 complete bytes that have been read so far.
 <p>The return value is the number of <b>complete</b> bytes in the buffer.
 There may be extra (<8) bits.

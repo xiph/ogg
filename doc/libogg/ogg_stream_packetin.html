@@ -17,13 +17,13 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function submits a packet to the bitstream for page 
+<p>This function submits a packet to the bitstream for page
 encapsulation. After this is called, more packets can be submitted,
 or pages can be written out.</p>
 
-<p>In a typical encoding situation, this should be used after filling a 
+<p>In a typical encoding situation, this should be used after filling a
 packet with data.
-The data in the packet is copied into the internal storage managed by 
+The data in the packet is copied into the internal storage managed by
 the <a href="ogg_stream_state.html">ogg_stream_state</a>, so the caller
 is free to alter the contents of <i>op</i> after this call has returned.
 

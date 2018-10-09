@@ -23,7 +23,7 @@ allows applications to explicitly request a specific page spill
 size.</p>
 
 <p>This function checks for remaining packets inside the stream and forces remaining packets into pages of approximately the requested size.
-This should be used when you want to flush all remaining data from a stream. <a href="ogg_stream_flush.html">ogg_stream_flush</a> may be used instead if a particular page size isn't important. 
+This should be used when you want to flush all remaining data from a stream. <a href="ogg_stream_flush.html">ogg_stream_flush</a> may be used instead if a particular page size isn't important.
 <p>This function can be used to verify that all packets have been flushed.  If the return value is 0, all packets have been placed into a page. Generally speaking, it should be called in a loop until all packets are flushed, since even a single packet may span multiple pages.
 
 <br><br>

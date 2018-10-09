@@ -17,13 +17,13 @@
 
 <p><i>declared in "ogg/ogg.h";</i></p>
 
-<p>This function is used to tell the <a href="ogg_sync_state.html">ogg_sync_state</a> struct how many bytes we wrote into the buffer. 
+<p>This function is used to tell the <a href="ogg_sync_state.html">ogg_sync_state</a> struct how many bytes we wrote into the buffer.
 
 <p>
-The general procedure is to request a pointer into an internal 
-<a href="ogg_sync_state.html">ogg_sync_state</a> buffer by calling 
+The general procedure is to request a pointer into an internal
+<a href="ogg_sync_state.html">ogg_sync_state</a> buffer by calling
 <a href="ogg_sync_buffer.html">ogg_sync_buffer()</a>. The buffer
-is then filled up to the requested size with new input, and 
+is then filled up to the requested size with new input, and
 ogg_sync_wrote() is called to advance the fill pointer by however
 much data was actually available.</p>
 

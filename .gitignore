@@ -32,3 +32,6 @@ src/.deps
 src/test_*
 macosx/build/
 /m4
+.buckd
+buck-out
+.buckconfig.local

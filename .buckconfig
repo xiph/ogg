@@ -1,5 +1,8 @@
 [project]
   ignore = .git
 
+[parser]
+  default_build_file_syntax = SKYLARK
+
 [cxx]
   should_remap_host_platform = true

@@ -35,3 +35,7 @@ macosx/build/
 .buckd
 buck-out
 .buckconfig.local
+.buckconfig.d
+buckaroo_macros.bzl
+buckaroo-macos
+buckaroo-linux

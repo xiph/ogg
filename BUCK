@@ -6,15 +6,18 @@ cxx_library(
     'ogg/os_types.h': 'include/ogg/os_types.h',
   },
   exported_platform_headers = [
+    ('linux.*', {
+      'ogg/config_types.h': 'include/ogg/config_types.linux.h',
+    }),
     ('macos.*', {
-      'ogg/config_types.h': 'include/ogg/config_types.macos.h', 
-    }), 
-  ], 
+      'ogg/config_types.h': 'include/ogg/config_types.macos.h',
+    }),
+  ],
   platform_headers = [
     ('macos.*', {
-      'config.h': 'config.macos.h', 
-    }), 
-  ], 
+      'config.h': 'config.macos.h',
+    }),
+  ],
   srcs = glob([
     'src/*.c',
   ]),

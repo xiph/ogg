@@ -1,17 +1,32 @@
-language: c
+language: cpp
+sudo: true
 dist: trusty
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-6
+      - gcc-6
+
+os:
+  - linux
+  - osx
+
 env:
-  - BUILD=AUTOTOOLS
-  - BUILD=CMAKE
+  - BUCKAROO_VERSION=v2.0.0
+
+cache:
+  directories:
+    - $HOME/.buckaroo/cache
+    - $TRAVIS_BUILD_DIR/bin
+
+osx_image: xcode9.3
+
+before_install:
+  - ./travis/before-install-$TRAVIS_OS_NAME.sh
 
 script:
-  - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then ./autogen.sh ; fi
-  - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then ./configure ; fi
-  - if [[ "$BUILD" == "AUTOTOOLS" ]] ; then make distcheck ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then mkdir build ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then pushd build ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/_inst .. ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then cmake --build . ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then cmake --build . --target install ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then popd ; fi
+  - ./bin/buckaroo install
+  - ./bin/buck build -c ui.superconsole=DISABLED //:ogg

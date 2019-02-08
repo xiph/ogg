@@ -6,6 +6,9 @@ cxx_library(
     'ogg/os_types.h': 'include/ogg/os_types.h',
   },
   exported_platform_headers = [
+    ('default.*', {
+      'ogg/config_types.h': 'include/ogg/config_types.linux.h',
+    }),
     ('linux.*', {
       'ogg/config_types.h': 'include/ogg/config_types.linux.h',
     }),

@@ -889,7 +889,7 @@ int main(void){
   for(i=0;i<test2size;i++){
     if(oggpack_look(&r,32)==-1)report("out of data. failed!");
     if(oggpack_look(&r,32)!=large[i]){
-      fprintf(stderr,"%ld != %ld (%lx!=%lx):",oggpack_look(&r,32),large[i],
+      fprintf(stderr,"%ld != %lu (%lx!=%lx):",oggpack_look(&r,32),large[i],
               oggpack_look(&r,32),large[i]);
       report("read incorrect value!\n");
     }
@@ -999,7 +999,7 @@ int main(void){
   for(i=0;i<test2size;i++){
     if(oggpackB_look(&r,32)==-1)report("out of data. failed!");
     if(oggpackB_look(&r,32)!=large[i]){
-      fprintf(stderr,"%ld != %ld (%lx!=%lx):",oggpackB_look(&r,32),large[i],
+      fprintf(stderr,"%ld != %lu (%lx!=%lx):",oggpackB_look(&r,32),large[i],
               oggpackB_look(&r,32),large[i]);
       report("read incorrect value!\n");
     }

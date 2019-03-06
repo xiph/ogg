@@ -95,6 +95,7 @@ AC_CHECK_SIZEOF(int32_t)
 AC_CHECK_SIZEOF(uint32_t)
 AC_CHECK_SIZEOF(u_int32_t)
 AC_CHECK_SIZEOF(int64_t)
+AC_CHECK_SIZEOF(uint64_t)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
@@ -135,6 +136,13 @@ case 8 in
      $ac_cv_sizeof_long_long) SIZE64="long long";;
 esac
 
+case 8 in
+     $ac_cv_sizeof_uint64_t) USIZE64="uint64_t";;
+     $ac_cv_sizeof_unsigned_int) USIZE64="unsigned int";;
+     $ac_cv_sizeof_unsigned_long) USIZE64="unsigned long";;
+     $ac_cv_sizeof_unsigned_long_long) USIZE64="unsigned long long";;
+esac
+
 if test -z "$SIZE16"; then
         AC_MSG_ERROR(No 16 bit type found on this platform!)
 fi
@@ -149,6 +157,9 @@ if test -z "$USIZE32"; then
 fi
 if test -z "$SIZE64"; then
         AC_MSG_WARN(No 64 bit type found on this platform!)
+fi
+if test -z "$USIZE64"; then
+        AC_MSG_WARN(No unsigned 64 bit type found on this platform!)
 fi
 
 AC_ARG_ENABLE([crc],
@@ -176,6 +187,7 @@ AC_SUBST(USIZE16)
 AC_SUBST(SIZE32)
 AC_SUBST(USIZE32)
 AC_SUBST(SIZE64)
+AC_SUBST(USIZE64)
 AC_SUBST(OPT)
 AC_SUBST(LIBS)
 AC_SUBST(DEBUG)

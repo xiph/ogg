@@ -43,6 +43,7 @@
      typedef unsigned long long ogg_uint64_t;
 #  elif defined(__MWERKS__)
      typedef long long ogg_int64_t;
+     typedef unsigned long long ogg_uint64_t;
      typedef int ogg_int32_t;
      typedef unsigned int ogg_uint32_t;
      typedef short ogg_int16_t;
@@ -61,6 +62,7 @@
        typedef __int64 ogg_int64_t;
        typedef __int32 ogg_int32_t;
        typedef unsigned __int32 ogg_uint32_t;
+       typedef unsigned __int64 ogg_uint64_t;
        typedef __int16 ogg_int16_t;
        typedef unsigned __int16 ogg_uint16_t;
 #    endif
@@ -74,6 +76,7 @@
    typedef int32_t ogg_int32_t;
    typedef uint32_t ogg_uint32_t;
    typedef int64_t ogg_int64_t;
+   typedef uint64_t ogg_uint64_t;
 
 #elif defined(__HAIKU__)
 
@@ -84,6 +87,7 @@
    typedef int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;
+   typedef unsigned long long ogg_uint64_t;
 
 #elif defined(__BEOS__)
 
@@ -94,6 +98,7 @@
    typedef int32_t ogg_int32_t;
    typedef uint32_t ogg_uint32_t;
    typedef int64_t ogg_int64_t;
+   typedef uint64_t ogg_uint64_t;
 
 #elif defined (__EMX__)
 
@@ -103,6 +108,8 @@
    typedef int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;
+   typedef unsigned long long ogg_uint64_t;
+
 
 #elif defined (DJGPP)
 
@@ -111,11 +118,13 @@
    typedef int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long ogg_int64_t;
+   typedef unsigned long long ogg_uint64_t;
 
 #elif defined(R5900)
 
    /* PS2 EE */
    typedef long ogg_int64_t;
+   typedef unsigned long ogg_uint64_t;
    typedef int ogg_int32_t;
    typedef unsigned ogg_uint32_t;
    typedef short ogg_int16_t;
@@ -128,6 +137,7 @@
    typedef signed int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long int ogg_int64_t;
+   typedef unsigned long long int ogg_uint64_t;
 
 #elif defined(__TMS320C6X__)
 
@@ -137,6 +147,7 @@
    typedef signed int ogg_int32_t;
    typedef unsigned int ogg_uint32_t;
    typedef long long int ogg_int64_t;
+   typedef unsigned long long int ogg_uint64_t;
 
 #else
 

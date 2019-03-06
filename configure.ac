@@ -164,7 +164,7 @@ fi
 
 AC_ARG_ENABLE([crc],
     [AS_HELP_STRING([--disable-crc],
-                    [Disable CRC in the demuxer)])],,
+                    [Disable CRC in the demuxer])],,
     [enable_crc=yes])
 
 AM_CONDITIONAL([DISABLE_CRC], [test "$enable_crc" = "no"])

@@ -48,7 +48,7 @@ int ogg_page_eos(const ogg_page *og){
 
 ogg_int64_t ogg_page_granulepos(const ogg_page *og){
   unsigned char *page=og->header;
-  ogg_int64_t granulepos=page[13]&(0xff);
+  ogg_uint64_t granulepos=page[13]&(0xff);
   granulepos= (granulepos<<8)|(page[12]&0xff);
   granulepos= (granulepos<<8)|(page[11]&0xff);
   granulepos= (granulepos<<8)|(page[10]&0xff);
@@ -56,21 +56,21 @@ ogg_int64_t ogg_page_granulepos(const ogg_page *og){
   granulepos= (granulepos<<8)|(page[8]&0xff);
   granulepos= (granulepos<<8)|(page[7]&0xff);
   granulepos= (granulepos<<8)|(page[6]&0xff);
-  return(granulepos);
+  return((ogg_int64_t)granulepos);
 }
 
 int ogg_page_serialno(const ogg_page *og){
-  return(og->header[14] |
-         (og->header[15]<<8) |
-         (og->header[16]<<16) |
-         (og->header[17]<<24));
+  return((int)((ogg_uint32_t)og->header[14]) |
+              ((ogg_uint32_t)og->header[15]<<8) |
+              ((ogg_uint32_t)og->header[16]<<16) |
+              ((ogg_uint32_t)og->header[17]<<24));
 }
 
 long ogg_page_pageno(const ogg_page *og){
-  return(og->header[18] |
-         (og->header[19]<<8) |
-         (og->header[20]<<16) |
-         (og->header[21]<<24));
+  return((long)((ogg_uint32_t)og->header[18]) |
+               ((ogg_uint32_t)og->header[19]<<8) |
+               ((ogg_uint32_t)og->header[20]<<16) |
+               ((ogg_uint32_t)og->header[21]<<24));
 }
 
 
@@ -236,7 +236,7 @@ static int _os_lacing_expand(ogg_stream_state *os,long needed){
 
 static ogg_uint32_t _os_update_crc(ogg_uint32_t crc, unsigned char *buffer, int size){
   while (size>=8){
-    crc^=buffer[0]<<24|buffer[1]<<16|buffer[2]<<8|buffer[3];
+    crc^=((ogg_uint32_t)buffer[0]<<24)|((ogg_uint32_t)buffer[1]<<16)|((ogg_uint32_t)buffer[2]<<8)|((ogg_uint32_t)buffer[3]);
 
     crc=crc_lookup[7][ crc>>24      ]^crc_lookup[6][(crc>>16)&0xFF]^
         crc_lookup[5][(crc>> 8)&0xFF]^crc_lookup[4][ crc     &0xFF]^

@@ -691,9 +691,6 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
 
   /* yes, have a whole page all ready to go */
   {
-    unsigned char *page=oy->data+oy->returned;
-    long bytes;
-
     if(og){
       og->header=page;
       og->header_len=oy->headerbytes;

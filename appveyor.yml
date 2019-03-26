@@ -1,7 +1,9 @@
 image: Visual Studio 2015
 configuration:
 - Debug
+- DebugDLL
 - Release
+- ReleaseDLL
 
 platform:
 - x86
@@ -14,6 +16,7 @@ build:
 
 after_build:
 - cmd: 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.lib include\ogg\*.h
+- cmd: if exist win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll
 
 artifacts:
 - path: ogg.zip

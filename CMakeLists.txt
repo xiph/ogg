@@ -115,7 +115,7 @@ endif()
 configure_pkg_config_file(ogg.pc.in)
 
 install(TARGETS ogg
-    EXPORT ogg-targets
+    EXPORT OggTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -123,20 +123,26 @@ install(TARGETS ogg
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ogg
 )
 
-write_basic_package_version_file(ogg-config-version.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
 if(INSTALL_CMAKE_PACKAGE_MODULE)
-    set(CMAKE_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/ogg)
-    install(EXPORT ogg-targets
+    set(CMAKE_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/Ogg)
+    install(EXPORT OggTargets
         DESTINATION ${CMAKE_INSTALL_CONFIGDIR}
         NAMESPACE Ogg::
-        FILE ogg-config.cmake
     )
-    install(
-        FILES ${CMAKE_CURRENT_BINARY_DIR}/ogg-config-version.cmake
+
+    include(CMakePackageConfigHelpers)
+
+    configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/OggConfig.cmake.in ${PROJECT_BINARY_DIR}/OggConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_CONFIGDIR}
+        PATH_VARS CMAKE_INSTALL_FULL_INCLUDEDIR
+    )
+
+    write_basic_package_version_file(${PROJECT_BINARY_DIR}/OggConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    install(FILES ${PROJECT_BINARY_DIR}/OggConfig.cmake ${PROJECT_BINARY_DIR}/OggConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_CONFIGDIR}
     )
 endif()

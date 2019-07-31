@@ -2099,6 +2099,8 @@ int main(void){
       }
     }
   }
+  ogg_stream_clear(&os_en);
+  ogg_stream_clear(&os_de);
 
   return(0);
 }

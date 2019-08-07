@@ -24,5 +24,5 @@ script:
   - if [[ "$BUILD" == "CMAKE" ]] ; then cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DCPACK_PACKAGE_CONTACT="Xiph.Org Foundation" .. ; fi
   - if [[ "$BUILD" == "CMAKE" ]] ; then cmake --build . ; fi
   - if [[ "$BUILD" == "CMAKE" ]] ; then ctest ; fi
-  - if [[ "$BUILD" == "CMAKE" ]] ; then cpack -G DEB ; fi
+  - if [[ "$BUILD" == "CMAKE" && "$TRAVIS_OS_NAME" == "linux" ]] ; then cpack -G DEB ; fi
   - if [[ "$BUILD" == "CMAKE" ]] ; then popd ; fi

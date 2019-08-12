@@ -2099,6 +2099,7 @@ int main(void){
       }
     }
   }
+  ogg_sync_clear(&oy);
   ogg_stream_clear(&os_en);
   ogg_stream_clear(&os_de);
 

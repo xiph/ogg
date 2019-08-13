@@ -49,7 +49,7 @@ typedef struct {
   int     b_o_s;          /* set after we've written the initial page
                              of a logical bitstream */
   long     serialno;
-  int      pageno;
+  long     pageno;
   ogg_int64_t  packetno;      /* sequence number for decode; the framing
                              knows where there's a hole in the data,
                              but we need coupling so that the codec

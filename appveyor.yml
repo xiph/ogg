@@ -14,10 +14,9 @@ environment:
   - BUILD_SYSTEM: MSVC
   - BUILD_SYSTEM: CMAKE
 
-
 build_script:
   - if "%BUILD_SYSTEM%" == "MSVC" (
-      msbuild "%APPVEYOR_BUILD_FOLDER%\win32\VS2015\libogg_static.sln" /m /v:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /property:Configuration=%CONFIGURATION%;Platform=%PLATFORM%
+      msbuild "%APPVEYOR_BUILD_FOLDER%\win32\VS2015\libogg.sln" /m /v:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /property:Configuration=%CONFIGURATION%;Platform=%PLATFORM%
     )
   - if "%BUILD_SYSTEM%" == "CMAKE" (
       mkdir "%APPVEYOR_BUILD_FOLDER%\build" &&
@@ -29,12 +28,9 @@ build_script:
 
 after_build:
   - if "%BUILD_SYSTEM%" == "MSVC" (
-      7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg_static.lib include\ogg\*.h
+      7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.lib include\ogg\*.h
+      if exist win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll
     )
-
-after_build:
-- cmd: 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.lib include\ogg\*.h
-- cmd: if exist win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll
 
 artifacts:
 - path: ogg.zip

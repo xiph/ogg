@@ -1,12 +1,10 @@
 image: Visual Studio 2015
 configuration:
 - Debug
-- DebugDLL
 - Release
-- ReleaseDLL
 
 platform:
-- x86
+- Win32
 - x64
 
 environment:
@@ -29,7 +27,6 @@ build_script:
 after_build:
   - if "%BUILD_SYSTEM%" == "MSVC" (
       7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.lib include\ogg\*.h
-      if exist win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll
     )
 
 artifacts:

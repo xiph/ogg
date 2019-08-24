@@ -29,9 +29,7 @@ build_script:
 after_build:
   - if "%BUILD_SYSTEM%" == "MSVC" (
       7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.lib include\ogg\*.h
-      if exist win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll (
-        7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll
-      )
+      if exist win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll 7z a ogg.zip win32\VS2015\%PLATFORM%\%CONFIGURATION%\libogg.dll
     )
 
 artifacts:

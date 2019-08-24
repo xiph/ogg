@@ -120,6 +120,14 @@ Use Makefile generator which is default one.
     cmake .
     make
 
+## Testing
+
+This package includes a collection of automated tests.
+Running them is not part of building nor installation but optional.
+To run the tests:
+
+    make check
+
 ## License ##
 
 THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.

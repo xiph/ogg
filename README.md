@@ -123,10 +123,15 @@ Use Makefile generator which is default one.
 ## Testing
 
 This package includes a collection of automated tests.
-Running them is not part of building nor installation but optional.
-To run the tests:
+Running them is not part of building nor installation but optional. 
+And they can only run under UNIX-like system.
+If build under automake:
 
     make check
+
+If build under CMake:
+
+    make test
 
 ## License ##
 

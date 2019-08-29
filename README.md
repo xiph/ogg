@@ -133,6 +133,10 @@ If build under CMake:
 
     make test
 
+or:
+
+    ctest
+
 ## License ##
 
 THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.

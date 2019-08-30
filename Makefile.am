@@ -26,6 +26,17 @@ dist-hook:
 	    echo "OK"; \
 	  fi; \
 	done
+
+# Verify cmake works with the dist tarball.
+cmake_builddir = _build.cmake
+distcheck-hook:
+	$(RM) -rf $(cmake_builddir)
+	mkdir $(cmake_builddir)
+	cd $(cmake_builddir) && cmake ../$(top_distdir)
+	cd $(cmake_builddir) && cmake --build .
+	cd $(cmake_builddir) && ctest
+	$(RM) -rf $(cmake_builddir)
+
 debug:
 	$(MAKE) all CFLAGS="@DEBUG@"
 

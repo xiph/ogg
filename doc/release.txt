@@ -9,6 +9,7 @@ Source release:
   - If interfaces were added, increment AGE.
   - If interfaces were removed, set AGE to zero.
 - Update the version and release date in doc/libogg/*.html.
+  - `make -C doc/libogg update-doc-version`
 - Check for uncommitted changes to master.
 - Tag the release commit with 'git tag -s vN.M'.
   - Include release notes in the tag annotation.

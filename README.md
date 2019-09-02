@@ -124,7 +124,9 @@ Use Makefile generator which is default one.
 
 This package includes a collection of automated tests.
 Running them is not part of building nor installation but optional. 
-And they can only run under UNIX-like system.
+
+### Unix-like
+
 If build under automake:
 
     make check
@@ -136,6 +138,16 @@ If build under CMake:
 or:
 
     ctest
+
+### Windows
+
+If build with configuration type "Debug", then:
+
+    ctest -C Debug
+
+If build with configuration type "Release", then:
+
+    ctest -C Release
 
 ## License ##
 

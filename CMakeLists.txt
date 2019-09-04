@@ -104,6 +104,22 @@ set_target_properties(
     PUBLIC_HEADER "${OGG_HEADERS}"
 )
 
+add_library(ogg_shared SHARED ${OGG_HEADERS} ${OGG_SOURCES})
+target_include_directories(ogg_shared PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+set_target_properties(
+    ogg_shared PROPERTIES
+    SOVERSION ${LIB_SOVERSION}
+    VERSION ${LIB_VERSION}
+    PUBLIC_HEADER "${OGG_HEADERS}"
+)
+
+SET_TARGET_PROPERTIES(ogg_shared PROPERTIES OUTPUT_NAME "ogg")
+
+
 if(BUILD_FRAMEWORK)
     set_target_properties(ogg PROPERTIES
         FRAMEWORK TRUE

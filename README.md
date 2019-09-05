@@ -125,7 +125,7 @@ Use Makefile generator which is default one.
 ## Testing ##
 
 This package includes a collection of automated tests.
-Running them is not part of building nor installation but optional. 
+Running them is not part of building nor installation but optional.
 
 ### Unix-like System or MinGW ###
 

@@ -120,12 +120,12 @@ Use Makefile generator which is default one.
     cmake .
     make
 
-## Testing
+## Testing ##
 
 This package includes a collection of automated tests.
 Running them is not part of building nor installation but optional. 
 
-### Unix-like
+### Unix-like System or MinGW ###
 
 If build under automake:
 
@@ -139,7 +139,7 @@ or:
 
     ctest
 
-### Windows
+### Windows with MSBuild ###
 
 If build with configuration type "Debug", then:
 

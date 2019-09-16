@@ -1,6 +1,6 @@
 language: cpp
 sudo: true
-dist: trusty
+dist: bionic
 
 addons:
   apt:
@@ -9,13 +9,22 @@ addons:
     packages:
       - g++-6
       - gcc-6
+      - make
+      - pkg-config
+      - zip
+      - g++
+      - zlib1g-dev
+      - unzip
+      - python3
 
 os:
   - linux
   - osx
+  - windows
 
 env:
-  - BUCKAROO_VERSION=v2.0.0
+  - BUCKAROO_VERSION=v2.2.0 PKG_CONFIG_PATH=/usr/lib/pkgconfig
+  - BUCKAROO_VERSION=bazel-alpha-1 BUCKAROO_USE_BAZEL=1 PKG_CONFIG_PATH=/usr/lib/pkgconfig MSYS2_ARG_CONV_EXCL="//"
 
 cache:
   directories:
@@ -28,5 +37,4 @@ before_install:
   - ./travis/before-install-$TRAVIS_OS_NAME.sh
 
 script:
-  - ./bin/buckaroo install
-  - ./bin/buck build -c ui.superconsole=DISABLED //:ogg
+  - ./travis/script.sh

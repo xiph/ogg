@@ -39,3 +39,5 @@ buck-out
 buckaroo_macros.bzl
 buckaroo-macos
 buckaroo-linux
+.ionide
+bazel-*

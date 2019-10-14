@@ -1564,7 +1564,7 @@ void test_pack(const int *pl, const int **headers, int byteskip,
             byteskipcount=byteskip;
           }
 
-          ogg_sync_wrote(&oy,next-buf);
+          ogg_sync_wrote(&oy,(long)(next-buf));
 
           while(1){
             int ret=ogg_sync_pageout(&oy,&og_de);

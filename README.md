@@ -26,8 +26,6 @@ Directory:
 
 - `win32` Win32 projects and build automation
 
-- `macosx` Mac OS X project and build files
-
 ## Contact ##
 
 The Ogg homepage is located at https://www.xiph.org/ogg/ .

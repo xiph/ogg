@@ -16,7 +16,7 @@ pkgconfig_DATA = ogg.pc
 EXTRA_DIST = README.md AUTHORS CHANGES COPYING \
 	libogg.spec libogg.spec.in \
 	ogg.m4 ogg.pc.in ogg-uninstalled.pc.in \
-	macosx win32 CMakeLists.txt cmake
+	win32 CMakeLists.txt cmake
 
 dist-hook:
 	for item in $(EXTRA_DIST); do \

@@ -1,5 +1,8 @@
-# Image from https://hub.docker.com/_/gcc/ based on Debian
-image: gcc:9
+default:
+  tags:
+    - docker
+  # Image from https://hub.docker.com/_/gcc/ based on Debian.
+  image: gcc:9
 
 autoconf:
   stage: build
@@ -11,8 +14,6 @@ autoconf:
     - ./configure
     - make
     - make distcheck
-  tags:
-    - docker
 
 cmake:
   stage: build
@@ -23,5 +24,3 @@ cmake:
     - mkdir build
     - cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
     - cmake --build build
-  tags:
-    - docker

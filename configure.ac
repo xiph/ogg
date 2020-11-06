@@ -25,9 +25,9 @@ dnl Set some options based on environment
 
 cflags_save="$CFLAGS"
 if test -z "$GCC"; then
-        case $host in 
+        case $host in
         *-*-irix*)
-                DEBUG="-g -signed" 
+                DEBUG="-g -signed"
                 CFLAGS="-O2 -w -signed"
                 PROFILE="-p -g3 -O2 -signed"
 		;;
@@ -39,11 +39,11 @@ if test -z "$GCC"; then
         *)
                 DEBUG="-g"
                 CFLAGS="-O"
-                PROFILE="-g -p" 
+                PROFILE="-g -p"
 		;;
         esac
 else
-        case $host in 
+        case $host in
         *-*-linux*)
                 DEBUG="-g -Wall -fsigned-char"
                 CFLAGS="-O2 -Wall -ffast-math -fsigned-char"

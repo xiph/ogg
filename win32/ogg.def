@@ -2,7 +2,6 @@
 ; ogg.def
 ; List of exported functions for Windows builds.
 ;
-LIBRARY ogg
 EXPORTS
 ;
 oggpack_writeinit

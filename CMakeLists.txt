@@ -16,7 +16,7 @@ endif()
 # Install options
 option(INSTALL_DOCS "Install documentation" ON)
 option(INSTALL_PKG_CONFIG_MODULE "Install ogg.pc file" ON)
-option(INSTALL_CMAKE_PACKAGE_MODULE "Install CMake package configiguration module" ON)
+option(INSTALL_CMAKE_PACKAGE_MODULE "Install CMake package configuration module" ON)
 
 # Extract project version from configure.ac
 file(READ configure.ac CONFIGURE_AC_CONTENTS)

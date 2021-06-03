@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([libogg],[1.3.4],[ogg-dev@xiph.org])
+AC_INIT([libogg],[1.3.5],[ogg-dev@xiph.org])
 
 LT_INIT
 AC_CONFIG_MACRO_DIR([m4])
@@ -12,7 +12,7 @@ AM_MAINTAINER_MODE([enable])
 dnl Library versioning
 
 LIB_CURRENT=8
-LIB_REVISION=4
+LIB_REVISION=5
 LIB_AGE=8
 AC_SUBST(LIB_CURRENT)
 AC_SUBST(LIB_REVISION)

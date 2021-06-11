@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
-project(ogg LANGUAGES C)
+
+# Extract project version from configure.ac
+file(READ configure.ac CONFIGURE_AC_CONTENTS)
+string(REGEX MATCH "AC_INIT\\(\\[libogg\\],\\[([0-9]*\\.[0-9]*\\.[0-9]*)\\]" DUMMY ${CONFIGURE_AC_CONTENTS})
+
+project(ogg VERSION ${CMAKE_MATCH_1} LANGUAGES C)
 
 # Required modules
 include(GNUInstallDirs)
@@ -17,14 +22,6 @@ endif()
 option(INSTALL_DOCS "Install documentation" ON)
 option(INSTALL_PKG_CONFIG_MODULE "Install ogg.pc file" ON)
 option(INSTALL_CMAKE_PACKAGE_MODULE "Install CMake package configuration module" ON)
-
-# Extract project version from configure.ac
-file(READ configure.ac CONFIGURE_AC_CONTENTS)
-string(REGEX MATCH "AC_INIT\\(\\[libogg\\],\\[([0-9]*).([0-9]*).([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})
-set(PROJECT_VERSION_MAJOR ${CMAKE_MATCH_1})
-set(PROJECT_VERSION_MINOR ${CMAKE_MATCH_2})
-set(PROJECT_VERSION_PATCH ${CMAKE_MATCH_3})
-set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
 # Extract library version from configure.ac
 string(REGEX MATCH "LIB_CURRENT=([0-9]*)" DUMMY ${CONFIGURE_AC_CONTENTS})

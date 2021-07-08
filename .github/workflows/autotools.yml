@@ -1,4 +1,4 @@
-name: Autotools
+name: Autotools build
 
 on:
   push:

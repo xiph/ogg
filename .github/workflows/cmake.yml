@@ -1,4 +1,4 @@
-name: CMake
+name: CMake build
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
       - name: Prepare build directory
         run: mkdir ${{ env.BUILD }}
 
-      - name: Generate
+      - name: Configure
         run: cmake -S . -B ${{ env.BUILD }}
 
       - name: Build

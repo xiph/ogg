@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: find sys/types.h
-        run: find /usr -name types.h
+        run: find / -name types.h | grep sys
 
       - name: grep sys/types.h
         run: fgrep int32_t /usr/include/sys/types.h

@@ -1,0 +1,20 @@
+name: macOS type diagnostics
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: grep sys/types.h
+        run: fgrep int32_t /usr/include/sys/types.h
+
+      - name: cat sys/types.h
+        run: cat /usr/include/sys/types.h

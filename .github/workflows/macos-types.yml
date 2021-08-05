@@ -13,11 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: find sys/types.h
-        run: find / -name types.h | grep sys
-
       - name: grep sys/types.h
-        run: fgrep int32_t /usr/include/sys/types.h
+        run: fgrep int32_t /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/sys/types.h
 
       - name: cat sys/types.h
-        run: cat /usr/include/sys/types.h
+        run: cat /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/sys/types.h

@@ -175,7 +175,7 @@ if(INSTALL_DOCS)
         doc/skeleton.html
     )
     install(FILES ${OGG_DOCS} DESTINATION ${CMAKE_INSTALL_DOCDIR}/html)
-    install(DIRECTORY doc/libogg DESTINATION ${CMAKE_INSTALL_DOCDIR}/html)
+    install(DIRECTORY doc/libogg DESTINATION ${CMAKE_INSTALL_DOCDIR}/html PATTERN "*.am" EXCLUDE)
 endif()
 
 if(BUILD_TESTING)

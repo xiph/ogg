@@ -49,7 +49,7 @@
      typedef short ogg_int16_t;
      typedef unsigned short ogg_uint16_t;
 #  else
-#    if defined(_MSC_VER) && (_MSC_VER >= 1800) /* MSVC 2013 and newer */
+#    if defined(_MSC_VER) && (_MSC_VER >= 1600) /* MSVC 2010 and newer */
 #      include <stdint.h>
        typedef int16_t ogg_int16_t;
        typedef uint16_t ogg_uint16_t;

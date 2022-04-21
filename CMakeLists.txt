@@ -10,7 +10,6 @@ project(ogg VERSION ${CMAKE_MATCH_1} LANGUAGES C)
 include(GNUInstallDirs)
 include(CheckIncludeFiles)
 include(CMakePackageConfigHelpers)
-include(CTest)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared library" OFF)

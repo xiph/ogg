@@ -101,6 +101,12 @@ set_target_properties(
     PUBLIC_HEADER "${OGG_HEADERS}"
 )
 
+if(WIN32)
+    set_target_properties(
+        ogg PROPERTIES
+        RUNTIME_OUTPUT_NAME ogg-${LIB_SOVERSION})
+endif()
+
 if(BUILD_FRAMEWORK)
     set_target_properties(ogg PROPERTIES
         FRAMEWORK TRUE

@@ -176,6 +176,12 @@ AS_IF([test "$enable_crc" = "no"],[
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
 
+AC_ARG_ENABLE([extra-programs],
+    [AS_HELP_STRING([--disable-extra-programs], [Do not build extra programs (demo and tests)])],,
+    [enable_extra_programs=yes])
+
+AM_CONDITIONAL([EXTRA_PROGRAMS], [test "$enable_extra_programs" = "yes"])
+
 dnl Make substitutions
 
 AC_SUBST(LIBTOOL_DEPS)

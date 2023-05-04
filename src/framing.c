@@ -60,17 +60,17 @@ ogg_int64_t ogg_page_granulepos(const ogg_page *og){
 }
 
 int ogg_page_serialno(const ogg_page *og){
-  return((int)((ogg_uint32_t)og->header[14]) |
+  return((int)(((ogg_uint32_t)og->header[14]) |
               ((ogg_uint32_t)og->header[15]<<8) |
               ((ogg_uint32_t)og->header[16]<<16) |
-              ((ogg_uint32_t)og->header[17]<<24));
+              ((ogg_uint32_t)og->header[17]<<24)));
 }
 
 long ogg_page_pageno(const ogg_page *og){
-  return((long)((ogg_uint32_t)og->header[18]) |
+  return((long)(((ogg_uint32_t)og->header[18]) |
                ((ogg_uint32_t)og->header[19]<<8) |
                ((ogg_uint32_t)og->header[20]<<16) |
-               ((ogg_uint32_t)og->header[21]<<24));
+               ((ogg_uint32_t)og->header[21]<<24)));
 }
 
 

@@ -39,7 +39,7 @@ static const unsigned int mask8B[]=
 void oggpack_writeinit(oggpack_buffer *b){
   memset(b,0,sizeof(*b));
   b->ptr=b->buffer=_ogg_malloc(BUFFER_INCREMENT);
-  b->buffer[0]='\0';
+  if(b->buffer) b->buffer[0]='\0';
   b->storage=BUFFER_INCREMENT;
 }
 

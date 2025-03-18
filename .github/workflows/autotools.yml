@@ -23,7 +23,7 @@ jobs:
 
       - name: Install macOS dependencies
         if: startsWith(matrix.os,'macos')
-        run: brew install automake pkg-config
+        run: brew install automake pkg-config libtool
 
       - name: configure
         run: |

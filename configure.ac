@@ -75,7 +75,6 @@ dnl Checks for programs.
 dnl Checks for libraries.
 
 dnl Checks for header files.
-AC_HEADER_STDC
 INCLUDE_INTTYPES_H=0
 INCLUDE_STDINT_H=0
 INCLUDE_SYS_TYPES_H=0

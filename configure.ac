@@ -45,22 +45,22 @@ if test -z "$GCC"; then
 else
         case $host in
         *-*-linux*)
-                DEBUG="-g -Wall -fsigned-char"
-                CFLAGS="-O2 -Wall -ffast-math -fsigned-char"
-                PROFILE="-Wall -W -pg -g -O2 -ffast-math -fsigned-char"
+                DEBUG="-g -Wall -Wextra -fsigned-char"
+                CFLAGS="-O2 -Wall -Wextra -ffast-math -fsigned-char"
+                PROFILE="-Wall -Wextra -W -pg -g -O2 -ffast-math -fsigned-char"
 		;;
         sparc-sun-*)
-                DEBUG="-g -Wall -fsigned-char"
+                DEBUG="-g -Wall -Wextra -fsigned-char"
                 CFLAGS="-O2 -ffast-math -fsigned-char"
                 PROFILE="-pg -g -O2 -fsigned-char"
 		;;
 	*-*-darwin*)
-		DEBUG="-fno-common -g -Wall -fsigned-char"
-		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
-		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+		DEBUG="-fno-common -g -Wall -Wextra -fsigned-char"
+		CFLAGS="-fno-common -O4 -Wall -Wextra -fsigned-char -ffast-math"
+		PROFILE="-fno-common -O4 -Wall -Wextra -pg -g -fsigned-char -ffast-math"
 		;;
         *)
-                DEBUG="-g -Wall -fsigned-char"
+                DEBUG="-g -Wall -Wextra -fsigned-char"
                 CFLAGS="-O2 -fsigned-char"
                 PROFILE="-O2 -g -pg -fsigned-char"
 		;;

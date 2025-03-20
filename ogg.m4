@@ -62,7 +62,7 @@ dnl
 #include <string.h>
 #include <ogg/ogg.h>
 
-int main ()
+int main (int, char **)
 {
   system("touch conf.oggtest");
   return 0;

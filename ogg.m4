@@ -20,7 +20,7 @@ AC_ARG_ENABLE(oggtest,AS_HELP_STRING([--disable-oggtest],[Do not try to compile 
     OGG_LIBS=""
   elif test "x$ogg_prefix" != "x" ; then
     OGG_LIBS="-L$ogg_prefix/lib"
-  elif test "x$prefix" != "xNONE" ; then
+  elif test "x$prefix" != "xNONE" && test "x$prefix" != "x/usr" ; then
     OGG_LIBS="-L$prefix/lib"
   fi
 
@@ -34,7 +34,7 @@ AC_ARG_ENABLE(oggtest,AS_HELP_STRING([--disable-oggtest],[Do not try to compile 
     OGG_CFLAGS=""
   elif test "x$ogg_prefix" != "x" ; then
     OGG_CFLAGS="-I$ogg_prefix/include"
-  elif test "x$prefix" != "xNONE"; then
+  elif test "x$prefix" != "xNONE" && test "x$prefix" != "x/usr" ; then
     OGG_CFLAGS="-I$prefix/include"
   fi
 

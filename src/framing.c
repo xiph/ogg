@@ -1652,6 +1652,7 @@ void test_pack(const int *pl, const int **headers, int byteskip,
     }
   }
   _ogg_free(data);
+  data=NULL;
   if(headers[pageno]!=NULL){
     fprintf(stderr,"did not write last page!\n");
     exit(1);
@@ -1846,6 +1847,7 @@ int main(void){
     }
 
     _ogg_free(data);
+    data=NULL;
 
     /* retrieve finished pages */
     for(i=0;i<5;i++){

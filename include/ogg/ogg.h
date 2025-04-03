@@ -201,6 +201,7 @@ extern int      ogg_page_packets(const ogg_page *og);
 
 extern void     ogg_packet_clear(ogg_packet *op);
 
+extern const char *ogg_version_string(void);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([libogg],[1.3.5],[ogg-dev@xiph.org])
+AC_INIT([libogg],[1.3.5])
 
 LT_INIT
 AC_CONFIG_MACRO_DIR([m4])

@@ -1,4 +1,4 @@
-Version 1.3.6 (unreleased)
+Version 1.3.6 (2025 June 16)
 
  * Update minimum cmake version to 3.6
    This fixes incompatibility with cmake >= 4.0

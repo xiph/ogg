@@ -28,7 +28,8 @@ autotools-gcc:
     INSTALL_EXTRA: cmake
   artifacts:
     paths:
-     - libogg-*.tar.gz
+     - libogg-*.tar.*
+     - libogg-*.zip
     expire_in: 2 week
 
 autotools-gcc-builddir:

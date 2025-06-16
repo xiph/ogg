@@ -18,11 +18,10 @@ Source release:
 - Upload source package 'libogg-${version}.tar.gz' et al.
   to the website and verify file permissions.
 - Update checksum files on website.
-- Update links on <https://www.opus-codec.org/downloads/>.
 - Add a copy of the documentation to <https://xiph.org/ogg/docs/>
   and update the links.
 
-Releases are committed to https://svn.xiph.org/releases/ogg/
+Releases are committed to the ftp.osuosl.org staging area
 which propagates to downloads.xiph.org.
 
 Release packages should also be manually attached to the corresponding

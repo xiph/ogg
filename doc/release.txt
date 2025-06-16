@@ -4,7 +4,7 @@ Source release:
 
 - Update CHANGES with notable specifics.
 - Update version and LIB_* API soname suffix in configure.ac.
-  - If the source code changed, incremement REVISION.
+  - If the source code changed, increment REVISION.
   - If interfaces changed, increment CURRENT and zero REVISION.
   - If interfaces were added, increment AGE.
   - If interfaces were removed, set AGE to zero.

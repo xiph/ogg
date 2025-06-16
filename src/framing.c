@@ -1510,7 +1510,7 @@ void test_pack(const int *pl, const int **headers, int byteskip,
   int byteskipcount=0;
 
   if (!data) {
-    fprintf(stderr,"unable to allocate requried data buffer!\n");
+    fprintf(stderr,"unable to allocate required data buffer!\n");
     exit(1);
   }
 
@@ -1826,7 +1826,7 @@ int main(void){
     ogg_page og[5];
 
     if (!data) {
-      fprintf(stderr,"unable to allocate requried packet data buffer!\n");
+      fprintf(stderr,"unable to allocate required packet data buffer!\n");
       exit(1);
     }
 

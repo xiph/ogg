@@ -55,12 +55,6 @@ check_include_files(stdint.h INCLUDE_STDINT_H)
 check_include_files(sys/types.h INCLUDE_SYS_TYPES_H)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-set(SIZE16 int16_t)
-set(USIZE16 uint16_t)
-set(SIZE32 int32_t)
-set(USIZE32 uint32_t)
-set(SIZE64 int64_t)
-set(USIZE64 uint64_t)
 
 include(CheckSizes)
 

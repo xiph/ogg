@@ -92,12 +92,12 @@ To generate projects just run cmake replacing `YOUR-PROJECT-GENERATOR` with a pr
 
     mkdir build
     cd build
-    cmake -G YOUR-PROJECT-GENERATOR ..
+    cmake -G YOUR-PROJECT-GENERATOR .
 
 Note that by default cmake generates projects that will build static libraries.
 To generate projects that will build dynamic library use `BUILD_SHARED_LIBS` option like this:
 
-    cmake -G YOUR-PROJECT-GENERATOR -DBUILD_SHARED_LIBS=1 ..
+    cmake -G YOUR-PROJECT-GENERATOR -DBUILD_SHARED_LIBS=1 .
 
 After projects are generated use them as usual
 
@@ -105,19 +105,19 @@ After projects are generated use them as usual
 
 Use proper generator for your Visual Studio version like:
 
-    cmake -G "Visual Studio 12 2013" ..
+    cmake -G "Visual Studio 12 2013" .
 
 #### Building on Mac OS X ####
 
 Use Xcode generator. To build framework run:
 
-    cmake -G Xcode -DBUILD_FRAMEWORK=1 ..
+    cmake -G Xcode -DBUILD_FRAMEWORK=1 .
 
 #### Building on Linux ####
 
 Use Makefile generator which is default one.
 
-    cmake ..
+    cmake .
     make
 
 ## Testing ##

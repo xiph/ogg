@@ -28,6 +28,8 @@
 #include <string.h>
 #include <ogg/ogg.h>
 
+#define GENERAL_VENDOR_STRING "Xiph.Org libOgg 1.3.6"
+
 /* A complete description of Ogg framing exists in docs/framing.html */
 
 int ogg_page_version(const ogg_page *og){
@@ -1008,6 +1010,10 @@ int ogg_stream_packetpeek(ogg_stream_state *os,ogg_packet *op){
 void ogg_packet_clear(ogg_packet *op) {
   _ogg_free(op->packet);
   memset(op, 0, sizeof(*op));
+}
+
+const char *ogg_version_string(void){
+  return GENERAL_VENDOR_STRING;
 }
 
 #ifdef _V_SELFTEST

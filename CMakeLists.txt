@@ -49,10 +49,25 @@ endfunction()
 
 message(STATUS "Configuring ${PROJECT_NAME} ${PROJECT_VERSION}")
 
-# Configure config_type.h
-check_include_files(inttypes.h INCLUDE_INTTYPES_H)
-check_include_files(stdint.h INCLUDE_STDINT_H)
-check_include_files(sys/types.h INCLUDE_SYS_TYPES_H)
+# Configure config_type.h (workaround to work both configure and cmake)
+set(INCLUDE_INTTYPES_H 0)
+set(INCLUDE_STDINT_H 0)
+set(INCLUDE_SYS_TYPES_H 0)
+check_include_files(inttypes.h INCLUDE_INTTYPES_H_)
+check_include_files(stdint.h INCLUDE_STDINT_H_)
+check_include_files(sys/types.h INCLUDE_SYS_TYPES_H_)
+
+if(INCLUDE_INTTYPES_H_ EQUAL 1)
+    set(INCLUDE_INTTYPES_H 1)
+endif()
+
+if(INCLUDE_STDINT_H_ EQUAL 1)
+    set(INCLUDE_STDINT_H 1)
+endif()
+
+if(INCLUDE_SYS_TYPES_H_ EQUAL 1)
+    set(INCLUDE_SYS_TYPES_H 1)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(SIZE16 int16_t)

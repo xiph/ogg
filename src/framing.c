@@ -857,6 +857,14 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
     }
   }
 
+  /* bodysize is derived from og->body_len minus the sum of the
+     skipped continued-packet lacing values above. A page whose
+     segment table is inconsistent with body_len can drive this
+     negative; passing a negative long to memcpy's size_t parameter
+     would request an enormous copy and overflow the body buffer.
+     Reject such pages defensively. */
+  if(bodysize<0) return -1;
+
   if(bodysize){
     if(_os_body_expand(os,bodysize)) return -1;
     memcpy(os->body_data+os->body_fill,body,bodysize);

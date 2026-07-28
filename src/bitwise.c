@@ -59,7 +59,11 @@ int oggpackB_writecheck(oggpack_buffer *b){
 }
 
 void oggpack_writetrunc(oggpack_buffer *b,long bits){
-  long bytes=bits>>3;
+  long bytes;
+  if(bits<0) goto err;
+  bytes=bits>>3;
+  if(bytes>b->endbyte || (bytes==b->endbyte && (bits&7)>b->endbit))
+    goto err;
   if(b->ptr){
     bits-=bytes*8;
     b->ptr=b->buffer+bytes;
@@ -67,10 +71,17 @@ void oggpack_writetrunc(oggpack_buffer *b,long bits){
     b->endbyte=bytes;
     *b->ptr&=mask[bits];
   }
+  return;
+ err:
+  oggpack_writeclear(b);
 }
 
 void oggpackB_writetrunc(oggpack_buffer *b,long bits){
-  long bytes=bits>>3;
+  long bytes;
+  if(bits<0) goto err;
+  bytes=bits>>3;
+  if(bytes>b->endbyte || (bytes==b->endbyte && (bits&7)>b->endbit))
+    goto err;
   if(b->ptr){
     bits-=bytes*8;
     b->ptr=b->buffer+bytes;
@@ -78,6 +89,9 @@ void oggpackB_writetrunc(oggpack_buffer *b,long bits){
     b->endbyte=bytes;
     *b->ptr&=mask8B[bits];
   }
+  return;
+ err:
+  oggpack_writeclear(b);
 }
 
 /* Takes only up to 32 bits. */
@@ -186,16 +200,21 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
                                                int),
                                      int msb){
   unsigned char *ptr=(unsigned char *)source;
+  long bytes;
+  long pbytes;
 
-  long bytes=bits/8;
-  long pbytes=(b->endbit+bits)/8;
+  if(bits<0 || bits>LONG_MAX-b->endbit) goto err;
+
+  bytes=bits/8;
+  pbytes=(b->endbit+bits)/8;
   bits-=bytes*8;
 
   /* expand storage up-front */
+  if(pbytes>LONG_MAX-b->endbyte) goto err;
   if(b->endbyte+pbytes>=b->storage){
     void *ret;
     if(!b->ptr) goto err;
-    if(b->storage>b->endbyte+pbytes+BUFFER_INCREMENT) goto err;
+    if(b->endbyte+pbytes>LONG_MAX-BUFFER_INCREMENT) goto err;
     b->storage=b->endbyte+pbytes+BUFFER_INCREMENT;
     ret=_ogg_realloc(b->buffer,b->storage);
     if(!ret) goto err;
@@ -341,6 +360,7 @@ long oggpackB_look1(oggpack_buffer *b){
 }
 
 void oggpack_adv(oggpack_buffer *b,int bits){
+  if(bits<0 || bits>INT_MAX-b->endbit) goto overflow;
   bits+=b->endbit;
 
   if(b->endbyte > b->storage-((bits+7)>>3)) goto overflow;
@@ -799,6 +819,51 @@ void copytestB(int prefill, int copy){
 
 }
 
+void invalidcounttest(int msb){
+  unsigned char source=0xaa;
+  oggpack_buffer write;
+  oggpack_buffer read;
+
+  oggpack_writeinit(&write);
+  if(msb)
+    oggpackB_writetrunc(&write,-8);
+  else
+    oggpack_writetrunc(&write,-8);
+  if(!oggpack_writecheck(&write))
+    report("negative truncation did not fail!\n");
+
+  oggpack_writeinit(&write);
+  if(msb)
+    oggpackB_write(&write,1,1);
+  else
+    oggpack_write(&write,1,1);
+  if(msb)
+    oggpackB_writetrunc(&write,9);
+  else
+    oggpack_writetrunc(&write,9);
+  if(!oggpack_writecheck(&write))
+    report("oversized truncation did not fail!\n");
+
+  oggpack_writeinit(&write);
+  if(msb)
+    oggpackB_writecopy(&write,&source,-8);
+  else
+    oggpack_writecopy(&write,&source,-8);
+  if(!oggpack_writecheck(&write))
+    report("negative copy did not fail!\n");
+
+  if(msb)
+    oggpackB_readinit(&read,&source,1);
+  else
+    oggpack_readinit(&read,&source,1);
+  if(msb)
+    oggpackB_adv(&read,-8);
+  else
+    oggpack_adv(&read,-8);
+  if((msb ? oggpackB_look1(&read) : oggpack_look1(&read))!=-1)
+    report("negative advance did not fail!\n");
+}
+
 int main(void){
   unsigned char *buffer;
   long bytes,i,j;
@@ -1081,6 +1146,11 @@ int main(void){
         copytestB(j,i);
   
   fprintf(stderr,"ok.      \n\n");
+
+  fprintf(stderr,"Testing invalid bit counts: ");
+  invalidcounttest(0);
+  invalidcounttest(1);
+  fprintf(stderr,"ok.\n");
 
   return(0);
 }

@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdint.h>
 #include <ogg/ogg.h>
 
 #define BUFFER_INCREMENT 256
@@ -193,7 +194,15 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
 
   /* expand storage up-front */
   if(b->endbyte+pbytes>=b->storage){
+    long source_offset=-1;
+    uintptr_t source_address=(uintptr_t)ptr;
+    uintptr_t buffer_address=(uintptr_t)b->buffer;
     void *ret;
+
+    /* Preserve sources that alias the buffer if realloc moves it. */
+    if(b->storage>0 && source_address>=buffer_address &&
+       source_address-buffer_address<(uintptr_t)b->storage)
+      source_offset=(long)(source_address-buffer_address);
     if(!b->ptr) goto err;
     if(b->storage>b->endbyte+pbytes+BUFFER_INCREMENT) goto err;
     b->storage=b->endbyte+pbytes+BUFFER_INCREMENT;
@@ -201,6 +210,8 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
     if(!ret) goto err;
     b->buffer=ret;
     b->ptr=b->buffer+b->endbyte;
+    if(source_offset>=0)
+      ptr=b->buffer+source_offset;
   }
 
   /* copy whole octets */
@@ -211,7 +222,7 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
       w(b,(unsigned long)(ptr[i]),8);
   }else{
     /* aligned block copy */
-    memmove(b->ptr,source,bytes);
+    memmove(b->ptr,ptr,bytes);
     b->ptr+=bytes;
     b->endbyte+=bytes;
     *b->ptr=0;
@@ -799,6 +810,50 @@ void copytestB(int prefill, int copy){
 
 }
 
+void copyselftest(int msb,int prefill_bits){
+  oggpack_buffer expected;
+  oggpack_buffer actual;
+  unsigned char source[192];
+  long copy_bits=128*8-3;
+  int i;
+
+  for(i=0;i<(int)sizeof(source);i++)
+    source[i]=(unsigned char)(i*29+7);
+
+  if(msb){
+    oggpackB_writeinit(&expected);
+    oggpackB_writeinit(&actual);
+    oggpackB_writecopy(&expected,source,sizeof(source)*8);
+    oggpackB_writecopy(&actual,source,sizeof(source)*8);
+    if(prefill_bits){
+      oggpackB_write(&expected,5,prefill_bits);
+      oggpackB_write(&actual,5,prefill_bits);
+    }
+    oggpackB_writecopy(&expected,source+7,copy_bits);
+    oggpackB_writecopy(&actual,actual.buffer+7,copy_bits);
+  }else{
+    oggpack_writeinit(&expected);
+    oggpack_writeinit(&actual);
+    oggpack_writecopy(&expected,source,sizeof(source)*8);
+    oggpack_writecopy(&actual,source,sizeof(source)*8);
+    if(prefill_bits){
+      oggpack_write(&expected,5,prefill_bits);
+      oggpack_write(&actual,5,prefill_bits);
+    }
+    oggpack_writecopy(&expected,source+7,copy_bits);
+    oggpack_writecopy(&actual,actual.buffer+7,copy_bits);
+  }
+
+  if(oggpack_writecheck(&expected) || oggpack_writecheck(&actual) ||
+     oggpack_bits(&expected)!=oggpack_bits(&actual) ||
+     oggpack_bytes(&expected)!=oggpack_bytes(&actual) ||
+     memcmp(expected.buffer,actual.buffer,oggpack_bytes(&expected)))
+    report("self-referential writecopy mismatch!\n");
+
+  oggpack_writeclear(&expected);
+  oggpack_writeclear(&actual);
+}
+
 int main(void){
   unsigned char *buffer;
   long bytes,i,j;
@@ -972,6 +1027,11 @@ int main(void){
   
   fprintf(stderr,"ok.      \n");
 
+  fprintf(stderr,"Testing self-referential writecopies (LSb): ");
+  copyselftest(0,0);
+  copyselftest(0,3);
+  fprintf(stderr,"ok.      \n");
+
 
   /********** lazy, cut-n-paste retest with MSb packing ***********/
 
@@ -1080,6 +1140,11 @@ int main(void){
       if(j&0x7)
         copytestB(j,i);
   
+  fprintf(stderr,"ok.      \n\n");
+
+  fprintf(stderr,"Testing self-referential writecopies (MSb): ");
+  copyselftest(1,0);
+  copyselftest(1,3);
   fprintf(stderr,"ok.      \n\n");
 
   return(0);

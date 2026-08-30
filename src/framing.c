@@ -773,21 +773,36 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
    into packet segments here as well. */
 
 int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
-  unsigned char *header=og->header;
-  unsigned char *body=og->body;
-  long           bodysize=og->body_len;
+  unsigned char *header;
+  unsigned char *body;
+  long           bodysize;
   int            segptr=0;
 
-  int version=ogg_page_version(og);
-  int continued=ogg_page_continued(og);
-  int bos=ogg_page_bos(og);
-  int eos=ogg_page_eos(og);
-  ogg_int64_t granulepos=ogg_page_granulepos(og);
-  int serialno=ogg_page_serialno(og);
-  long pageno=ogg_page_pageno(og);
-  int segments=header[26];
+  int version;
+  int continued;
+  int bos;
+  int eos;
+  ogg_int64_t granulepos;
+  int serialno;
+  long pageno;
+  int segments;
 
-  if(ogg_stream_check(os)) return -1;
+  if(ogg_stream_check(os) || !og || !og->header || og->header_len<27)
+    return -1;
+
+  header=og->header;
+  segments=header[26];
+  if(og->header_len<27+segments) return -1;
+
+  body=og->body;
+  bodysize=og->body_len;
+  version=ogg_page_version(og);
+  continued=ogg_page_continued(og);
+  bos=ogg_page_bos(og);
+  eos=ogg_page_eos(og);
+  granulepos=ogg_page_granulepos(og);
+  serialno=ogg_page_serialno(og);
+  pageno=ogg_page_pageno(og);
 
   /* clean up 'returned data' */
   {
@@ -1684,6 +1699,22 @@ int main(void){
   ogg_stream_init(&os_en,0x04030201);
   ogg_stream_init(&os_de,0x04030201);
   ogg_sync_init(&oy);
+
+  {
+    ogg_page invalid_page;
+    unsigned char short_header[1]={0};
+    unsigned char truncated_lacing[27]={0};
+
+    memset(&invalid_page,0,sizeof(invalid_page));
+    invalid_page.header=short_header;
+    invalid_page.header_len=1;
+    if(ogg_stream_pagein(&os_de,&invalid_page)!=-1)error();
+
+    truncated_lacing[26]=1;
+    invalid_page.header=truncated_lacing;
+    invalid_page.header_len=27;
+    if(ogg_stream_pagein(&os_de,&invalid_page)!=-1)error();
+  }
 
   /* Exercise each code path in the framing code.  Also verify that
      the checksums are working.  */

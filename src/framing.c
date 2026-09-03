@@ -312,7 +312,7 @@ int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count,
 
   for (i = 0; i < count; ++i) {
     memcpy(os->body_data+os->body_fill, iov[i].iov_base, iov[i].iov_len);
-    os->body_fill += (int)iov[i].iov_len;
+    os->body_fill += (long)iov[i].iov_len;
   }
 
   /* Store lacing vals for this packet */
@@ -819,6 +819,25 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   /* check the serial number */
   if(serialno!=os->serialno)return(-1);
   if(version>0)return(-1);
+
+  /* Validate that the page is internally consistent before trusting the
+     segment table: the lacing values must fit in the header and must not
+     claim more body data than the page actually contains.  Pages produced
+     by ogg_sync_pageout always satisfy this (they are length- and
+     checksum-verified), but ogg_stream_pagein is a public entry point and
+     may be handed pages that were parsed or constructed elsewhere.  A
+     page whose segment table overshoots its body would otherwise drive
+     bodysize negative and corrupt the stream state (negative-size memcpy,
+     negative body_fill). */
+  if(og->header_len<segments+27 || bodysize<0) return(-1);
+  {
+    int i;
+    long acc=0;
+    for(i=0;i<segments;i++){
+      acc+=header[27+i];
+      if(acc>bodysize) return(-1);
+    }
+  }
 
   if(_os_lacing_expand(os,segments+1)) return -1;
 
@@ -1510,7 +1529,7 @@ void test_pack(const int *pl, const int **headers, int byteskip,
   int byteskipcount=0;
 
   if (!data) {
-    fprintf(stderr,"unable to allocate requried data buffer!\n");
+    fprintf(stderr,"unable to allocate required data buffer!\n");
     exit(1);
   }
 
@@ -1826,7 +1845,7 @@ int main(void){
     ogg_page og[5];
 
     if (!data) {
-      fprintf(stderr,"unable to allocate requried packet data buffer!\n");
+      fprintf(stderr,"unable to allocate required packet data buffer!\n");
       exit(1);
     }
 

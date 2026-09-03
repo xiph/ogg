@@ -1,13 +1,14 @@
 # Ogg
 
-[![Travis Build Status](https://travis-ci.org/xiph/ogg.svg?branch=master)](https://travis-ci.org/xiph/ogg)
-[![Jenkins Build Status](https://mf4.xiph.org/jenkins/job/libogg/badge/icon)](https://mf4.xiph.org/jenkins/job/libogg/)
+[![GitLab Pipeline Status](https://gitlab.xiph.org/xiph/ogg/badges/main/pipeline.svg)](https://gitlab.xiph.org/xiph/ogg/pipelines)
+[![GitHub CI Autotools build](https://github.com/xiph/ogg/actions/workflows/autotools.yml/badge.svg)](https://github.com/xiph/ogg/actions/workflows/autotools.yml)
+[![GitHub CI CMake build](https://github.com/xiph/ogg/actions/workflows/cmake.yml/badge.svg)](https://github.com/xiph/ogg/actions/workflows/cmake.yml)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/xiph/ogg?branch=master&svg=true)](https://ci.appveyor.com/project/rillian/ogg)
 
 Ogg project codecs use the Ogg bitstream format to arrange the raw,
 compressed bitstream into a more robust, useful form. For example,
 the Ogg bitstream makes seeking, time stamping and error recovery
-possible, as well as mixing several sepearate, concurrent media
+possible, as well as mixing several separate, concurrent media
 streams into a single physical bitstream.
 
 ## What's here ##
@@ -18,7 +19,7 @@ use with Ogg bitstreams.
 
 Directory:
 
-- `src` The source for libogg, a BSD-license inplementation of the public domain Ogg bitstream format
+- `src` The source for libogg, a BSD-license implementation of the public domain Ogg bitstream format
 
 - `include` Library API headers
 

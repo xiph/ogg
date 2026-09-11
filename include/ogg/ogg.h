@@ -22,6 +22,7 @@ extern "C" {
 
 #include <stddef.h>
 #include <ogg/os_types.h>
+#include <ogg/ogg_bounds_safety.h>
 
 typedef struct {
   void *iov_base;
@@ -50,7 +51,12 @@ typedef struct {
    Ogg bitstream **********************************************************/
 
 typedef struct {
-  unsigned char   *body_data;    /* bytes from packet bodies */
+  /* body_storage is the capacity companion for body_data.
+   * Field order is preserved (pointer before size) for public ABI;
+   * update sites assign capacity before the pointer so counted-by
+   * invariants hold under optional -fbounds-safety builds.
+   */
+  unsigned char   * OGG_COUNTED_BY_OR_NULL(body_storage) body_data; /* bytes from packet bodies */
   long    body_storage;          /* storage elements allocated */
   long    body_fill;             /* elements stored; fill mark */
   long    body_returned;         /* elements of fill returned */

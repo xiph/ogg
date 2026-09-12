@@ -13,6 +13,16 @@ include(CMakePackageConfigHelpers)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
+
+# Optional Clang -fbounds-safety. Default OFF: OGG_*COUNTED_BY* macros in
+# ogg_bounds_safety.h are inert and the ABI/build is unchanged. When ON,
+# requires a Clang that provides -fbounds-safety / <ptrcheck.h>.
+option(OGG_ENABLE_FBOUNDS_SAFETY
+       "Enable Clang -fbounds-safety annotations (experimental toolchain)" OFF)
+if(OGG_ENABLE_FBOUNDS_SAFETY)
+  add_definitions(-DOGG_SUPPORT_FBOUNDS_SAFETY)
+  add_compile_options(-fbounds-safety)
+endif()
 if(APPLE)
     option(BUILD_FRAMEWORK "Build Framework bundle for OSX" OFF)
 endif()
@@ -69,6 +79,7 @@ configure_file(include/ogg/config_types.h.in include/ogg/config_types.h @ONLY)
 set(OGG_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/include/ogg/config_types.h
     include/ogg/ogg.h
+    include/ogg/ogg_bounds_safety.h
     include/ogg/os_types.h
 )
 

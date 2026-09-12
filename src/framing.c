@@ -133,6 +133,7 @@ static void _ogg_crc_init(){
 int ogg_stream_init(ogg_stream_state *os,int serialno){
   if(os){
     memset(os,0,sizeof(*os));
+    /* counted_by: set capacity before pointer */
     os->body_storage=16*1024;
     os->lacing_storage=1024;
 
@@ -162,6 +163,9 @@ int ogg_stream_check(ogg_stream_state *os){
 int ogg_stream_clear(ogg_stream_state *os){
   if(os){
     if(os->body_data)_ogg_free(os->body_data);
+    /* counted_by clear order: drop pointer then capacity */
+    os->body_data=NULL;
+    os->body_storage=0;
     if(os->lacing_vals)_ogg_free(os->lacing_vals);
     if(os->granule_vals)_ogg_free(os->granule_vals);
 
@@ -196,6 +200,7 @@ static int _os_body_expand(ogg_stream_state *os,long needed){
       ogg_stream_clear(os);
       return -1;
     }
+    /* counted_by: set capacity before pointer */
     os->body_storage=body_storage;
     os->body_data=ret;
   }

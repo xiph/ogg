@@ -586,7 +586,7 @@ int ogg_sync_check(ogg_sync_state *oy){
 }
 
 char *ogg_sync_buffer(ogg_sync_state *oy, long size){
-  if(ogg_sync_check(oy)) return NULL;
+  if(ogg_sync_check(oy) || size<0) return NULL;
 
   /* first, clear out any space that has been previously returned */
   if(oy->returned){
@@ -624,7 +624,7 @@ char *ogg_sync_buffer(ogg_sync_state *oy, long size){
 
 int ogg_sync_wrote(ogg_sync_state *oy, long bytes){
   if(ogg_sync_check(oy))return -1;
-  if(oy->fill+bytes>oy->storage)return -1;
+  if(bytes<0 || bytes>oy->storage-oy->fill)return -1;
   oy->fill+=bytes;
   return(0);
 }
@@ -1684,6 +1684,22 @@ int main(void){
   ogg_stream_init(&os_en,0x04030201);
   ogg_stream_init(&os_de,0x04030201);
   ogg_sync_init(&oy);
+
+  /* Reject invalid lengths before they can move the sync fill pointer
+     outside the allocated buffer. */
+  fprintf(stderr,"testing invalid sync lengths... ");
+  if(ogg_sync_buffer(&oy,-1)!=NULL || ogg_sync_wrote(&oy,-1)!=-1 ||
+     oy.fill!=0){
+    fprintf(stderr,"failed.\n");
+    exit(1);
+  }
+  if(!ogg_sync_buffer(&oy,1) || ogg_sync_wrote(&oy,1)!=0 ||
+     ogg_sync_wrote(&oy,LONG_MAX)!=-1 || oy.fill!=1){
+    fprintf(stderr,"failed.\n");
+    exit(1);
+  }
+  ogg_sync_reset(&oy);
+  fprintf(stderr,"ok.\n");
 
   /* Exercise each code path in the framing code.  Also verify that
      the checksums are working.  */

@@ -59,7 +59,12 @@ int oggpackB_writecheck(oggpack_buffer *b){
 }
 
 void oggpack_writetrunc(oggpack_buffer *b,long bits){
-  long bytes=bits>>3;
+  long bytes;
+  if(bits<0 || bits>oggpack_bits(b)){
+    oggpack_writeclear(b);
+    return;
+  }
+  bytes=bits>>3;
   if(b->ptr){
     bits-=bytes*8;
     b->ptr=b->buffer+bytes;
@@ -70,7 +75,12 @@ void oggpack_writetrunc(oggpack_buffer *b,long bits){
 }
 
 void oggpackB_writetrunc(oggpack_buffer *b,long bits){
-  long bytes=bits>>3;
+  long bytes;
+  if(bits<0 || bits>oggpackB_bits(b)){
+    oggpackB_writeclear(b);
+    return;
+  }
+  bytes=bits>>3;
   if(b->ptr){
     bits-=bytes*8;
     b->ptr=b->buffer+bytes;
@@ -187,19 +197,23 @@ static void oggpack_writecopy_helper(oggpack_buffer *b,
                                      int msb){
   unsigned char *ptr=(unsigned char *)source;
 
-  long bytes=bits/8;
-  long pbytes=(b->endbit+bits)/8;
+  long bytes,pbytes;
+  if(bits<0 || bits>LONG_MAX-b->endbit) goto err;
+  bytes=bits/8;
+  pbytes=(b->endbit+bits)/8;
   bits-=bytes*8;
 
   /* expand storage up-front */
+  if(pbytes>LONG_MAX-b->endbyte) goto err;
   if(b->endbyte+pbytes>=b->storage){
+    long new_storage=b->endbyte+pbytes;
     void *ret;
-    if(!b->ptr) goto err;
-    if(b->storage>b->endbyte+pbytes+BUFFER_INCREMENT) goto err;
-    b->storage=b->endbyte+pbytes+BUFFER_INCREMENT;
-    ret=_ogg_realloc(b->buffer,b->storage);
+    if(!b->ptr || new_storage>LONG_MAX-BUFFER_INCREMENT) goto err;
+    new_storage+=BUFFER_INCREMENT;
+    ret=_ogg_realloc(b->buffer,new_storage);
     if(!ret) goto err;
     b->buffer=ret;
+    b->storage=new_storage;
     b->ptr=b->buffer+b->endbyte;
   }
 
@@ -341,6 +355,7 @@ long oggpackB_look1(oggpack_buffer *b){
 }
 
 void oggpack_adv(oggpack_buffer *b,int bits){
+  if(bits<0) goto overflow;
   bits+=b->endbit;
 
   if(b->endbyte > b->storage-((bits+7)>>3)) goto overflow;
@@ -970,6 +985,36 @@ int main(void){
       if(j&0x7)
         copytest(j,i);
   
+  fprintf(stderr,"ok.      \n");
+
+  fprintf(stderr,"Testing invalid bit counts: ");
+  {
+    unsigned char source[8]={0};
+    oggpack_buffer t;
+
+    oggpack_writeinit(&t);
+    oggpack_write(&t,0xaa,8);
+    oggpack_writetrunc(&t,-8);
+    if(oggpack_writecheck(&t)==0)report("negative writetrunc accepted!\n");
+
+    oggpackB_writeinit(&t);
+    oggpackB_write(&t,0xaa,8);
+    oggpackB_writetrunc(&t,-8);
+    if(oggpackB_writecheck(&t)==0)report("negative B writetrunc accepted!\n");
+
+    oggpack_writeinit(&t);
+    oggpack_writecopy(&t,source,-8);
+    if(oggpack_writecheck(&t)==0)report("negative writecopy accepted!\n");
+
+    oggpackB_writeinit(&t);
+    oggpackB_write(&t,0x7f,7);
+    oggpackB_writecopy(&t,source,LONG_MAX);
+    if(oggpackB_writecheck(&t)==0)report("overflowing writecopy accepted!\n");
+
+    oggpack_readinit(&t,source,sizeof(source));
+    oggpack_adv(&t,-8);
+    if(t.ptr!=NULL)report("negative advance accepted!\n");
+  }
   fprintf(stderr,"ok.      \n");
 
 

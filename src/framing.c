@@ -256,6 +256,10 @@ void ogg_page_checksum_set(ogg_page *og){
   if(og){
     ogg_uint32_t crc_reg=0;
 
+    if(!og->header || og->header_len<27 || og->header_len>INT_MAX ||
+       og->body_len<0 || og->body_len>INT_MAX ||
+       (og->body_len && !og->body)) return;
+
     /* safety; needed for API behavior, but not framing code */
     og->header[22]=0;
     og->header[23]=0;
@@ -1684,6 +1688,23 @@ int main(void){
   ogg_stream_init(&os_en,0x04030201);
   ogg_stream_init(&os_de,0x04030201);
   ogg_sync_init(&oy);
+
+  {
+    unsigned char header[27]={0};
+    ogg_page bad;
+
+    memset(&bad,0,sizeof(bad));
+    bad.header=header;
+    header[22]=0x7f;
+    bad.header_len=-1;
+    ogg_page_checksum_set(&bad);
+    if(header[22]!=0x7f) error();
+#if LONG_MAX > INT_MAX
+    bad.header_len=(long)INT_MAX+1;
+    ogg_page_checksum_set(&bad);
+    if(header[22]!=0x7f) error();
+#endif
+  }
 
   /* Exercise each code path in the framing code.  Also verify that
      the checksums are working.  */

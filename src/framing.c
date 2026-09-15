@@ -28,6 +28,22 @@
 #include <string.h>
 #include <ogg/ogg.h>
 
+static long _os_pageno_from_u32(ogg_uint32_t pageno){
+#if LONG_MAX > 2147483647L
+  return (long)pageno;
+#else
+  if(pageno<=(ogg_uint32_t)LONG_MAX)return (long)pageno;
+  return LONG_MIN+(long)(pageno-0x80000000U);
+#endif
+}
+
+static ogg_uint32_t _ogg_page_pageno_u32(const ogg_page *og){
+  return((ogg_uint32_t)og->header[18] |
+         ((ogg_uint32_t)og->header[19]<<8) |
+         ((ogg_uint32_t)og->header[20]<<16) |
+         ((ogg_uint32_t)og->header[21]<<24));
+}
+
 /* A complete description of Ogg framing exists in docs/framing.html */
 
 int ogg_page_version(const ogg_page *og){
@@ -67,10 +83,7 @@ int ogg_page_serialno(const ogg_page *og){
 }
 
 long ogg_page_pageno(const ogg_page *og){
-  return((long)((ogg_uint32_t)og->header[18]) |
-               ((ogg_uint32_t)og->header[19]<<8) |
-               ((ogg_uint32_t)og->header[20]<<16) |
-               ((ogg_uint32_t)og->header[21]<<24));
+  return _os_pageno_from_u32(_ogg_page_pageno_u32(og));
 }
 
 
@@ -414,7 +427,6 @@ static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force, int 
   if(os->b_o_s==0)os->header[5]|=0x02;
   /* last page flag? */
   if(os->e_o_s && os->lacing_fill==vals)os->header[5]|=0x04;
-  os->b_o_s=1;
 
   /* 64 bits of PCM position */
   for(i=6;i<14;i++){
@@ -433,18 +445,17 @@ static int ogg_stream_flush_i(ogg_stream_state *os,ogg_page *og, int force, int 
 
   /* 32 bits of page counter (we have both counter and page header
      because this val can roll over) */
-  if(os->pageno==-1)os->pageno=0; /* because someone called
-                                     stream_reset; this would be a
-                                     strange thing to do in an
-                                     encode stream, but it has
-                                     plausible uses */
+  if(os->pageno==-1 && os->b_o_s==0)
+    os->pageno=0; /* someone called stream_reset */
   {
-    long pageno=os->pageno++;
+    ogg_uint32_t pageno=(ogg_uint32_t)os->pageno;
+    os->pageno=_os_pageno_from_u32(pageno+1U);
     for(i=18;i<22;i++){
       os->header[i]=(unsigned char)(pageno&0xff);
       pageno>>=8;
     }
   }
+  os->b_o_s=1;
 
   /* zero for computation; filled in later */
   os->header[22]=0;
@@ -784,7 +795,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   int eos=ogg_page_eos(og);
   ogg_int64_t granulepos=ogg_page_granulepos(og);
   int serialno=ogg_page_serialno(og);
-  long pageno=ogg_page_pageno(og);
+  ogg_uint32_t pageno=_ogg_page_pageno_u32(og);
   int segments=header[26];
 
   if(ogg_stream_check(os)) return -1;
@@ -823,7 +834,7 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
   if(_os_lacing_expand(os,segments+1)) return -1;
 
   /* are we in sequence? */
-  if(pageno!=os->pageno){
+  if(pageno!=(ogg_uint32_t)os->pageno){
     int i;
 
     /* unroll previous partial packet (if any) */
@@ -832,7 +843,10 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
     os->lacing_fill=os->lacing_packet;
 
     /* make a note of dropped data in segment table */
-    if(os->pageno!=-1){
+    /* header_fill is encode-only working storage.  On decode, a nonzero
+       value records that the expected page sequence is initialized; this
+       distinguishes reset pageno==-1 from valid 0xffffffff on ILP32. */
+    if(os->pageno!=-1 || os->header_fill){
       os->lacing_vals[os->lacing_fill++]=0x400;
       os->lacing_packet++;
     }
@@ -896,7 +910,8 @@ int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
       os->lacing_vals[os->lacing_fill-1]|=0x200;
   }
 
-  os->pageno=pageno+1;
+  os->pageno=_os_pageno_from_u32(pageno+1U);
+  os->header_fill=1;
 
   return(0);
 }
@@ -1132,6 +1147,61 @@ static void free_page(ogg_page *og){
 void error(void){
   fprintf(stderr,"error!\n");
   exit(1);
+}
+
+static void pageno_rollover_test(void){
+  ogg_stream_state enc,dec;
+  ogg_packet in,out;
+  ogg_page page,pages[4];
+  unsigned char data[4]={0x11,0x22,0x33,0x44};
+  static const ogg_uint32_t pageno[4]={
+    0xfffffffdU,0xfffffffeU,0xffffffffU,0U
+  };
+  int i;
+
+  if(ogg_stream_init(&enc,1))error();
+  enc.b_o_s=1;
+  enc.pageno=_os_pageno_from_u32(pageno[0]);
+
+  for(i=0;i<4;i++){
+    memset(&in,0,sizeof(in));
+    in.packet=data+i;
+    in.bytes=1;
+    in.e_o_s=(i==3);
+    in.granulepos=i;
+    if(ogg_stream_packetin(&enc,&in))error();
+    if(ogg_stream_flush(&enc,&page)!=1)error();
+    if(_ogg_page_pageno_u32(&page)!=pageno[i])error();
+    if(copy_page(&page))error();
+    pages[i]=page;
+  }
+  if((ogg_uint32_t)enc.pageno!=1U)error();
+
+  if(ogg_stream_init(&dec,1))error();
+  dec.pageno=_os_pageno_from_u32(pageno[0]);
+
+  for(i=0;i<4;i++){
+    if(ogg_stream_pagein(&dec,pages+i))error();
+    if(ogg_stream_packetout(&dec,&out)!=1)error();
+    if(out.bytes!=1 || out.packet[0]!=data[i])error();
+  }
+
+  /* Seek in just before rollover, then drop page 0xffffffff.  This also
+     verifies that reset's pageno==-1 sentinel remains distinct from the
+     valid ILP32 representation of an expected 0xffffffff page. */
+  if(ogg_stream_reset(&dec))error();
+  if(ogg_stream_pagein(&dec,pages))error();
+  if(ogg_stream_packetout(&dec,&out)!=1)error();
+  if(ogg_stream_pagein(&dec,pages+1))error();
+  if(ogg_stream_packetout(&dec,&out)!=1)error();
+  if(ogg_stream_pagein(&dec,pages+3))error();
+  if(ogg_stream_packetout(&dec,&out)!=-1)error();
+  if(ogg_stream_packetout(&dec,&out)!=1)error();
+  if(out.bytes!=1 || out.packet[0]!=data[3])error();
+
+  for(i=0;i<4;i++)free_page(pages+i);
+  ogg_stream_clear(&enc);
+  ogg_stream_clear(&dec);
 }
 
 /* 17 only */
@@ -1684,6 +1754,10 @@ int main(void){
   ogg_stream_init(&os_en,0x04030201);
   ogg_stream_init(&os_de,0x04030201);
   ogg_sync_init(&oy);
+
+  fprintf(stderr,"testing page number rollover... ");
+  pageno_rollover_test();
+  fprintf(stderr,"ok.\n");
 
   /* Exercise each code path in the framing code.  Also verify that
      the checksums are working.  */

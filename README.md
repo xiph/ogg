@@ -125,6 +125,8 @@ Use Makefile generator which is default one.
 
 This package includes a collection of automated tests.
 Running them is not part of building nor installation but optional.
+For CMake builds, configure with `-DBUILD_TESTING=ON` before building to enable
+the test executables and register them with CTest.
 
 ### Unix-like System or MinGW ###
 

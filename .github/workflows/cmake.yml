@@ -29,10 +29,10 @@ jobs:
         run: mkdir ${{ env.BUILD }}
 
       - name: Configure
-        run: cmake -S . -B ${{ env.BUILD }}
+        run: cmake -S . -B ${{ env.BUILD }} -DBUILD_TESTING=ON
 
       - name: Build
         run: cmake --build ${{ env.BUILD }}
 
       - name: Test
-        run: ctest --test-dir ${{ env.BUILD }} -V -C Debug
+        run: ctest --test-dir ${{ env.BUILD }} -V -C Debug --no-tests=error

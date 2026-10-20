@@ -773,21 +773,40 @@ int ogg_sync_pageout(ogg_sync_state *oy, ogg_page *og){
    into packet segments here as well. */
 
 int ogg_stream_pagein(ogg_stream_state *os, ogg_page *og){
-  unsigned char *header=og->header;
-  unsigned char *body=og->body;
-  long           bodysize=og->body_len;
-  int            segptr=0;
+  unsigned char *header;
+  unsigned char *body;
+  long bodysize;
+  long expected_body=0;
+  int segptr=0;
+  int segments;
+  int i;
+  int version;
+  int continued;
+  int bos;
+  int eos;
+  ogg_int64_t granulepos;
+  int serialno;
+  long pageno;
 
-  int version=ogg_page_version(og);
-  int continued=ogg_page_continued(og);
-  int bos=ogg_page_bos(og);
-  int eos=ogg_page_eos(og);
-  ogg_int64_t granulepos=ogg_page_granulepos(og);
-  int serialno=ogg_page_serialno(og);
-  long pageno=ogg_page_pageno(og);
-  int segments=header[26];
+  if(ogg_stream_check(os) || !og || !og->header ||
+     og->header_len<27 || og->body_len<0) return -1;
 
-  if(ogg_stream_check(os)) return -1;
+  header=og->header;
+  body=og->body;
+  bodysize=og->body_len;
+  segments=header[26];
+
+  if(og->header_len<27+segments) return -1;
+  for(i=0;i<segments;i++) expected_body+=header[27+i];
+  if(expected_body!=bodysize || (bodysize && !body)) return -1;
+
+  version=ogg_page_version(og);
+  continued=ogg_page_continued(og);
+  bos=ogg_page_bos(og);
+  eos=ogg_page_eos(og);
+  granulepos=ogg_page_granulepos(og);
+  serialno=ogg_page_serialno(og);
+  pageno=ogg_page_pageno(og);
 
   /* clean up 'returned data' */
   {
@@ -1684,6 +1703,51 @@ int main(void){
   ogg_stream_init(&os_en,0x04030201);
   ogg_stream_init(&os_de,0x04030201);
   ogg_sync_init(&oy);
+
+  {
+    unsigned char header[28]={0};
+    unsigned char body[1]={0};
+    ogg_page bad;
+
+    memset(&bad,0,sizeof(bad));
+    bad.header=header;
+    bad.body=body;
+    bad.header_len=1;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+
+    /* A declared segment must fit within the supplied header. */
+    bad.header_len=27;
+    header[26]=1;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+
+    bad.header_len=sizeof(header);
+    header[27]=255;
+    bad.body_len=1;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+
+    /* Reject both undersized and oversized bodies, not just overreads. */
+    header[27]=1;
+    bad.body_len=2;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+
+    bad.body_len=-1;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+
+    bad.body_len=1;
+    bad.body=NULL;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+
+    bad.body=body;
+    bad.header=NULL;
+    if(ogg_stream_pagein(&os_de,&bad)!=-1)
+      error();
+  }
 
   /* Exercise each code path in the framing code.  Also verify that
      the checksums are working.  */

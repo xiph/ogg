@@ -36,3 +36,10 @@ jobs:
 
       - name: Test
         run: ctest --test-dir ${{ env.BUILD }} -V -C Debug
+
+      - name: Check installed Autoconf macro
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cmake --install "${BUILD}" --prefix "${RUNNER_TEMP}/ogg-install"
+          test -f "${RUNNER_TEMP}/ogg-install/share/aclocal/ogg.m4"

@@ -644,7 +644,9 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
   unsigned char *next;
   long bytes;
 
-  if(ogg_sync_check(oy))return 0;
+  if(ogg_sync_check(oy) || !oy->data){
+    return 0;
+  }
 
   page=oy->data+oy->returned;
   bytes=oy->fill-oy->returned;
@@ -1684,6 +1686,18 @@ int main(void){
   ogg_stream_init(&os_en,0x04030201);
   ogg_stream_init(&os_de,0x04030201);
   ogg_sync_init(&oy);
+
+  {
+    /* nothing buffered yet, so oy.data is still NULL */
+    ogg_page og;
+
+    fprintf(stderr,"testing sync on an empty buffer... ");
+    if(ogg_sync_pageseek(&oy,&og)!=0 || ogg_sync_pageout(&oy,&og)!=0){
+      fprintf(stderr,"failed.\n");
+      exit(1);
+    }
+    fprintf(stderr,"ok.\n");
+  }
 
   /* Exercise each code path in the framing code.  Also verify that
      the checksums are working.  */
